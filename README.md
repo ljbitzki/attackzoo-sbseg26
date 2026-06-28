@@ -57,6 +57,10 @@ The current repository contains 60 attacks declared through `attack.yaml`, organ
 | `6) Denial of Service and Impact` | 8 |
 | `7) IoT` | 21 |
 
+The current MITRE ATT&CK metadata covers 9 tactics, 21 top-level techniques,
+and 35 technique/sub-technique entries when sub-techniques are counted
+separately.
+
 ### Target Servers
 
 | Server | Container | Host-exposed port(s) |

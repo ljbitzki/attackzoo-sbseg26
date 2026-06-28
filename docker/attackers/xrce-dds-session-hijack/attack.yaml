@@ -15,7 +15,7 @@ mitre:
 - https://attack.mitre.org/tactics/TA0008/
 - https://attack.mitre.org/tactics/TA0040/
 - https://attack.mitre.org/techniques/T1563/
-- https://attack.mitre.org/techniques/T1557/
+- https://attack.mitre.org/techniques/T1565/
 - https://attack.mitre.org/techniques/T1565/002/
 params:
 - key: target_ip

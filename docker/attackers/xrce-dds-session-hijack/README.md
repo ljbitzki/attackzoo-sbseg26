@@ -13,7 +13,7 @@
 | Container | `attack-xrce-dds-session-hijack` |
 | Suggested max runtime | `30s` |
 | Typical targets/services | `xrce-dds-agent` |
-| MITRE ATT&CK | [https://attack.mitre.org/tactics/TA0008/](https://attack.mitre.org/tactics/TA0008/)<br>[https://attack.mitre.org/tactics/TA0040/](https://attack.mitre.org/tactics/TA0040/)<br>[https://attack.mitre.org/techniques/T1563/](https://attack.mitre.org/techniques/T1563/)<br>[https://attack.mitre.org/techniques/T1557/](https://attack.mitre.org/techniques/T1557/)<br>[https://attack.mitre.org/techniques/T1565/002/](https://attack.mitre.org/techniques/T1565/002/) |
+| MITRE ATT&CK | [https://attack.mitre.org/tactics/TA0008/](https://attack.mitre.org/tactics/TA0008/)<br>[https://attack.mitre.org/tactics/TA0040/](https://attack.mitre.org/tactics/TA0040/)<br>[https://attack.mitre.org/techniques/T1563/](https://attack.mitre.org/techniques/T1563/)<br>[https://attack.mitre.org/techniques/T1565/](https://attack.mitre.org/techniques/T1565/)<br>[https://attack.mitre.org/techniques/T1565/002/](https://attack.mitre.org/techniques/T1565/002/) |
 
 ## Parameters
 

@@ -12,6 +12,7 @@ target_mapping:
   target: target_net
 mitre:
 - https://attack.mitre.org/tactics/TA0006/
+- https://attack.mitre.org/tactics/TA0009/
 - https://attack.mitre.org/techniques/T1557/
 - https://attack.mitre.org/techniques/T1557/002/
 params:

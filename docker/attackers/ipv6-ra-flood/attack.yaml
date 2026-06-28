@@ -12,5 +12,9 @@ no_params_note: This attack does not take parameters and operates at the local n
 details_warning: This attack can generate a large amount of data if captured until its automatic completion. For demonstrations, use less than 5 seconds of execution.
 mitre:
 - https://attack.mitre.org/tactics/TA0006/
+- https://attack.mitre.org/tactics/TA0009/
+- https://attack.mitre.org/tactics/TA0040/
 - https://attack.mitre.org/techniques/T1557/
+- https://attack.mitre.org/techniques/T1498/
+- https://attack.mitre.org/techniques/T1498/001/
 params: []

@@ -13,9 +13,9 @@ target_mapping:
   port: target_port
 details_warning: This attack can generate a large amount of data if captured until its automatic completion. For demonstrations, use less than 5 seconds of execution.
 mitre:
-- https://attack.mitre.org/tactics/TA0007/
-- https://attack.mitre.org/techniques/T1595/001/
-- https://attack.mitre.org/techniques/T1046/
+- https://attack.mitre.org/tactics/TA0040/
+- https://attack.mitre.org/techniques/T1498/
+- https://attack.mitre.org/techniques/T1498/001/
 params:
 - key: target_ip
   label: Target IP address or FQDN

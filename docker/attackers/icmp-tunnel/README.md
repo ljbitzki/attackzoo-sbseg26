@@ -13,7 +13,7 @@
 | Container | `attack-icmp-tunnel` |
 | Suggested max runtime | `10s` |
 | Typical targets/services | `ssh-server` |
-| MITRE ATT&CK | [https://attack.mitre.org/tactics/TA0006/](https://attack.mitre.org/tactics/TA0006/)<br>[https://attack.mitre.org/tactics/TA0011/](https://attack.mitre.org/tactics/TA0011/)<br>[https://attack.mitre.org/techniques/T1572/](https://attack.mitre.org/techniques/T1572/)<br>[https://attack.mitre.org/techniques/T1095/](https://attack.mitre.org/techniques/T1095/)<br>[https://attack.mitre.org/techniques/T1110/001/](https://attack.mitre.org/techniques/T1110/001/) |
+| MITRE ATT&CK | [https://attack.mitre.org/tactics/TA0011/](https://attack.mitre.org/tactics/TA0011/)<br>[https://attack.mitre.org/techniques/T1090/](https://attack.mitre.org/techniques/T1090/)<br>[https://attack.mitre.org/techniques/T1095/](https://attack.mitre.org/techniques/T1095/)<br>[https://attack.mitre.org/techniques/T1572/](https://attack.mitre.org/techniques/T1572/) |
 
 ## Parameters
 

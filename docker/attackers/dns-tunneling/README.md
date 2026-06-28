@@ -13,7 +13,7 @@
 | Container | `attack-dns-tunneling` |
 | Suggested max runtime | `10s` |
 | Typical targets/services | `external/local DNS resolver` |
-| MITRE ATT&CK | [https://attack.mitre.org/tactics/TA0040/](https://attack.mitre.org/tactics/TA0040/)<br>[https://attack.mitre.org/techniques/T1499/](https://attack.mitre.org/techniques/T1499/)<br>[https://attack.mitre.org/techniques/T1499/002/](https://attack.mitre.org/techniques/T1499/002/) |
+| MITRE ATT&CK | [https://attack.mitre.org/tactics/TA0010/](https://attack.mitre.org/tactics/TA0010/)<br>[https://attack.mitre.org/tactics/TA0011/](https://attack.mitre.org/tactics/TA0011/)<br>[https://attack.mitre.org/techniques/T1048/](https://attack.mitre.org/techniques/T1048/)<br>[https://attack.mitre.org/techniques/T1048/003/](https://attack.mitre.org/techniques/T1048/003/)<br>[https://attack.mitre.org/techniques/T1071/](https://attack.mitre.org/techniques/T1071/)<br>[https://attack.mitre.org/techniques/T1071/004/](https://attack.mitre.org/techniques/T1071/004/) |
 
 ## Parameters
 

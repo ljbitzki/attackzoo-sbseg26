@@ -10,9 +10,12 @@ target_services:
 - external/local DNS resolver
 no_params_note: This attack does not take a target. It uses DNS servers 1.1.1.1, 1.0.0.1, 8.8.8.8, 8.8.4.4, 9.9.9.9, 149.112.112.112, and 76.76.19.19.
 mitre:
-- https://attack.mitre.org/tactics/TA0040/
-- https://attack.mitre.org/techniques/T1499/
-- https://attack.mitre.org/techniques/T1499/002/
+- https://attack.mitre.org/tactics/TA0010/
+- https://attack.mitre.org/tactics/TA0011/
+- https://attack.mitre.org/techniques/T1048/
+- https://attack.mitre.org/techniques/T1048/003/
+- https://attack.mitre.org/techniques/T1071/
+- https://attack.mitre.org/techniques/T1071/004/
 params: []
 intensity_params:
 - key: duration_s

@@ -13,7 +13,7 @@
 | Container | `attack-arp-spoof` |
 | Suggested max runtime | `10s` |
 | Typical targets/services | `local network` |
-| MITRE ATT&CK | [https://attack.mitre.org/tactics/TA0006/](https://attack.mitre.org/tactics/TA0006/)<br>[https://attack.mitre.org/techniques/T1557/](https://attack.mitre.org/techniques/T1557/)<br>[https://attack.mitre.org/techniques/T1557/002/](https://attack.mitre.org/techniques/T1557/002/) |
+| MITRE ATT&CK | [https://attack.mitre.org/tactics/TA0006/](https://attack.mitre.org/tactics/TA0006/)<br>[https://attack.mitre.org/tactics/TA0009/](https://attack.mitre.org/tactics/TA0009/)<br>[https://attack.mitre.org/techniques/T1557/](https://attack.mitre.org/techniques/T1557/)<br>[https://attack.mitre.org/techniques/T1557/002/](https://attack.mitre.org/techniques/T1557/002/) |
 
 ## Parameters
 

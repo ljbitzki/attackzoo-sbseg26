@@ -13,8 +13,8 @@ target_mapping:
   port: target_port
 mitre:
 - https://attack.mitre.org/tactics/TA0006/
-- https://attack.mitre.org/techniques/T1110/001/
 - https://attack.mitre.org/techniques/T1110/
+- https://attack.mitre.org/techniques/T1110/001/
 params:
 - key: target_ip
   label: Target IP address or FQDN

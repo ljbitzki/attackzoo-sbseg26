@@ -14,6 +14,7 @@ target_mapping:
 details_warning: This attack can generate a large amount of data if captured until its automatic completion. For demonstrations, use less than 5 seconds of execution.
 mitre:
 - https://attack.mitre.org/tactics/TA0043/
+- https://attack.mitre.org/techniques/T1595/
 - https://attack.mitre.org/techniques/T1595/003/
 params:
 - key: target_ip

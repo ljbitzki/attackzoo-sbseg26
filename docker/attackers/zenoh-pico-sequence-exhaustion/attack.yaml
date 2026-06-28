@@ -14,8 +14,9 @@ target_mapping:
 mitre:
 - https://attack.mitre.org/tactics/TA0040/
 - https://attack.mitre.org/techniques/T1499/
-- https://attack.mitre.org/techniques/T1565/002/
 - https://attack.mitre.org/techniques/T1499/003/
+- https://attack.mitre.org/techniques/T1565/
+- https://attack.mitre.org/techniques/T1565/002/
 params:
 - key: target_ip
   label: Target IP address or FQDN

@@ -13,7 +13,7 @@
 | Container | `attack-smb-enumerating` |
 | Suggested max runtime | `10s` |
 | Typical targets/services | `target IP service` |
-| MITRE ATT&CK | [https://attack.mitre.org/tactics/TA0007/](https://attack.mitre.org/tactics/TA0007/)<br>[https://attack.mitre.org/tactics/TA0043/](https://attack.mitre.org/tactics/TA0043/)<br>[https://attack.mitre.org/techniques/T1595/002/](https://attack.mitre.org/techniques/T1595/002/)<br>[https://attack.mitre.org/techniques/T1135/](https://attack.mitre.org/techniques/T1135/) |
+| MITRE ATT&CK | [https://attack.mitre.org/tactics/TA0043/](https://attack.mitre.org/tactics/TA0043/)<br>[https://attack.mitre.org/tactics/TA0007/](https://attack.mitre.org/tactics/TA0007/)<br>[https://attack.mitre.org/techniques/T1590/](https://attack.mitre.org/techniques/T1590/)<br>[https://attack.mitre.org/techniques/T1592/](https://attack.mitre.org/techniques/T1592/)<br>[https://attack.mitre.org/techniques/T1595/](https://attack.mitre.org/techniques/T1595/)<br>[https://attack.mitre.org/techniques/T1595/002/](https://attack.mitre.org/techniques/T1595/002/)<br>[https://attack.mitre.org/techniques/T1046/](https://attack.mitre.org/techniques/T1046/)<br>[https://attack.mitre.org/techniques/T1135/](https://attack.mitre.org/techniques/T1135/)<br>[https://attack.mitre.org/techniques/T1087/](https://attack.mitre.org/techniques/T1087/)<br>[https://attack.mitre.org/techniques/T1069/](https://attack.mitre.org/techniques/T1069/) |
 
 ## Parameters
 

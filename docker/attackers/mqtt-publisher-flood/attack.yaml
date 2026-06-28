@@ -13,6 +13,7 @@ target_mapping:
   port: target_port
 mitre:
 - https://attack.mitre.org/tactics/TA0040/
+- https://attack.mitre.org/techniques/T1499/
 - https://attack.mitre.org/techniques/T1499/002/
 params:
 - key: target_ip

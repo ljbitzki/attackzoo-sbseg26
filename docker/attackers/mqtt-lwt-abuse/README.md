@@ -13,7 +13,7 @@
 | Container | `attack-mqtt-lwt-abuse` |
 | Suggested max runtime | `10s` |
 | Typical targets/services | `mqtt-broker` |
-| MITRE ATT&CK | [https://attack.mitre.org/tactics/TA0040/](https://attack.mitre.org/tactics/TA0040/)<br>[https://attack.mitre.org/techniques/T1565/](https://attack.mitre.org/techniques/T1565/)<br>[https://attack.mitre.org/techniques/T1565/002/](https://attack.mitre.org/techniques/T1565/002/)<br>[https://attack.mitre.org/techniques/T1071/005/](https://attack.mitre.org/techniques/T1071/005/) |
+| MITRE ATT&CK | [https://attack.mitre.org/tactics/TA0040/](https://attack.mitre.org/tactics/TA0040/)<br>[https://attack.mitre.org/techniques/T1565/](https://attack.mitre.org/techniques/T1565/)<br>[https://attack.mitre.org/techniques/T1565/001/](https://attack.mitre.org/techniques/T1565/001/)<br>[https://attack.mitre.org/techniques/T1565/002/](https://attack.mitre.org/techniques/T1565/002/) |
 
 ## Parameters
 

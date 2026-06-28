@@ -11,6 +11,8 @@ target_services:
 no_params_note: This attack does not take parameters and operates at the local network level.
 mitre:
 - https://attack.mitre.org/tactics/TA0040/
+- https://attack.mitre.org/techniques/T1498/
+- https://attack.mitre.org/techniques/T1498/001/
 - https://attack.mitre.org/techniques/T1499/
 - https://attack.mitre.org/techniques/T1499/002/
 params: []
