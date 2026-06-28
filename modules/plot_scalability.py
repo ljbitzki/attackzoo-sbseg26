@@ -3,14 +3,11 @@
 
 import argparse
 from pathlib import Path
-
 import pandas as pd
 import matplotlib.pyplot as plt
 
-
 def p95(x):
     return x.quantile(0.95)
-
 
 def main():
     ap = argparse.ArgumentParser()

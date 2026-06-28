@@ -11,7 +11,6 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, Mapping, Optional, Tuple
 from urllib.parse import urlparse
-
 from modules.attackzoo.common import _ensure_dir, _phase_of
 
 ProbeResult = Tuple[int, float, str]

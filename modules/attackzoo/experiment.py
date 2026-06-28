@@ -29,7 +29,6 @@ def _start_hook(cmd_template: str, vars_: Dict[str, Any]) -> Optional[subprocess
     # shell=True allows user-defined redirections and pipes
     return subprocess.Popen(cmd, shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, preexec_fn=os.setsid)
 
-
 def _parse_probe_services(raw: str) -> List[str]:
     services: List[str] = []
     for item in (raw or "").split(","):
