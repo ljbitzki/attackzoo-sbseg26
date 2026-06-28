@@ -59,3 +59,4 @@ else
     echo -e "Starting the image build with \"\e[32m./build.sh\e[0m\""
     ./build.sh
 fi
+exit 0
