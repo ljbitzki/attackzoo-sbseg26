@@ -24,10 +24,8 @@ def ensure_network(name: str) -> None:
         if res.returncode != 0:
             raise RuntimeError(res.stderr)
 
-
 def remove_container(name: str) -> None:
     run(["docker", "rm", "-f", name])
-
 
 def start_target(name: str, image: str, network: str, host_port: int) -> None:
     remove_container(name)
