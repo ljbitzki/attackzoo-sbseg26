@@ -489,6 +489,7 @@ servers under `experiments/http_features/.../*.pcap` or `captures/`.
 Goal: reproduce the tool's experimental organization with warmup, attack, and cooldown phases, availability probes, and consolidated reports.serverple with an HTTP attack and hooks:
 
 ```bash
+
 HTTP_IP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' server-http-server)
 
 python3 attackzoo.py experiment \
