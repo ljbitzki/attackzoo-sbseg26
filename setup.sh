@@ -8,7 +8,7 @@ sudo chmod +x /usr/bin/dumpcap
 sudo setcap cap_net_raw,cap_net_admin=eip "$(command -v tcpdump)"
 
 echo "Installing tools..."
-chmod +x clients.sh docker-install.sh servers.sh build.sh environ.sh
+chmod +x clients.sh docker-install.sh servers.sh build.sh environment.sh
 python3 -m venv .venv
 source .venv/bin/activate
 pip install --upgrade pip

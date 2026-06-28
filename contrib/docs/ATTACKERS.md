@@ -28,6 +28,5 @@ Create or update `docker/attackers/<attack-name>/` with a `Dockerfile`, an execu
 Then verify discovery with:
 
 ```bash
-python3 AttackZoo.py list --id <attack_id>
+python3 attackzoo.py list --id <attack_id>
 ```
-

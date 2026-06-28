@@ -93,8 +93,8 @@ else
     fail "Invalid JSON"
 fi
 
-echo -n "[4] list --category DoS... "
-OUTPUT=$($CLI list --category "DoS" 2>&1)
+echo -n "[4] list --category Denial... "
+OUTPUT=$($CLI list --category "Denial" 2>&1)
 if echo "$OUTPUT" | grep -qi "dos\|flood\|syn\|udp\|icmp" 2>/dev/null; then
     ok
 else

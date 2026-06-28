@@ -35,12 +35,12 @@ The artifact is intended to support the following review badges:
 | Component | Location | Purpose |
 | --- | --- | --- |
 | Main CLI | `attackzoo.py` | Command-line entry point for listing, running, stopping, and inspecting attacks, captures, features, datasets, and experiments. |
-| CLI parser and commands | `modules/AttackZoo/` | Implementation of `status`, `list`, `run`, `stop`, `ps`, `logs`, `captures`, `features`, `dataset`, `experiment`, and `report`. |
+| CLI parser and commands | `modules/attackzoo/` | Implementation of `status`, `list`, `run`, `stop`, `ps`, `logs`, `captures`, `features`, `dataset`, `experiment`, and `report`. |
 | Dynamic attack catalog | `docker/attackers/*/attack.yaml` | Plug-and-play attack definitions loaded automatically by the tool. |
 | Target servers | `docker/servers/` | Docker images for HTTP, SSH, SMB, MQTT, CoAP, XRCE-DDS, Zenoh, Telnet, and SSL/Heartbleed services. |
 | Benign clients | `docker/clients/` | Containers that generate benign background traffic. |
 | Web UI | `modules/tool.py` | Streamlit interface for interactive use. |
-| Helper scripts | `setup.sh`, `build.sh`, `servers.sh`, `clients.sh`, `environ.sh` | Dependency installation, Docker image builds, server/client control, and Streamlit environment control. |
+| Helper scripts | `setup.sh`, `build.sh`, `servers.sh`, `clients.sh`, `environment.sh` | Dependency installation, Docker image builds, server/client control, and Streamlit environment control. |
 | Outputs | `captures/`, `features/`, `datasets/`, `experiments/`, `logs/` | Artifacts generated during runs and experiments. |
 
 ### Current Catalog
@@ -263,7 +263,7 @@ streamlit run modules/tool.py --theme.base="dark" --server.headless true
 To restart the environment and Streamlit UI together:
 
 ```bash
-./environ.sh restart
+./environment.sh restart
 ```
 
 ### 7. List The Full Catalog
@@ -591,7 +591,7 @@ Expected result: the new attack appears in the CLI without editing `modules/regi
 |-- build.sh                      # Docker image build and server startup wrapper
 |-- servers.sh                    # Control script for server-* containers
 |-- clients.sh                    # Control script for client-* containers
-|-- environ.sh                    # Streamlit/environment helper
+|-- environment.sh                # Streamlit/environment helper
 |-- requirements.txt              # Python dependencies
 |-- modules/
 |   |-- tool.py                   # Streamlit UI
