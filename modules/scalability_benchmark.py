@@ -14,10 +14,8 @@ from pathlib import Path
 from typing import Optional
 from urllib.request import urlopen
 
-
 def run(cmd: list[str], timeout: Optional[float] = None) -> subprocess.CompletedProcess:
     return subprocess.run(cmd, capture_output=True, text=True, timeout=timeout)
-
 
 def ensure_network(name: str) -> None:
     res = run(["docker", "network", "inspect", name])

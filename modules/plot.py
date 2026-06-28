@@ -6,6 +6,7 @@ from pathlib import Path
 CSV_PATH = "T3_summary_censored.csv"
 OUT_PATH = "fig_t3_l0_l2_comparison.png"
 
+
 # Read the CSV
 df = pd.read_csv(CSV_PATH)
 
