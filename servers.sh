@@ -76,3 +76,4 @@ case ${1} in
         echo "An action argument is required (start, stop, or restart)"
         ;;
 esac
+exit 0
