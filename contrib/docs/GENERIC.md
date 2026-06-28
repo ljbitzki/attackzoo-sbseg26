@@ -19,3 +19,4 @@ Container READMEs, YAML descriptions, script comments, CLI help text, and intern
 ## Validation
 
 After changing scripts or catalog files, run syntax checks for Python, shell, and YAML files where possible. Full Docker builds are useful but optional when the change is limited to documentation text.
+

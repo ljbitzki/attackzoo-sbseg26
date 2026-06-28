@@ -9,3 +9,4 @@ python3 contrib/scripts/check_attack_smoke.py
 ```
 
 Each execution creates an `attack-smoke-<timestamp>/` subdirectory with `summary.md`, `results.json`, and logs from the tested containers. These subdirectories are local generated artifacts and should not be committed to the repository.
+
