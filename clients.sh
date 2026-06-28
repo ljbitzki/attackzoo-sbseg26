@@ -220,3 +220,4 @@ case "${ACTION}:${TARGET}" in
         start_super
         ;;
 esac
+exit 0
