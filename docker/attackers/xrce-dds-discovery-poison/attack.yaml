@@ -1,0 +1,30 @@
+id: iot_xrce_dds_discovery_poison
+name: XRCE-DDS Discovery Poisoning
+category: 7) IoT
+subcategory: 7.1 IoT Protocols / XRCE-DDS
+description: Poisoning or manipulation of XRCE-DDS agent discovery messages to induce incorrect association, redirection, or discovery degradation.
+image: attack-xrce-dds-discovery-poison:latest
+container_name: attack-xrce-dds-discovery-poison
+max_runtime_s: 10
+target_services:
+- xrce-dds-agent
+target_mapping:
+  target: target_ip
+  port: target_port
+mitre:
+- https://attack.mitre.org/tactics/TA0040/
+- https://attack.mitre.org/tactics/TA0006/
+- https://attack.mitre.org/techniques/T1557/
+- https://attack.mitre.org/techniques/T1565/002/
+params:
+- key: target_ip
+  label: Advertised fake agent IP/FQDN
+  kind: ip
+  placeholder: __HOST_IP__
+- key: target_port
+  label: Advertised fake agent port
+  kind: port
+  placeholder: '6666'
+  default: 6666
+intensity_params:
+- key: duration_s

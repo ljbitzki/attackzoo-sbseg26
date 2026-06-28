@@ -1,0 +1,49 @@
+id: client-super
+name: Super Client / Multiprotocol
+role: benign-client
+image: client-super:latest
+container_name_pattern: client-super-<N>
+base_image: ubuntu:24.04
+service: Parameterized benign traffic generator for one protocol per run
+protocols:
+- http
+- https
+- smb
+- ssh
+- rdp
+- telnet
+- smtp
+- imap
+- pop3
+- ftp
+- dns
+- snmp
+- sip
+- coap
+- mqtt
+- zenoh
+- xrce-dds
+entrypoint: python3 /tmp/super-client.py
+parameters:
+- service
+- ip
+- port|0
+- count
+- interval_s
+- total_time_s
+startup: docker run --rm --name client-super-1 client-super:latest web 172.17.0.2 80 10 1 15
+purpose: Generate controlled benign traffic with count, interval, and duration defined by parameters.
+observability:
+- stdout with attempts, success/failure, and elapsed time
+- per-protocol traffic in PCAP
+- fine-grained benign load control
+target_services:
+- http-server
+- ssh-server
+- smb-server
+- mqtt-broker
+- coap-server
+- telnet-server
+- ssl-heartbleed
+- xrce-dds-agent
+- zenoh-router

@@ -1,0 +1,30 @@
+id: iot_xrce_dds_entity_flood
+name: XRCE-DDS Entity Flood
+category: 7) IoT
+subcategory: 7.1 IoT Protocols / XRCE-DDS
+description: Mass creation of XRCE-DDS entities to consume session, memory, and control resources on the agent.
+image: attack-xrce-dds-entity-flood:latest
+container_name: attack-xrce-dds-entity-flood
+max_runtime_s: 10
+target_services:
+- xrce-dds-agent
+target_mapping:
+  target: target_ip
+  port: target_port
+mitre:
+- https://attack.mitre.org/tactics/TA0040/
+- https://attack.mitre.org/techniques/T1499/
+- https://attack.mitre.org/techniques/T1499/003/
+params:
+- key: target_ip
+  label: Target IP address or FQDN
+  kind: ip
+  placeholder: __HOST_IP__
+- key: target_port
+  label: Target port
+  kind: port
+  placeholder: '8888'
+  default: 8888
+intensity_params:
+- key: duration_s
+  default: 5

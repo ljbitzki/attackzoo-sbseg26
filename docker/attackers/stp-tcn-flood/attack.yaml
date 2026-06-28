@@ -1,0 +1,17 @@
+id: net_stp_tcn_flood
+name: STP TCN Flood
+category: 2) Network Interception and Exploitation
+subcategory: 2.1 L2/L3
+description: BPDU (Bridge Protocol Data Unit) packet flood with STP topology change information and random MAC addresses.
+image: attack-stp-tcn-flood:latest
+container_name: attack-stp-tcn-flood
+max_runtime_s: 10
+target_services:
+- local network
+no_params_note: This attack does not take parameters and operates at the local network level.
+details_warning: This attack can generate a large amount of data if captured until its automatic completion. For demonstrations, use less than 5 seconds of execution.
+mitre:
+- https://attack.mitre.org/tactics/TA0040/
+- https://attack.mitre.org/techniques/T1498/001/
+- https://attack.mitre.org/techniques/T1565/002/
+params: []

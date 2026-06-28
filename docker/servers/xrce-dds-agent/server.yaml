@@ -1,0 +1,33 @@
+id: xrce-dds-agent
+name: Micro XRCE-DDS Agent
+role: target-server
+image: server-xrce-dds-agent:latest
+container_name: server-xrce-dds-agent
+base_image: built through agent-source-install.sh
+service: eProsima Micro XRCE-DDS Agent over UDP transport
+protocols:
+- xrce-dds
+- udp
+internal_ports:
+- 8888/udp
+published_ports:
+- 8888:8888/udp
+startup: docker run -d --rm -p 8888:8888/udp --name server-xrce-dds-agent server-xrce-dds-agent:latest udp4 -p 8888
+logs: docker logs server-xrce-dds-agent
+purpose: Serve as an XRCE-DDS agent for IoT attacks involving discovery, entities, fragments, sessions, timing, and UDP DoS.
+observability:
+- XRCE-DDS/UDP datagrams
+- agent stdout logs
+- optional telemetry through docker stats
+related_attacks:
+- iot_xrce_dds_discovery_poison
+- iot_xrce_dds_entity_flood
+- iot_xrce_dds_fragment_abuse
+- iot_xrce_dds_malformed_inject
+- iot_xrce_dds_session_hijack
+- iot_xrce_dds_time_desync
+- iot_xrce_dds_udp_dos
+benign_clients:
+- client-super:xrce-dds
+notes:
+- There is no direct local Dockerfile; the image is prepared by docker/servers/xrce-dds-agent/agent-source-install.sh.

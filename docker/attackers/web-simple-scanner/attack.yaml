@@ -1,0 +1,26 @@
+id: web_simple_scanner
+name: Web Simple Scanner
+category: 3) Web Application Attacks
+subcategory: 3.1 General Web
+description: Simplified scanner for known web vulnerabilities.
+image: attack-web-simple-scanner:latest
+container_name: attack-web-simple-scanner
+max_runtime_s: 10
+target_services:
+- http-server
+target_mapping:
+  target: target_ip
+  port: target_port
+mitre:
+- https://attack.mitre.org/tactics/TA0043/
+- https://attack.mitre.org/techniques/T1595/002/
+params:
+- key: target_ip
+  label: Target IP address or FQDN
+  kind: ip
+  placeholder: __HOST_IP__
+- key: target_port
+  label: Target port
+  kind: port
+  placeholder: '8080'
+  default: 8080

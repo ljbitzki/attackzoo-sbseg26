@@ -1,0 +1,33 @@
+id: iot_zenoh_pico_keepalive_flood
+name: Zenoh-Pico Keepalive Flood
+category: 7) IoT
+subcategory: 7.1 IoT Protocols / Zenoh
+description: Flood of Zenoh/Zenoh-Pico keepalive messages to consume processing and session-handling capacity.
+image: attack-zenoh-pico-keepalive-flood:latest
+container_name: attack-zenoh-pico-keepalive-flood
+max_runtime_s: 10
+target_services:
+- zenoh-router
+target_mapping:
+  target: target_ip
+  port: target_port
+mitre:
+- https://attack.mitre.org/tactics/TA0040/
+- https://attack.mitre.org/techniques/T1498/
+- https://attack.mitre.org/techniques/T1498/001/
+- https://attack.mitre.org/techniques/T1499/002/
+params:
+- key: target_ip
+  label: Target IP address or FQDN
+  kind: ip
+  placeholder: __HOST_IP__
+- key: target_port
+  label: Target port
+  kind: port
+  placeholder: '7447'
+  default: 7447
+intensity_params:
+- key: duration_s
+  default: 10
+- key: threads
+  default: 4

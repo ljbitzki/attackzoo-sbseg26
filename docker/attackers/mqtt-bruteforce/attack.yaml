@@ -1,0 +1,27 @@
+id: iot_mqtt_bruteforce
+name: MQTT Bruteforce
+category: 7) IoT
+subcategory: 7.1 IoT Protocols / MQTT
+description: MQTT authentication brute force against the target broker using a controlled wordlist.
+image: attack-mqtt-bruteforce:latest
+container_name: attack-mqtt-bruteforce
+max_runtime_s: 10
+target_services:
+- mqtt-broker
+target_mapping:
+  target: target_ip
+  port: target_port
+mitre:
+- https://attack.mitre.org/tactics/TA0006/
+- https://attack.mitre.org/techniques/T1110/001/
+- https://attack.mitre.org/techniques/T1110/
+params:
+- key: target_ip
+  label: Target IP address or FQDN
+  kind: ip
+  placeholder: __HOST_IP__
+- key: target_port
+  label: Target port
+  kind: port
+  placeholder: '1883'
+  default: 1883

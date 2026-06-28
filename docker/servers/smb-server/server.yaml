@@ -1,0 +1,32 @@
+id: smb-server
+name: SMB / Samba Server
+role: target-server
+image: server-smb-server:latest
+container_name: server-smb-server
+base_image: alpine
+service: Samba with a public share configured at container startup
+protocols:
+- smb
+- netbios
+internal_ports:
+- 137/udp
+- 138/udp
+- 139/tcp
+- 445/tcp
+published_ports:
+- 137:137/udp
+- 138:138/udp
+- 139:139/tcp
+- 445:445/tcp
+startup: docker run -it -d --rm --name server-smb-server -p 139:139 -p 445:445 -p 137:137/udp -p 138:138/udp server-smb-server:latest -g "log level = 3" -s "public;/share" -u "example2;badpass"
+logs: docker logs server-smb-server
+purpose: Provide an SMB/Samba share for enumeration and benign share-listing traffic.
+observability:
+- SMB/NetBIOS queries
+- Samba logs on stdout
+- share-listing attempts
+related_attacks:
+- recon_smb_enum
+benign_clients:
+- client-random:smb
+- client-super:smb

@@ -1,0 +1,22 @@
+id: recon_snmp_scanner
+name: SNMP Scanner
+category: 1) Reconnaissance and Discovery
+subcategory: 1.2 Port, service, OS, and vulnerability scanning
+description: SNMP scan across all hosts in a network using a community-string wordlist.
+image: attack-snmp-scanner:latest
+container_name: attack-snmp-scanner
+max_runtime_s: 10
+target_services:
+- target IP service
+target_mapping:
+  target: target_ip
+mitre:
+- https://attack.mitre.org/tactics/TA0007/
+- https://attack.mitre.org/tactics/TA0006/
+- https://attack.mitre.org/techniques/T1046/
+- https://attack.mitre.org/techniques/T1110/001/
+params:
+- key: target_ip
+  label: Target IP address or FQDN
+  kind: ip
+  placeholder: __HOST_IP__

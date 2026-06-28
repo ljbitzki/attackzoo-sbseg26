@@ -1,0 +1,41 @@
+id: client-random
+name: Random Client
+role: benign-client
+image: client-random:latest
+container_name_pattern: client-random-<N>
+base_image: ubuntu:24.04
+service: Continuous pseudo-random benign traffic generator
+protocols:
+- http
+- https
+- ssh
+- smb
+- mqtt
+- coap
+- telnet
+entrypoint: /tmp/clients.sh
+parameters:
+- WEB_SERVER
+- SSH_SERVER
+- SMB_SERVER
+- MQTT_SERVER
+- COAP_SERVER
+- TELNET_SERVER
+- SSL_SERVER
+startup: docker run -d --rm --name client-random-1 client-random:latest <WEB_IP> <SSH_IP> <SMB_IP> <MQTT_IP> <COAP_IP> <TELNET_IP> <SSL_IP>
+purpose: Generate continuous benign noise during experiments by randomly choosing among supported protocol clients.
+observability:
+- stdout with the selected service
+- mixed benign traffic in PCAP
+- random time spacing between requests
+target_services:
+- http-server
+- ssh-server
+- smb-server
+- mqtt-broker
+- coap-server
+- telnet-server
+- ssl-heartbleed
+notes:
+- Infinite loop; use docker rm -f on the container to stop it.
+- Does not cover XRCE-DDS or Zenoh; use client-super for those protocols.

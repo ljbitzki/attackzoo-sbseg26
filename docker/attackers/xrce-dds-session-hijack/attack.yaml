@@ -1,0 +1,32 @@
+id: iot_xrce_dds_session_hijack
+name: XRCE-DDS Session Hijack
+category: 7) IoT
+subcategory: 7.1 IoT Protocols / XRCE-DDS
+description: XRCE-DDS session hijacking or collision attempts through manipulation of identifiers, keys, or session fields.
+image: attack-xrce-dds-session-hijack:latest
+container_name: attack-xrce-dds-session-hijack
+max_runtime_s: 30
+target_services:
+- xrce-dds-agent
+target_mapping:
+  target: target_ip
+  port: target_port
+mitre:
+- https://attack.mitre.org/tactics/TA0008/
+- https://attack.mitre.org/tactics/TA0040/
+- https://attack.mitre.org/techniques/T1563/
+- https://attack.mitre.org/techniques/T1557/
+- https://attack.mitre.org/techniques/T1565/002/
+params:
+- key: target_ip
+  label: Target IP address or FQDN
+  kind: ip
+  placeholder: __HOST_IP__
+- key: target_port
+  label: Target port
+  kind: port
+  placeholder: '8888'
+  default: 8888
+intensity_params:
+- key: duration_s
+  default: 30

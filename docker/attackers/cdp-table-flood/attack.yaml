@@ -1,0 +1,17 @@
+id: net_cdp_table_flood
+name: CDP Table Flood
+category: 2) Network Interception and Exploitation
+subcategory: 2.1 L2/L3
+description: CDP (Cisco Discovery Protocol) table flood on the local network.
+image: attack-cdp-table-flood:latest
+container_name: attack-cdp-table-flood
+max_runtime_s: 10
+target_services:
+- local network
+no_params_note: This attack does not take parameters and operates at the local network level.
+details_warning: This attack can generate a large amount of data if captured until its automatic completion. For demonstrations, use less than 5 seconds of execution.
+mitre:
+- https://attack.mitre.org/tactics/TA0040/
+- https://attack.mitre.org/techniques/T1498/
+- https://attack.mitre.org/techniques/T1498/001/
+params: []

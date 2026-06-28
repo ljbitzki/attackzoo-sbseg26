@@ -1,0 +1,23 @@
+id: exf_dns_tunneling
+name: DNS Tunneling
+category: 5) Exfiltration and Tunneling
+subcategory: 5.1 Exfiltration and Tunneling
+description: DNS tunneling exfiltration behavior through random domain name resolution.
+image: attack-dns-tunneling:latest
+container_name: attack-dns-tunneling
+max_runtime_s: 10
+target_services:
+- external/local DNS resolver
+no_params_note: This attack does not take a target. It uses DNS servers 1.1.1.1, 1.0.0.1, 8.8.8.8, 8.8.4.4, 9.9.9.9, 149.112.112.112, and 76.76.19.19.
+mitre:
+- https://attack.mitre.org/tactics/TA0040/
+- https://attack.mitre.org/techniques/T1499/
+- https://attack.mitre.org/techniques/T1499/002/
+params: []
+intensity_params:
+- key: duration_s
+- key: count
+  default: 200
+- key: delay_ms
+  default: 200
+- key: payload_size

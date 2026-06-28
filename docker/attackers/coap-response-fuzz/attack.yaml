@@ -1,0 +1,28 @@
+id: iot_coap_response_fuzz
+name: CoAP Response Fuzzing
+category: 7) IoT
+subcategory: 7.1 IoT Protocols / CoAP
+description: Burst of randomized or mutated CoAP messages intended to trigger errors, exceptions, or crashes on the target.
+image: attack-coap-response-fuzz:latest
+container_name: attack-coap-response-fuzz
+max_runtime_s: 10
+target_services:
+- coap-server
+target_mapping:
+  target: target_ip
+  port: target_port
+mitre:
+- https://attack.mitre.org/tactics/TA0040/
+- https://attack.mitre.org/techniques/T1499/
+- https://attack.mitre.org/techniques/T1499/004/
+- https://attack.mitre.org/techniques/T1190/
+params:
+- key: target_ip
+  label: Target IP address or FQDN
+  kind: ip
+  placeholder: __HOST_IP__
+- key: target_port
+  label: Target port
+  kind: port
+  placeholder: '5683'
+  default: 5683

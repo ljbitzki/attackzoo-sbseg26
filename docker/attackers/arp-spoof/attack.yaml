@@ -1,0 +1,25 @@
+id: net_arp_spoof
+name: ARP Spoof
+category: 2) Network Interception and Exploitation
+subcategory: 2.1 L2/L3
+description: Network gateway interception attack through ARP spoofing.
+image: attack-arp-spoof:latest
+container_name: attack-arp-spoof
+max_runtime_s: 10
+target_services:
+- local network
+target_mapping:
+  target: target_net
+mitre:
+- https://attack.mitre.org/tactics/TA0006/
+- https://attack.mitre.org/techniques/T1557/
+- https://attack.mitre.org/techniques/T1557/002/
+params:
+- key: spoof_gw
+  label: Spoofed Gateway
+  kind: ip
+  placeholder: 192.168.0.1
+- key: target_net
+  label: Target network
+  kind: cidr
+  placeholder: 192.168.0.0/24

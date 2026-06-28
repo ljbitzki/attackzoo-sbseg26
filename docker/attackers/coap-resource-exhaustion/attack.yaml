@@ -1,0 +1,27 @@
+id: iot_coap_resource_exhaustion
+name: CoAP Resource Discovery Exhaustion
+category: 7) IoT
+subcategory: 7.1 IoT Protocols / CoAP
+description: Burst of CoAP resource discovery/mapping messages, typically against /.well-known/core, intended to exhaust target resources.
+image: attack-coap-resource-exhaustion:latest
+container_name: attack-coap-resource-exhaustion
+max_runtime_s: 10
+target_services:
+- coap-server
+target_mapping:
+  target: target_ip
+  port: target_port
+mitre:
+- https://attack.mitre.org/tactics/TA0040/
+- https://attack.mitre.org/techniques/T1499/
+- https://attack.mitre.org/techniques/T1499/003/
+params:
+- key: target_ip
+  label: Target IP address or FQDN
+  kind: ip
+  placeholder: __HOST_IP__
+- key: target_port
+  label: Target port
+  kind: port
+  placeholder: '5683'
+  default: 5683

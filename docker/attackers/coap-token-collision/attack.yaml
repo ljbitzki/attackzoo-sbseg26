@@ -1,0 +1,28 @@
+id: iot_coap_token_collision
+name: CoAP Token Collision
+category: 7) IoT
+subcategory: 7.1 IoT Protocols / CoAP
+description: Burst of CoAP messages that forces token reuse or collisions to degrade target state tracking and transaction correlation.
+image: attack-coap-token-collision:latest
+container_name: attack-coap-token-collision
+max_runtime_s: 10
+target_services:
+- coap-server
+target_mapping:
+  target: target_ip
+  port: target_port
+mitre:
+- https://attack.mitre.org/tactics/TA0040/
+- https://attack.mitre.org/techniques/T1499/
+- https://attack.mitre.org/techniques/T1499/003/
+- https://attack.mitre.org/techniques/T1565/002/
+params:
+- key: target_ip
+  label: Target IP address or FQDN
+  kind: ip
+  placeholder: __HOST_IP__
+- key: target_port
+  label: Target port
+  kind: port
+  placeholder: '5683'
+  default: 5683

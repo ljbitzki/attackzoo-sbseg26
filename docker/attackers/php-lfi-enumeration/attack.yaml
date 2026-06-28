@@ -1,0 +1,26 @@
+id: php_lfi_enumeration
+name: PHP LFI Enumeration
+category: 3) Web Application Attacks
+subcategory: 3.2 Insecure Direct Object Reference (IDOR)
+description: Controlled enumeration of Local File Inclusion (LFI) vectors in a vulnerable PHP application.
+image: attack-php-lfi-enumeration:latest
+container_name: attack-php-lfi-enumeration
+max_runtime_s: 10
+target_services:
+- http-server
+target_mapping:
+  target: target_ip
+  port: target_port
+mitre:
+- https://attack.mitre.org/tactics/TA0001/
+- https://attack.mitre.org/techniques/T1190/
+params:
+- key: target_ip
+  label: Target IP address or FQDN
+  kind: ip
+  placeholder: __HOST_IP__
+- key: target_port
+  label: Target port
+  kind: port
+  placeholder: '8080'
+  default: 8080

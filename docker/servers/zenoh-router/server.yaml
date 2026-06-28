@@ -1,0 +1,30 @@
+id: zenoh-router
+name: Zenoh Router
+role: target-server
+image: server-zenoh-router:latest
+container_name: server-zenoh-router
+base_image: eclipse/zenoh:1.7.2
+service: Eclipse Zenoh router
+protocols:
+- zenoh
+- tcp
+internal_ports:
+- 7447/tcp
+published_ports:
+- 7447:7447/tcp
+startup: docker run -d --rm --name server-zenoh-router -p 7447:7447 server-zenoh-router:latest
+logs: docker logs server-zenoh-router
+purpose: Serve as a Zenoh router for Zenoh-Pico attacks against fragmentation, keepalive, memory, fuzzing, sequence, and timestamp behavior.
+observability:
+- Zenoh TCP/7447 connections
+- container stdout logs
+- optional telemetry through docker stats
+related_attacks:
+- iot_zenoh_pico_fragments_reassembly
+- iot_zenoh_pico_keepalive_flood
+- iot_zenoh_pico_memory_exhaustion
+- iot_zenoh_pico_proto_fuzzer
+- iot_zenoh_pico_sequence_exhaustion
+- iot_zenoh_pico_timestamp_mess
+benign_clients:
+- client-super:zenoh

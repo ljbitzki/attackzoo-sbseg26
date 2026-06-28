@@ -1,0 +1,36 @@
+id: http-server
+name: HTTP / DVWA Server
+role: target-server
+image: server-http-server:latest
+container_name: server-http-server
+base_image: vulnerables/web-dvwa
+service: HTTP with Damn Vulnerable Web Application (DVWA)
+protocols:
+- http
+internal_ports:
+- 80/tcp
+published_ports:
+- 8080:80/tcp
+startup: docker run -d --rm --name server-http-server -p 8080:80 server-http-server:latest
+logs: docker exec -it server-http-server cat /var/log/messages
+purpose: Provide a vulnerable web application for web attacks, scanners, enumeration, and controlled HTTP DoS.
+observability:
+- HTTP traffic in PCAP
+- HTTP response codes through probes
+- internal logs in /var/log/messages
+related_attacks:
+- web_sql_injection
+- web_dir_enumeration
+- web_idor_path_traversal
+- web_idor_url_parameter
+- php_lfi_enumeration
+- web_post_bruteforce
+- web_simple_scanner
+- web_wide_scanner
+- web_xss_scanner
+- dos_http_simple
+- dos_http_slowloris
+benign_clients:
+- client-random:web
+- client-super:http
+- client-super:https

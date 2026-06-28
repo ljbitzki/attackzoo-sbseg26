@@ -1,0 +1,33 @@
+id: iot_coap_get_flood
+name: CoAP GET Flood
+category: 7) IoT
+subcategory: 7.1 IoT Protocols / CoAP
+description: Burst of CoAP GET requests against the target CoAP/IoT service to overload the application layer.
+image: attack-coap-get-flood:latest
+container_name: attack-coap-get-flood
+max_runtime_s: 10
+target_services:
+- coap-server
+target_mapping:
+  target: target_ip
+  port: target_port
+mitre:
+- https://attack.mitre.org/tactics/TA0040/
+- https://attack.mitre.org/techniques/T1499/
+- https://attack.mitre.org/techniques/T1499/002/
+- https://attack.mitre.org/techniques/T1499/003/
+params:
+- key: target_ip
+  label: Target IP address or FQDN
+  kind: ip
+  placeholder: __HOST_IP__
+- key: target_port
+  label: Target port
+  kind: port
+  placeholder: '5683'
+  default: 5683
+intensity_params:
+- key: duration_s
+- key: count
+  default: 1000
+- key: delay_ms

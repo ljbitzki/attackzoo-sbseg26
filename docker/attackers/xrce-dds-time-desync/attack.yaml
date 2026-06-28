@@ -1,0 +1,30 @@
+id: iot_xrce_dds_time_desync
+name: XRCE-DDS Time Desynchronization
+category: 7) IoT
+subcategory: 7.1 IoT Protocols / XRCE-DDS
+description: Manipulation of XRCE-DDS messages and time-related fields to induce logical desynchronization between client and agent.
+image: attack-xrce-dds-time-desync:latest
+container_name: attack-xrce-dds-time-desync
+max_runtime_s: 30
+target_services:
+- xrce-dds-agent
+target_mapping:
+  target: target_ip
+  port: target_port
+mitre:
+- https://attack.mitre.org/tactics/TA0040/
+- https://attack.mitre.org/techniques/T1565/
+- https://attack.mitre.org/techniques/T1565/002/
+params:
+- key: target_ip
+  label: Target IP address or FQDN
+  kind: ip
+  placeholder: __HOST_IP__
+- key: target_port
+  label: Target port
+  kind: port
+  placeholder: '8888'
+  default: 8888
+intensity_params:
+- key: duration_s
+  default: 30

@@ -1,0 +1,26 @@
+id: bf_telnet
+name: Telnet Bruteforce
+category: 4) Brute Force Against Remote Access Applications
+subcategory: 4.1 Brute Force
+description: Telnet authentication brute force.
+image: attack-telnet-bruteforce:latest
+container_name: attack-telnet-bruteforce
+max_runtime_s: 10
+target_services:
+- telnet-server
+target_mapping:
+  target: target_ip
+  port: target_port
+mitre:
+- https://attack.mitre.org/tactics/TA0006/
+- https://attack.mitre.org/techniques/T1110/001/
+params:
+- key: target_ip
+  label: Target IP address or FQDN
+  kind: ip
+  placeholder: __HOST_IP__
+- key: target_port
+  label: Target port
+  kind: port
+  placeholder: '2323'
+  default: 2323

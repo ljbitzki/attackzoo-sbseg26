@@ -1,0 +1,31 @@
+id: mqtt-broker
+name: MQTT Broker
+role: target-server
+image: server-mqtt-broker:latest
+container_name: server-mqtt-broker
+base_image: eclipse-mosquitto:2
+service: Eclipse Mosquitto MQTT broker
+protocols:
+- mqtt
+- websocket
+internal_ports:
+- 1883/tcp
+- 9001/tcp
+published_ports:
+- 1883:1883/tcp
+- 9001:9001/tcp
+startup: docker run -d --rm --name server-mqtt-broker -p 1883:1883 -p 9001:9001 server-mqtt-broker:latest
+logs: docker logs server-mqtt-broker
+purpose: Act as an MQTT broker for publishing, brute force, LWT abuse, and QoS amplification in IoT experiments.
+observability:
+- MQTT CONNECT/PUBLISH/SUBSCRIBE
+- Mosquitto logs
+- optional telemetry through docker stats
+related_attacks:
+- iot_mqtt_bruteforce
+- iot_mqtt_publisher
+- iot_mqtt_lwt_abuse
+- iot_mqtt_qos_amplification
+benign_clients:
+- client-random:mqtt
+- client-super:mqtt

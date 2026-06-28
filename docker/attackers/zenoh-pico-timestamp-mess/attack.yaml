@@ -1,0 +1,33 @@
+id: iot_zenoh_pico_timestamp_mess
+name: Zenoh-Pico Timestamp Manipulation Flood
+category: 7) IoT
+subcategory: 7.1 IoT Protocols / Zenoh
+description: Flood of Zenoh/Zenoh-Pico packets with manipulated timestamps to affect target ordering, expiration, or time logic.
+image: attack-zenoh-pico-timestamp-mess:latest
+container_name: attack-zenoh-pico-timestamp-mess
+max_runtime_s: 10
+target_services:
+- zenoh-router
+target_mapping:
+  target: target_ip
+  port: target_port
+mitre:
+- https://attack.mitre.org/tactics/TA0040/
+- https://attack.mitre.org/techniques/T1565/
+- https://attack.mitre.org/techniques/T1565/002/
+- https://attack.mitre.org/techniques/T1499/003/
+params:
+- key: target_ip
+  label: Target IP address or FQDN
+  kind: ip
+  placeholder: __HOST_IP__
+- key: target_port
+  label: Target port
+  kind: port
+  placeholder: '7447'
+  default: 7447
+intensity_params:
+- key: duration_s
+  default: 10
+- key: threads
+  default: 4

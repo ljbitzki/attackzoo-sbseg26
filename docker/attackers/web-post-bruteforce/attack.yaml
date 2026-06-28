@@ -1,0 +1,28 @@
+id: web_post_bruteforce
+name: Web POST Bruteforce
+category: 3) Web Application Attacks
+subcategory: 3.1 General Web
+description: Web application POST authentication brute force using a wordlist.
+image: attack-web-post-bruteforce:latest
+container_name: attack-web-post-bruteforce
+max_runtime_s: 10
+target_services:
+- http-server
+target_mapping:
+  target: target_ip
+  port: target_port
+details_warning: This attack can generate a large amount of data if captured until its automatic completion. For demonstrations, use less than 5 seconds of execution.
+mitre:
+- https://attack.mitre.org/tactics/TA0006/
+- https://attack.mitre.org/techniques/T1110/001/
+- https://attack.mitre.org/techniques/T1110/
+params:
+- key: target_ip
+  label: Target IP address or FQDN
+  kind: ip
+  placeholder: __HOST_IP__
+- key: target_port
+  label: Target port
+  kind: port
+  placeholder: '8080'
+  default: 8080

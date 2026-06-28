@@ -1,0 +1,31 @@
+id: iot_xrce_dds_udp_dos
+name: XRCE-DDS UDP DoS
+category: 7) IoT
+subcategory: 7.1 IoT Protocols / XRCE-DDS
+description: UDP packet flood against the XRCE-DDS agent to degrade network or service availability.
+image: attack-xrce-dds-udp-dos:latest
+container_name: attack-xrce-dds-udp-dos
+max_runtime_s: 10
+target_services:
+- xrce-dds-agent
+target_mapping:
+  target: target_ip
+  port: target_port
+mitre:
+- https://attack.mitre.org/tactics/TA0040/
+- https://attack.mitre.org/techniques/T1498/
+- https://attack.mitre.org/techniques/T1498/001/
+- https://attack.mitre.org/techniques/T1499/002/
+params:
+- key: target_ip
+  label: Target IP address or FQDN
+  kind: ip
+  placeholder: __HOST_IP__
+- key: target_port
+  label: Target port
+  kind: port
+  placeholder: '8888'
+  default: 8888
+intensity_params:
+- key: duration_s
+  default: 10

@@ -1,0 +1,31 @@
+id: iot_xrce_dds_fragment_abuse
+name: XRCE-DDS Fragment Abuse
+category: 7) IoT
+subcategory: 7.1 IoT Protocols / XRCE-DDS
+description: Fragmented, incomplete, or overlapping XRCE-DDS publications that stress reassembly, queues, and fragment handling on the agent.
+image: attack-xrce-dds-fragment-abuse:latest
+container_name: attack-xrce-dds-fragment-abuse
+max_runtime_s: 30
+target_services:
+- xrce-dds-agent
+target_mapping:
+  target: target_ip
+  port: target_port
+mitre:
+- https://attack.mitre.org/tactics/TA0040/
+- https://attack.mitre.org/techniques/T1499/
+- https://attack.mitre.org/techniques/T1499/003/
+- https://attack.mitre.org/techniques/T1499/004/
+params:
+- key: target_ip
+  label: Target IP address or FQDN
+  kind: ip
+  placeholder: __HOST_IP__
+- key: target_port
+  label: Target port
+  kind: port
+  placeholder: '8888'
+  default: 8888
+intensity_params:
+- key: duration_s
+  default: 30

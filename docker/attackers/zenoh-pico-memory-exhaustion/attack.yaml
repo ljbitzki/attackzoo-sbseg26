@@ -1,0 +1,32 @@
+id: iot_zenoh_pico_memory_exhaustion
+name: Zenoh-Pico Memory Exhaustion
+category: 7) IoT
+subcategory: 7.1 IoT Protocols / Zenoh
+description: Memory exhaustion of the Zenoh router/peer through mass creation of resources, sessions, declarations, or pending messages.
+image: attack-zenoh-pico-memory-exhaustion:latest
+container_name: attack-zenoh-pico-memory-exhaustion
+max_runtime_s: 10
+target_services:
+- zenoh-router
+target_mapping:
+  target: target_ip
+  port: target_port
+mitre:
+- https://attack.mitre.org/tactics/TA0040/
+- https://attack.mitre.org/techniques/T1499/
+- https://attack.mitre.org/techniques/T1499/003/
+params:
+- key: target_ip
+  label: Target IP address or FQDN
+  kind: ip
+  placeholder: __HOST_IP__
+- key: target_port
+  label: Target port
+  kind: port
+  placeholder: '7447'
+  default: 7447
+intensity_params:
+- key: duration_s
+  default: 10
+- key: threads
+  default: 4

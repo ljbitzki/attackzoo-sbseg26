@@ -1,0 +1,33 @@
+id: iot_zenoh_pico_fragments_reassembly
+name: Zenoh-Pico Fragment Reassembly Flood
+category: 7) IoT
+subcategory: 7.1 IoT Protocols / Zenoh
+description: Flood of incomplete Zenoh/Zenoh-Pico fragments to stress router or peer buffers and reassembly logic.
+image: attack-zenoh-pico-fragments-reassembly:latest
+container_name: attack-zenoh-pico-fragments-reassembly
+max_runtime_s: 10
+target_services:
+- zenoh-router
+target_mapping:
+  target: target_ip
+  port: target_port
+mitre:
+- https://attack.mitre.org/tactics/TA0040/
+- https://attack.mitre.org/techniques/T1499/
+- https://attack.mitre.org/techniques/T1499/003/
+- https://attack.mitre.org/techniques/T1499/004/
+params:
+- key: target_ip
+  label: Target IP address or FQDN
+  kind: ip
+  placeholder: __HOST_IP__
+- key: target_port
+  label: Target port
+  kind: port
+  placeholder: '7447'
+  default: 7447
+intensity_params:
+- key: duration_s
+  default: 10
+- key: threads
+  default: 4

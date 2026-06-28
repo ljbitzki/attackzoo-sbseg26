@@ -1,0 +1,25 @@
+id: telnet-server
+name: Telnet Server
+role: target-server
+image: server-telnet-server:latest
+container_name: server-telnet-server
+base_image: ubuntu:24.04
+service: telnetd via xinetd
+protocols:
+- telnet
+internal_ports:
+- 23/tcp
+published_ports:
+- 2323:23/tcp
+startup: docker run -d --rm --name server-telnet-server -p 2323:23 server-telnet-server:latest
+logs: docker logs server-telnet-server
+purpose: Serve as a target for Telnet brute force and simple benign login traffic.
+observability:
+- Telnet TCP/23 connections
+- xinetd/telnetd logs when available
+- login attempts
+related_attacks:
+- bf_telnet
+benign_clients:
+- client-random:telnet
+- client-super:telnet

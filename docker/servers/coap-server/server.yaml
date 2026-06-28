@@ -1,0 +1,30 @@
+id: coap-server
+name: CoAP Server
+role: target-server
+image: server-coap-server:latest
+container_name: server-coap-server
+base_image: python:3.11-alpine
+service: Python CoAP server based on CoAPServer
+protocols:
+- coap
+internal_ports:
+- 5683/tcp
+- 5683/udp
+published_ports:
+- 5683:5683/tcp
+- 5683:5683/udp
+startup: docker run -d --rm --name server-coap-server -p 5683:5683 -p 5683:5683/udp server-coap-server:latest
+logs: docker logs server-coap-server
+purpose: Serve as a target for CoAP GET requests, resource discovery, fuzzing, and token collisions.
+observability:
+- CoAP UDP/TCP traffic
+- server stdout logs
+- responses to /.well-known/core
+related_attacks:
+- iot_coap_get_flood
+- iot_coap_resource_exhaustion
+- iot_coap_response_fuzz
+- iot_coap_token_collision
+benign_clients:
+- client-random:coap
+- client-super:coap

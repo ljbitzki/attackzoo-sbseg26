@@ -1,0 +1,26 @@
+id: ssl-heartbleed
+name: HTTPS Heartbleed Server
+role: target-server
+image: server-ssl-heartbleed:latest
+container_name: server-ssl-heartbleed
+base_image: vulhub/openssl:1.0.1c-with-nginx
+service: nginx with Heartbleed-vulnerable OpenSSL for a controlled experiment
+protocols:
+- https
+- tls
+internal_ports:
+- 443/tcp
+published_ports:
+- 8443:443/tcp
+startup: docker run -d --rm --name server-ssl-heartbleed -p 8443:443 server-ssl-heartbleed:latest
+logs: docker logs server-ssl-heartbleed
+purpose: Provide a vulnerable HTTPS target for Heartbleed attack validation and observable TLS traffic generation.
+observability:
+- TLS handshakes
+- HTTPS traffic
+- nginx logs when emitted by the container
+related_attacks:
+- web_https_heartbleed
+benign_clients:
+- client-random:https
+- client-super:https

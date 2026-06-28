@@ -1,0 +1,16 @@
+id: net_ipv6_mld_flood
+name: IPv6 MLD Flood
+category: 2) Network Interception and Exploitation
+subcategory: 2.2 IPv6
+description: ICMPv6 Multicast Listener Report MLD (131) flood on the local network.
+image: attack-ipv6-mld-flood:latest
+container_name: attack-ipv6-mld-flood
+max_runtime_s: 10
+target_services:
+- local IPv6 network
+no_params_note: This attack does not take parameters and operates at the local network level.
+details_warning: This attack can generate a large amount of data if captured until its automatic completion. For demonstrations, use less than 5 seconds of execution.
+mitre:
+- https://attack.mitre.org/tactics/TA0040/
+- https://attack.mitre.org/techniques/T1498/001/
+params: []

@@ -1,0 +1,158 @@
+# ---------------------------------------------------------------------------
+# Local hidden directories
+# ---------------------------------------------------------------------------
+# Keep local dot-directories out of the repository: .venv/, .codex/, .agents/,
+# .pytest_cache/, .ruff_cache/, .mypy_cache/, IDE folders, etc.
+.*/
+
+# Allow repository-level hidden files and common versioned config directories.
+!.gitignore
+!.gitattributes
+!.github/
+!.github/**
+!.devcontainer/
+!.devcontainer/**
+
+# ---------------------------------------------------------------------------
+# Python
+# ---------------------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+__pypackages__/
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+latex/
+
+# Packaging/build artifacts
+build/
+dist/
+develop-eggs/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+*.egg
+.installed.cfg
+MANIFEST
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Test, lint and type-check caches
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+cover/
+*.cover
+*.py.cover
+nosetests.xml
+.tox/
+.nox/
+.hypothesis/
+.pytest_cache/
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pyre/
+.pytype/
+.ruff_cache/
+.cache/
+
+# ---------------------------------------------------------------------------
+# AttackZoo generated artifacts
+# ---------------------------------------------------------------------------
+captures/*
+features/*
+datasets/*
+experiments/*
+models/*
+
+# Keep documentation placeholders inside generated/log directories if present.
+!captures/
+!captures/README.md
+!features/
+!features/README.md
+!datasets/
+!datasets/README.md
+!experiments/
+!experiments/README.md
+!models/
+!models/README.md
+!logs/
+logs/*
+!logs/README.md
+
+# Keep the reports directory documented, but do not version generated smoke outputs.
+!contrib/reports/
+contrib/reports/*
+!contrib/reports/README.md
+
+# Experiment/output file types that may be created outside the standard dirs.
+*.pcap
+*.pcapng
+*.cap
+*.log
+*.pid
+*.tmp
+*.bak
+
+# ---------------------------------------------------------------------------
+# External/local tool checkouts and scratch files
+# ---------------------------------------------------------------------------
+NTLFlowLyzer/
+old/
+.tmp/
+tmp/
+temp/
+exp_.*
+ds-orig.py
+ferramenta_old*
+tempCodeRunnerFile.py
+
+# ---------------------------------------------------------------------------
+# Data stores and service state
+# ---------------------------------------------------------------------------
+*.rdb
+*.aof
+mnesia/
+rabbitmq/
+rabbitmq-data/
+activemq-data/
+
+# ---------------------------------------------------------------------------
+# Documentation builds
+# ---------------------------------------------------------------------------
+docs/
+site/
+
+# Keep artifact/contribution documentation versioned.
+!contrib/docs/
+!contrib/docs/**
+
+# ---------------------------------------------------------------------------
+# Local secrets and environment files
+# ---------------------------------------------------------------------------
+.env
+.env.*
+!.env.example
+.envrc
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+.pypirc

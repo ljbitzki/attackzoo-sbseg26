@@ -1,0 +1,28 @@
+id: dos_http_slowloris
+name: DoS HTTP Slowloris
+category: 6) Denial of Service and Impact
+subcategory: 6.2 Application-layer DoS
+description: Slowloris-style HTTP application DoS.
+image: attack-dos-http-slowloris:latest
+container_name: attack-dos-http-slowloris
+max_runtime_s: 10
+target_services:
+- http-server
+target_mapping:
+  target: target_ip
+  port: target_port
+mitre:
+- https://attack.mitre.org/tactics/TA0040/
+- https://attack.mitre.org/techniques/T1499/003/
+params:
+- key: target_ip
+  label: Target IP address or FQDN
+  kind: ip
+  placeholder: __HOST_IP__
+- key: target_port
+  label: Target port
+  kind: port
+  placeholder: '8080'
+  default: 8080
+intensity_params:
+- key: duration_s
