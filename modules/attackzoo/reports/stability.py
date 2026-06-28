@@ -6,7 +6,6 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Tuple
 
-
 def _parse_iso_datetime(value: Any) -> Optional[datetime]:
     """Parses ISO timestamps generated in meta.json, accepting the Z suffix."""
     if not value:
@@ -18,7 +17,6 @@ def _parse_iso_datetime(value: Any) -> Optional[datetime]:
         return datetime.fromisoformat(s)
     except Exception:
         return None
-
 
 def _csv_data_row_count(path: Path) -> int:
     """Counts CSV data rows, excluding the header."""
