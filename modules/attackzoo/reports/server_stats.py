@@ -4,7 +4,6 @@ import sys
 from pathlib import Path
 from typing import Any, Dict, Iterable, List
 
-
 def generate_server_stats_reports(
     stats_csv_files: Iterable[Path],
     outdir: Path,

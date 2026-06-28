@@ -5,7 +5,6 @@ import sys
 from pathlib import Path
 from typing import Any, Dict, Iterable, List
 
-
 def generate_reports(probe_csv_files: Iterable[Path], outdir: Path, warmup: float, attack: float, cooldown: float) -> None:
     """
     Generate tables and figures from probe_*.csv or probe.csv files.
