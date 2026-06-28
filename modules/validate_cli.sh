@@ -1,21 +1,4 @@
 #!/usr/bin/env bash
-# validate_cli.sh - setup and validation for attackzoo.py on Ubuntu Linux
-#
-# Attack types - how to validate them correctly
-# Continuous attacks keep the container alive until stopped; validate with docker ps and use --duration to stop automatically.
-# One-shot attacks run the tool and exit naturally; validate with docker wait followed by docker logs.
-# Brute-force attacks run until their wordlist is exhausted or they are interrupted; validate with docker ps and docker logs.
-#
-# Usage:
-#   ./validate_cli.sh setup                 - installs dependencies and creates .venv
-#   ./validate_cli.sh                       - tests without Docker
-#   ./validate_cli.sh --docker              - basic Docker tests without a target server
-#   ./validate_cli.sh --docker --target IP  - all tests; requires a running target server
-#
-# Prerequisites:
-#   - Ubuntu 24.04 LTS or a compatible Linux distribution
-#   - Docker installed and accessible for --docker
-#   - Repository cloned in any directory
 
 set -euo pipefail
 
