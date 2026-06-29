@@ -19,6 +19,12 @@ def _ensure_dirs() -> None:
     FEATURES_DIR.mkdir(parents=True, exist_ok=True)
     TMP_DIR.mkdir(parents=True, exist_ok=True)
 
+def _ensure_output_parent(out_csv: Path) -> None:
+    """
+    Ensure the requested feature CSV directory exists.
+    """
+    out_csv.parent.mkdir(parents=True, exist_ok=True)
+
 def stem_no_ext(p: Path) -> str:
     """
     Capture file path as a string.
@@ -138,6 +144,7 @@ def extract_with_ntlflowlyzer(pcap_path: Path, out_csv: Path) -> Dict[str, Any]:
         return {"ok": False, "stderr": "ntlflowlyzer not found in PATH (install NTLFlowLyzer).", "cmd": []}
 
     _ensure_dirs()
+    _ensure_output_parent(out_csv)
 
     def _run_ntl(pcap_in: Path) -> Tuple[int, str, str, Path]:
         cfg = {
@@ -207,6 +214,7 @@ def extract_with_tshark(pcap_path: Path, out_csv: Path) -> Dict[str, Any]:
         return {"ok": False, "stderr": "tshark not found in PATH.", "cmd": []}
 
     _ensure_dirs()
+    _ensure_output_parent(out_csv)
 
     fields = [
         "frame.number",
@@ -267,6 +275,7 @@ def extract_with_scapy(pcap_path: Path, out_csv: Path) -> Dict[str, Any]:
     :rtype: Dict[str, Any]
     """
     _ensure_dirs()
+    _ensure_output_parent(out_csv)
     try:
         from scapy.all import PcapReader  # type: ignore
         from scapy.layers.inet import IP, TCP, UDP  # type: ignore
