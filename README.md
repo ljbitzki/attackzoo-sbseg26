@@ -39,7 +39,7 @@ The artifact is intended to support the following review badges:
 | Dynamic attack catalog | `docker/attackers/*/attack.yaml` | Plug-and-play attack definitions loaded automatically by the tool. |
 | Target servers | `docker/servers/` | Docker images for HTTP, SSH, SMB, MQTT, CoAP, XRCE-DDS, Zenoh, Telnet, and SSL/Heartbleed services. |
 | Benign clients | `docker/clients/` | Containers that generate benign background traffic. |
-| Web UI | `modules/tool.py` | Streamlit interface for interactive use. |
+| Web UI | `modules/attackzoo_st.py` | Streamlit interface for interactive use. |
 | Helper scripts | `setup.sh`, `build.sh`, `servers.sh`, `clients.sh`, `environment.sh` | Dependency installation, Docker image builds, server/client control, and Streamlit environment control. |
 | Outputs | `captures/`, `features/`, `datasets/`, `experiments/`, `logs/` | Artifacts generated during runs and experiments. |
 
@@ -261,7 +261,7 @@ To open the Streamlit interface directly:
 
 ```bash
 source .venv/bin/activate
-streamlit run modules/tool.py --theme.base="dark" --server.headless true
+streamlit run modules/attackzoo_st.py --theme.base="dark" --server.headless true
 ```
 
 To restart the environment and Streamlit UI together:
@@ -598,7 +598,7 @@ Expected result: the new attack appears in the CLI without editing `modules/regi
 |-- environment.sh                # Streamlit/environment helper
 |-- requirements.txt              # Python dependencies
 |-- modules/
-|   |-- tool.py                   # Streamlit UI
+|   |-- attackzoo_st.py                   # Streamlit UI
 |   |-- loader.py                 # Dynamic attack.yaml discovery
 |   |-- registry.py               # AttackSpec/ParamSpec dataclasses and loaded catalog
 |   |-- runners.py                # Docker wrappers

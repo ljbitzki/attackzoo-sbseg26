@@ -11,12 +11,12 @@ function RESTART {
     if [[ -z "${SLPID}" ]]; then
         ./servers.sh restart
         source .venv/bin/activate
-        streamlit run modules/tool.py --theme.base="dark" --server.headless true &
+        streamlit run modules/attackzoo_st.py --theme.base="dark" --server.headless true &
     else
         sudo kill "${SLPID}"
         ./servers.sh restart
         source .venv/bin/activate
-        streamlit run modules/tool.py --theme.base="dark" --server.headless true &
+        streamlit run modules/attackzoo_st.py --theme.base="dark" --server.headless true &
     fi
 }
 
