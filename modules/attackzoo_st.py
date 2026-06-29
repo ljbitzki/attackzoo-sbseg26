@@ -2789,7 +2789,7 @@ for tab, category_name in zip(tabs, category_names):
         category_tab_ui(category_name, CATEGORIES[category_name])
 
 st.divider()
-st.caption("26th Brazilian Symposium on Cybersecurity (SBSeg) 2026 - SBSeg26.")
+st.caption("26th Brazilian Symposium on Cybersecurity (SBSeg) 2026 - SF.")
 st.caption(
     "This tool is intended for educational use and must not be used to attack addresses outside the experiment. "
     "For demonstrations, use this machine's own IP as the attack target for attacks aimed directly at an IP address. "
