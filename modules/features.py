@@ -174,7 +174,7 @@ def extract_with_ntlflowlyzer(pcap_path: Path, out_csv: Path) -> Dict[str, Any]:
             used_pcap = cleaned
             rc, out, err, cfg_path = _run_ntl(cleaned)
 
-    ok = (rc == 0) and out_csv.exists()
+    ok = (rc == 0) and out_csv.exists() and out_csv.stat().st_size > 0
 
     user_hint = ""
     if not ok and looks_like_truncated_pcap(err):
@@ -257,7 +257,7 @@ def extract_with_tshark(pcap_path: Path, out_csv: Path) -> Dict[str, Any]:
         stderr = (p.stderr or b"").decode("utf-8", errors="replace").strip()
 
         out_csv.write_text(stdout, encoding="utf-8")
-        ok = (p.returncode == 0) and out_csv.exists()
+        ok = (p.returncode == 0) and out_csv.exists() and out_csv.stat().st_size > 0
         return {"ok": ok, "returncode": p.returncode, "stderr": stderr, "cmd": cmd, "output": str(out_csv)}
     except Exception as e:
         return {"ok": False, "stderr": str(e), "cmd": cmd}

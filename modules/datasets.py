@@ -188,12 +188,21 @@ def load_features(csv_paths: Union[PathLike, Iterable[PathLike]]) -> pd.DataFram
         csv_paths = [csv_paths]
 
     dfs: List[pd.DataFrame] = []
+    skipped: List[str] = []
     for path in csv_paths:
         p = Path(path)
         if not p.is_file():
             raise FileNotFoundError(f"CSV file not found: {p}")
 
-        df = pd.read_csv(p, engine="python")
+        if p.stat().st_size == 0:
+            skipped.append(str(p))
+            continue
+
+        try:
+            df = pd.read_csv(p, engine="python")
+        except pd.errors.EmptyDataError:
+            skipped.append(str(p))
+            continue
         source = _detect_source_tool(df, p)
 
         df_norm = _normalize_common(df, source)
@@ -201,7 +210,8 @@ def load_features(csv_paths: Union[PathLike, Iterable[PathLike]]) -> pd.DataFram
         dfs.append(df_norm)
 
     if not dfs:
-        raise ValueError("No values provided.")
+        detail = f" Skipped empty CSVs: {', '.join(skipped)}" if skipped else ""
+        raise ValueError(f"No values provided.{detail}")
 
     return pd.concat(dfs, ignore_index=True)
 
@@ -238,7 +248,7 @@ def build_dataset_unsupervised_for_capture(
         feats_dir / f"tshark-{base}.csv",
         feats_dir / f"scapy-{base}.csv",
     ]
-    csvs = [p for p in candidates if p.exists()]
+    csvs = [p for p in candidates if p.exists() and p.stat().st_size > 0]
     if not csvs:
         raise FileNotFoundError(f"No feature CSV found for {base} in {feats_dir}")
 
