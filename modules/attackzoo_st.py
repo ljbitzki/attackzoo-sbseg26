@@ -770,6 +770,8 @@ SERVER_SPECS = [
     ("SMB Server", "server-smb-server"),
     ("MQTT Broker", "server-mqtt-broker"),
     ("CoAP Server", "server-coap-server"),
+    ("XRCE-DDS Agent", "server-xrce-dds-agent"),
+    ("Zenoh Router", "server-zenoh-router"),
     ("Telnet Server", "server-telnet-server"),
     ("SSL Heartbleed", "server-ssl-heartbleed"),
 ]
@@ -792,6 +794,8 @@ SERVER_LOG_SPECS: Dict[str, Dict[str, Any]] = {
     "server-smb-server": {"mode": "exec_sh", "sh": "/var/log/samba/*"},
     "server-ssh-server": {"mode": "exec_sh", "sh": "/var/log/auth.log"},
     "server-ssl-heartbleed": {"mode": "exec_sh", "sh": "/var/log/access.log"},
+    "server-xrce-dds-agent": {"mode": "docker_logs"},
+    "server-zenoh-router": {"mode": "docker_logs"},
     "server-telnet-server": {
         "mode": "exec_sh",
         "sh": "/var/log/wtmp",
@@ -1475,11 +1479,13 @@ def render_benign_clients_view() -> None:
                 "label": "Zenoh-Pico (Zenoh)",
                 "desc": "Lightweight connectivity attempt (TCP connect; UDP probe fallback). Common TCP: 7447. UDP multicast scouting example: 7446.",
                 "default_port": 7447,
+                "server_label": "Zenoh Router",
             },
-            "xrcedds": {
+            "xrce-dds": {
                 "label": "XRCE-DDS (Micro XRCE-DDS)",
                 "desc": "Sends a benign UDP probe datagram to the agent. Common agent port: 8888/UDP.",
                 "default_port": 8888,
+                "server_label": "XRCE-DDS Agent",
             },
         }
 
