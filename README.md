@@ -15,7 +15,7 @@
 
 # AttackZoo: A Reproducible Testbed for the Execution of Attacks and the Generation of Network Traffic Datasets
 
-This repository contains **AttackZoo**, a Docker-based testbed for building and running controlled network, application, and IoT attack scenarios. The artifact automates target servers, benign clients, attack containers, traffic capture, feature extraction, dataset generation, and experiment reporting through both a command-line interface and a Streamlit UI.
+This repository contains **AttackZoo**, a Docker-based testbed for building and running controlled network, application, and IoT attack scenarios. The artifact automates target servers, benign clients, attack containers, traffic capture, feature extraction, dataset generation, and experiment reporting through both a command-line (CLI) interface and an optional Streamlit Web UI.
 
 The associated paper, "Containerized Attack Testbed: A Reproducible Approach for Generating Traffic Evidence," presents an environment for producing reproducible traffic evidence from parameterized Docker attacks. The artifact is intended to let reviewers inspect the testbed, run attacks in an isolated lab, capture PCAP files, and regenerate metrics and reports used to support the paper's claims.
 
