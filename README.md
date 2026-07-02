@@ -23,18 +23,18 @@ The associated paper, "Containerized Attack Testbed: A Reproducible Approach for
 
 This document is organized as follows:
 
-1. Project summary and artifact scope.
-2. This README Structure.
-3. Artifact Badges Considered.
-4. Basic environment information, components, and requirements.
-5. Dependencies and external resources used during installation.
-6. Safety and isolation guidance.
-7. Installation on a clean machine.
-8. Minimal validation test.
-9. Reproducible experiment claims.
-10. Basic code and repository documentation.
-11. Troubleshooting.
-12. License.
+1. [Project summary and artifact scope](#attackzoo-a-reproducible-testbed-for-the-execution-of-attacks-and-the-generation-of-network-traffic-datasets).
+2. [This README Structure](#readme-structure).
+3. [Artifact Badges Considered](#artifact-badges-considered).
+4. [Basic environment information, components, and requirements](#basic-information).
+5. [Dependencies and external resources used during installation](#dependencies).
+6. [Safety and isolation guidance](#safety-considerations).
+7. [Installation on a clean machine](#installation).
+8. [Minimal validation test](#minimal-test).
+9. [Reproducible experiment claims](#reproducible-experiment-claims).
+10. [Basic code and repository documentation](#basic-documentation).
+11. [Troubleshooting](#troubleshooting).
+12. [License](#license).
 
 ## Artifact Badges Considered
 
