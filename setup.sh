@@ -1,8 +1,19 @@
 #!/usr/bin/env bash
 
+PROFILE="${1:-full}"
+
+case "${PROFILE}" in
+    full|redux)
+        ;;
+    *)
+        echo "Usage: $0 [full|redux]"
+        exit 1
+        ;;
+esac
+
 echo "Installing required packages..."
 sudo apt update
-sudo DEBIAN_FRONTEND=noninteractive apt install -y tshark tcpdump python3-venv cmake wireshark redis ca-certificates curl
+sudo DEBIAN_FRONTEND=noninteractive apt install -y tshark tcpdump python3-venv cmake wireshark redis ca-certificates curl git
 sudo DEBIAN_FRONTEND=noninteractive dpkg-reconfigure wireshark-common
 sudo chmod +x /usr/bin/dumpcap
 sudo setcap cap_net_raw,cap_net_admin=eip "$(command -v tcpdump)"
@@ -22,4 +33,4 @@ python3 setup.py install
 rm -rf .git/
 cd ../
 pip install -r requirements.txt
-./docker-install.sh
+./docker-install.sh "${PROFILE}"

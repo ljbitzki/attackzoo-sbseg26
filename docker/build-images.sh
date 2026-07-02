@@ -1,4 +1,48 @@
 #!/usr/bin/env bash
+PROFILE="${1:-full}"
+
+case "${PROFILE}" in
+    full)
+        ;;
+    redux)
+        if [ $( docker ps -a | grep -Ec '(server|attack)' ) -gt 0 ]; then
+            while read -r CONTAINER; do
+                docker rm -f "${CONTAINER}"
+            done < <( docker ps -a | grep -E '(server|attack)' | awk '{print $1}' )
+        fi
+        LOCAL_IP=$( ip route get 9.9.9.9 | awk '{print $7; exit}' )
+
+        docker build --no-cache -t server-http-server -f servers/http-server/Dockerfile .
+        docker run -d --rm --name server-http-server -p 8080:80 server-http-server:latest
+        wait
+        docker build -t server-ssh-server -f servers/ssh-server/Dockerfile .
+        docker run -d --rm --name server-ssh-server -p 2222:22 server-ssh-server:latest
+        wait
+        docker build -t server-mqtt-broker -f servers/mqtt-broker/Dockerfile .
+        docker run -d --rm --name server-mqtt-broker -p 1883:1883 -p 9001:9001 server-mqtt-broker:latest
+        wait
+
+        docker build --no-cache -t attack-arp-scan -f attackers/arp-scan/Dockerfile .
+        docker build --no-cache -t attack-arp-spoof -f attackers/arp-spoof/Dockerfile .
+        docker build -t attack-web-simple-scanner -f attackers/web-simple-scanner/Dockerfile .
+        docker build -t attack-ssh-bruteforce -f attackers/ssh-bruteforce/Dockerfile .
+        docker build -t attack-icmp-tunnel -f attackers/icmp-tunnel/Dockerfile .
+        docker build -t attack-dos-http-simple -f attackers/dos-http-simple/Dockerfile .
+        docker build -t attack-mqtt-publisher -f attackers/mqtt-publisher-flood/Dockerfile .
+
+        echo "Web server: $( docker container inspect server-http-server --format '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' )"
+        echo "SSH server: $( docker container inspect server-ssh-server --format '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' )"
+        echo "MQTT Broker: $( docker container inspect server-mqtt-broker --format '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' )"
+        echo "This machine: ${LOCAL_IP}"
+        echo "Reduced lab images created. Benign client images were not built."
+        exit 0
+        ;;
+    *)
+        echo "Usage: $0 [full|redux]"
+        exit 1
+        ;;
+esac
+
 if [ $( docker ps -a | grep -Ec '(server|attack)' ) -gt 0 ]; then
     while read -r CONTAINER; do
         docker rm -f "${CONTAINER}"

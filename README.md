@@ -207,6 +207,22 @@ chmod +x build.sh
 
 This builds server, attacker, and client images, starts target servers, and prints container IP addresses. The first build depends on machine and network speed; on an SSD-backed machine with stable Internet access, reserve 20 to 60 minutes because many Docker images and packages are downloaded or compiled.
 
+### Optional Reduced Lab
+
+For a faster reviewer demonstration, the repository also provides a reduced
+profile with seven attacks, one from each catalog category, and only the HTTP,
+SSH, and MQTT target servers:
+
+```bash
+./setup.sh redux
+source .venv/bin/activate
+python3 contrib/scripts/run_redux_campaign.py
+```
+
+The reduced profile does not build benign client images. See
+`contrib/docs/REDUX_LAB.md` for the included attack list, server profile, and
+campaign defaults.
+
 ### 4. Activate The Python Environment
 
 ```bash

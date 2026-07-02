@@ -869,14 +869,14 @@ def start_servers(args: argparse.Namespace) -> None:
         action = "start"
     else:
         return
-    result = subprocess.run([str(REPO_ROOT / "servers.sh"), action], cwd=REPO_ROOT)
+    result = subprocess.run([str(REPO_ROOT / "servers.sh"), action, args.server_profile], cwd=REPO_ROOT)
     if result.returncode != 0:
         raise SystemExit(result.returncode)
 
 
 def stop_servers(args: argparse.Namespace) -> None:
     if args.stop_servers_on_exit:
-        subprocess.run([str(REPO_ROOT / "servers.sh"), "stop"], cwd=REPO_ROOT)
+        subprocess.run([str(REPO_ROOT / "servers.sh"), "stop", args.server_profile], cwd=REPO_ROOT)
 
 
 def save_catalog_snapshot(args: argparse.Namespace, campaign_root: Path) -> None:
@@ -1089,6 +1089,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     parser.add_argument("--start-servers", action=argparse.BooleanOptionalAction, default=True)
     parser.add_argument("--restart-servers", action="store_true")
+    parser.add_argument("--server-profile", choices=["all", "full", "redux"], default="all")
     parser.add_argument("--stop-servers-on-exit", action="store_true")
     parser.add_argument("--resume", action="store_true")
     parser.add_argument("--stop-on-failure", action="store_true")
