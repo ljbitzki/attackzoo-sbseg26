@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="./contrib/assets/attackzoo.png" width="400"/>
+  <img src="./contrib/assets/attackzoo.png" width="666"/>
 </p>
 <p align="center">
   <a href="https://www.gnu.org/software/bash/"><img src="https://img.shields.io/badge/Made%20with-Bash-8d2b01.svg" /></a>
