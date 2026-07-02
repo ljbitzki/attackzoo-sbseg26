@@ -226,28 +226,28 @@ Logging out and back in also applies the group change.
 
 ### 3. Build Images And Start Servers
 
+We offer 2 options: A `Full` and a `Reduced` Testbed's version.
+
+#### Full testbed (60 attackers, 9 servers, 2 client types and all dependencies)
+
+>[!CAUTION]
+> This builds all server, attacker, and client images, starts target servers, and other elements. The first build depends on machine and network speed: on a machine similar to the one previously described as the test environment used by the authors, **reserve 20 to 60 minutes** because many Docker images and packages will be downloaded and compiled.
+
 ```bash
-chmod +x build.sh
-./build.sh
+chmod +x setup.sh
+./setup.sh
 ```
 
-This builds server, attacker, and client images, starts target servers, and prints container IP addresses. The first build depends on machine and network speed; on an SSD-backed machine with stable Internet access, reserve 20 to 60 minutes because many Docker images and packages are downloaded or compiled.
+#### Reduced testbed (7 attackers, 3 servers and dependencies)
 
-### Optional Reduced Lab
-
-For a faster reviewer demonstration, the repository also provides a reduced
-profile with seven attacks, one from each catalog category, and only the HTTP,
-SSH, and MQTT target servers:
+>[!TIP]
+>For a faster reviewer demonstration, the repository provides a reduced profile with seven attacks, one from each catalog category, and only the HTTP, SSH, and MQTT target servers: yet they still manage to demonstrate all of the tool's capabilities.
 
 ```bash
 ./setup.sh redux
-source .venv/bin/activate
-python3 contrib/scripts/run_redux_campaign.py
 ```
 
-The reduced profile does not build benign client images. See
-`contrib/docs/REDUX_LAB.md` for the included attack list, server profile, and
-campaign defaults.
+The reduced profile does not build benign client images. See [contrib/docs/REDUX_LAB.md](contrib/docs/REDUX_LAB.md) for more information about the included attack list, server profile, and campaign defaults.
 
 ### 4. Activate The Python Environment
 
@@ -321,6 +321,9 @@ python3 attackzoo.py list --category "IoT"
 python3 attackzoo.py list --id dos_syn_flood
 ```
 
+>[!TIP]
+>All possible parameters have tips for completion. Run `python3 attackzoo.py` without any parameter e follow the output for the available options!
+
 ## Minimal Test
 
 This section runs a short validation to confirm that the CLI loads the catalog, that target servers are active, and that a simple attack can be launched againstserverocal testbed.
@@ -329,7 +332,7 @@ This section runs a short validation to confirm that the CLI loads the catalog, 
 
 ```bash
 cd /path/to/sbseg26
-souserverenv/bin/activate
+source .venv/bin/activate
 ```
 
 ### 2. Confirm Docker And The Catalog
