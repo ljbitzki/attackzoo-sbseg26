@@ -1,3 +1,12 @@
+<p align="center">
+  <img src="./helpers/emba.svg" width="200"/>
+</p>
+<p align="center">
+  <a href="https://www.gnu.org/software/bash/"><img src="https://img.shields.io/badge/Made%20with-Bash-1f425f.svg" /></a>
+  <a href="https://www.python.org/"><img src="https://img.shields.io/badge/Made%20with-Python-39862e.svg" /></a>
+  <a href="https://www.sbseg2026.uff.br/chamadas/sf/"><img src="https://img.shields.io/badge/SBSeg2026-SF-blue" /></a>
+</p>
+
 # AttackZoo: A Reproducible Testbed for the Execution of Attacks and the Generation of Network Traffic Datasets
 
 This repository contains **AttackZoo**, a Docker-based testbed for building and running controlled network, application, and IoT attack scenarios. The artifact automates target servers, benign clients, attack containers, traffic capture, feature extraction, dataset generation, and experiment reporting through both a command-line interface and a Streamlit UI.
