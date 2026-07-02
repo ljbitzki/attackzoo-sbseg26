@@ -1,10 +1,16 @@
 <p align="center">
-  <img src="./helpers/emba.svg" width="200"/>
+  <img src="./contrib/assets/attackzoo.png" width="400"/>
 </p>
 <p align="center">
-  <a href="https://www.gnu.org/software/bash/"><img src="https://img.shields.io/badge/Made%20with-Bash-1f425f.svg" /></a>
-  <a href="https://www.python.org/"><img src="https://img.shields.io/badge/Made%20with-Python-39862e.svg" /></a>
+  <a href="https://www.gnu.org/software/bash/"><img src="https://img.shields.io/badge/Made%20with-Bash-8d2b01.svg" /></a>
+  <a href="https://www.python.org/"><img src="https://img.shields.io/badge/Made%20with-Python-7ed321.svg" /></a>
+  <a href="https://docker.com/"><img src="https://img.shields.io/badge/docker-257bd6?logo=docker&logoColor=white" /></a>
   <a href="https://www.sbseg2026.uff.br/chamadas/sf/"><img src="https://img.shields.io/badge/SBSeg2026-SF-blue" /></a>
+  <img src="https://img.shields.io/badge/SeloD-41824a" /></a>
+  <img src="https://img.shields.io/badge/SeloF-5b9de3" /></a>
+  <img src="https://img.shields.io/badge/SeloS-d34e55" /></a>
+  <img src="https://img.shields.io/badge/SeloR-e8aa3f" /></a>
+  <a href="https://opensource.org/license/bsd-3-clause"><img src="https://img.shields.io/badge/BSD-License-003001.svg" /></a>
 </p>
 
 # AttackZoo: A Reproducible Testbed for the Execution of Attacks and the Generation of Network Traffic Datasets
@@ -32,10 +38,10 @@ This document is organized as follows:
 
 The artifact is intended to support the following review badges:
 
-- Artifacts Available.
-- Artifacts Functional.
-- Artifacts Sustainable.
-- Experiments Reproducible.
+- Artifacts Available. <img src="./contrib/assets/SeloD.png" width="20"/>
+- Artifacts Functional. <img src="./contrib/assets/SeloF.png" width="20"/>
+- Artifacts Sustainable. <img src="./contrib/assets/SeloS.png" width="20"/>
+- Experiments Reproducible. <img src="./contrib/assets/SeloR.png" width="20"/>
 
 ## Basic Information
 
@@ -84,7 +90,7 @@ separately.
 | Telnet | `server-telnet-server` | `2323/tcp -> 23/tcp` |
 | SSL/Heartbleed | `server-ssl-heartbleed` | `8443/tcp -> 443/tcp` |
 
-The build script may also start Dozzle on `11080/tcp` to make Docker logs easier to inspect from a browser.
+The build script may also start [Dozzle](https://dozzle.dev/) on `11080/tcp` to make Docker logs easier to inspect from a browser.
 
 ### Recommended Execution Environment
 
@@ -92,22 +98,24 @@ Environment used by the authors for local tests:
 
 | Resource | Tested configuration |
 | --- | --- |
-| CPU | AMD Ryzen 5 5500X |
-| Memory | 8 GB DDR4 |
-| Storage | SSD |
+| CPU | AMD Ryzen 5 5600X 6-Core Processor |
+| Memory | 32 GB DDR4 |
+| Storage | NVMe |
 | Operating system | Kubuntu 24.04 LTS |
 | Python | Python 3.12 with `venv` |
 | Docker | Docker Engine 29.2.1 |
 | Optional virtualization | VirtualBox 7.1 |
 
-Minimum recommended environment for review:
+>[!WARNING]
+>**Minimum recommended environment for review:**
 
 | Resource | Recommended minimum |
 | --- | --- |
-| Operating system | Ubuntu 24.04 LTS or a compatible Linux distribution with `apt`, Docker, and Python 3 |
+| Operating system | Ubuntu 24.04 LTS or a compatible Linux distribution with `apt` |
+| Packages | Docker and Python 3 |
 | CPU | 4 vCPUs |
-| Memory | 8 GB RAM for reduced tests; 16 GB for full experiment batches |
-| Disk | 30 GB free for installation and images; 50 GB or more for PCAP captures and repeated experiments |
+| Memory | 4 GB RAM for reduced tests; 8 GB for full experiment |
+| Storage | 30 GB free for installation and images; 50 GB or more for PCAP captures and repeated experiments |
 | Network | Isolated environment, preferably a VM or dedicated host without direct Internet exposure |
 
 ## Dependencies
@@ -127,7 +135,7 @@ Minimum recommended environment for review:
 - `redis`
 - Docker Engine (`docker-ce`, `docker-ce-cli`, `containerd.io`, `docker-buildx-plugin`, `docker-compose-plugin`)
 
-The script also adds the current user to the `docker` group, configures capture permissions for `tcpdump`/`dumpcap`, creates `.venv/`, installs Python dependencies, and installs NTLFlowLyzer from GitHub.
+The script also adds the current user to the `docker` group, configures capture permissions for `tcpdump`/`dumpcap`, creates `.venv/`, installs Python dependencies, and installs latest NTLFlowLyzer Project direct from GitHub repository cloning.
 
 ### Python Dependencies
 
@@ -152,6 +160,9 @@ pyyaml>=6.0
 
 No SSH keys, private credentials, API tokens, or cloud infrastructure are required to run the artifact.
 
+>[!IMPORTANT]
+> The time required to complete the process may vary depending on the host's resources and the available internet speed.
+
 ## Safety Considerations
 
 This artifact runs scanners, brute-force tools, fuzzers, floods, and other attack behaviors. Use it only in an environment that you own, isolate, and are authorized to test.
@@ -159,6 +170,7 @@ This artifact runs scanners, brute-force tools, fuzzers, floods, and other attac
 Safe review recommendations:
 
 - Run the artifact in a VM or dedicated machine.
+  - **It is strongly advised against using the operating system directly on the device where the repository will be installed.**
 - Do not point attacks at external addresses, third-party networks, or services without explicit authorization.
 - Prefer internal testbed targets, such as the `server-*` containers.
 - Avoid exposing the host directly to the Internet during review.
@@ -177,22 +189,22 @@ Weak passwords and intentionally vulnerable configurations in the containers are
 
 ## Installation
 
-The steps below assume a clean Ubuntu 24.04 LTS machine or an equivalent environment. Run all commands from the repository root.
+The steps below assume a clean Ubuntu 24.04 LTS machine or an equivalent environment.
 
-### 1. Clone The Repository
+### 1. Clone the repository and enters it
 
 ```bash
 git clone <REPOSITORY_URL>
 cd sbseg26
 ```
 
-If the artifact directory was already provided, enter its root:
+Or if the artifact repository was already downloads, just enter its root:
 
 ```bash
 cd /path/to/sbseg26
 ```
 
-### 2. Install System And Python Dependencies
+### 2. Install system and Python dependencies
 
 ```bash
 chmod +x setup.sh
@@ -204,6 +216,9 @@ After installation, apply the new Docker group permission:
 ```bash
 newgrp docker
 ```
+
+>[!NOTE]
+> This command will reload the shell session. It's mandatory to reload the current shell before continue.
 
 Logging out and back in also applies the group change.
 
