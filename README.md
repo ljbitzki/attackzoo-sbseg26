@@ -2,9 +2,9 @@
   <img src="./contrib/assets/attackzoo.png" width="666"/>
 </p>
 <p align="center">
-  <a href="https://www.gnu.org/software/bash/"><img src="https://img.shields.io/badge/Made%20with-Bash-8d2b01.svg" /></a>
-  <a href="https://www.python.org/"><img src="https://img.shields.io/badge/Made%20with-Python-7ed321.svg" /></a>
-  <a href="https://docker.com/"><img src="https://img.shields.io/badge/docker-257bd6?logo=docker&logoColor=white" /></a>
+  <a href="https://www.linux.org/"><img src="https://img.shields.io/badge/Linux-8d2b01?logo=Linux&logoColor=white" /></a>
+  <a href="https://www.python.org/"><img src="https://img.shields.io/badge/Python-7ed321?logo=python&logoColor=white" /></a>
+  <a href="https://docker.com/"><img src="https://img.shields.io/badge/Docker-257bd6?logo=docker&logoColor=white" /></a>
   <a href="https://www.sbseg2026.uff.br/chamadas/sf/"><img src="https://img.shields.io/badge/SBSeg2026-SF-blue" /></a>
   <img src="https://img.shields.io/badge/SeloD-41824a" /></a>
   <img src="https://img.shields.io/badge/SeloF-5b9de3" /></a>
