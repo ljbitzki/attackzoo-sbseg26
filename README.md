@@ -196,14 +196,14 @@ The steps below assume a clean Ubuntu 24.04 LTS machine or an equivalent environ
 ### 1. Clone the repository and enters it
 
 ```bash
-git clone <REPOSITORY_URL>
-cd sbseg26
+git clone https://github.com/ljbitzki/attackzoo-sbseg26.git
+cd attackzoo-sbseg26
 ```
 
 Or if the artifact repository was already downloads, just enter its root:
 
 ```bash
-cd /path/to/sbseg26
+cd /path/to/attackzoo-sbseg26
 ```
 
 ### 2. Install system and Python dependencies
