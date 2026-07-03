@@ -13,7 +13,7 @@
   <a href="https://opensource.org/license/bsd-3-clause"><img src="https://img.shields.io/badge/BSD-License-003001.svg" /></a>
 </p>
 
-# AttackZoo: A Reproducible Testbed for the Execution of Attacks and the Generation of Network Traffic Datasets
+# AttackZoo: A Reproducible Testbed for Attack Execution and Network Traffic Datasets Generation
 
 This repository contains **AttackZoo**, a Docker-based testbed for building and running controlled network, application, and IoT attack scenarios. The artifact automates target servers, benign clients, attack containers, traffic capture, feature extraction, dataset generation, and experiment reporting through both a command-line (CLI) interface and an optional Streamlit Web UI.
 
