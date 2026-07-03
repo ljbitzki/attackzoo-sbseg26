@@ -40,10 +40,10 @@ This document is organized as follows:
 
 The artifact is intended to support the following review badges:
 
-- Artifacts Available (Artefatos Disponíveis): **`SeloD`** <img src="./contrib/assets/SeloD.png" width="20"/>
-- Artifacts Functional (Artefatos Funcionais): **`SeloF`** <img src="./contrib/assets/SeloF.png" width="20"/>
-- Artifacts Sustainable (Artefatos Sustentáveis): **`SeloS`** <img src="./contrib/assets/SeloS.png" width="20"/>
-- Experiments Reproducible (Experimentos Reprodutíveis): **`SeloR`** <img src="./contrib/assets/SeloR.png" width="20"/>
+- Available Artifacts (Artefatos Disponíveis): **`SeloD`** <img src="./contrib/assets/SeloD.png" width="20"/>
+- Functional Artifacts (Artefatos Funcionais): **`SeloF`** <img src="./contrib/assets/SeloF.png" width="20"/>
+- Sustainable Artifacts (Artefatos Sustentáveis): **`SeloS`** <img src="./contrib/assets/SeloS.png" width="20"/>
+- Reproducible Experiments (Experimentos Reprodutíveis): **`SeloR`** <img src="./contrib/assets/SeloR.png" width="20"/>
 
 ## Basic Information
 
@@ -104,7 +104,7 @@ Environment used by the authors for local tests:
 | Memory | 32 GB DDR4 |
 | Storage | NVMe |
 | Operating system | Kubuntu 24.04 LTS |
-| Python | Python 3.12 with `venv` |
+| Python | Python 3.11 with `venv` |
 | Docker | Docker Engine 29.2.1 |
 | Optional virtualization | VirtualBox 7.1 |
 
@@ -130,7 +130,7 @@ Environment used by the authors for local tests:
 - `curl`
 - `cmake`
 - `git`
-- `python3-venv`S
+- `python3-venv`
 - `tcpdump`
 - `tshark`
 - `wireshark`
@@ -140,11 +140,11 @@ Environment used by the authors for local tests:
 >[!CAUTION]
 >Please note that **this repository depends** on `Docker Engine` being installed as described in the [official documentation](https://docs.docker.com/engine/install/ubuntu/) and also on the [post-installation instructions for Linux](https://docs.docker.com/engine/install/linux-postinstall). Be advised that installation via `apt install` **might not be compatible**.
 
-The script also adds the current user to the `docker` group, configures capture permissions for `tcpdump`/`dumpcap`, creates `.venv/`, installs Python dependencies, and installs latest NTLFlowLyzer Project direct from GitHub repository cloning.
+The script also adds the current user to the `docker` group, configures capture permissions for `tcpdump`/`dumpcap`, creates `.venv/`, installs Python dependencies, and installs latest NTLFlowLyzer Project (direct from GitHub repository cloning).
 
 ### Python Dependencies
 
-Direct dependencies from `requirements.txt`:
+Dependencies from `requirements.txt`:
 
 ```text
 streamlit>=1.36
@@ -165,17 +165,17 @@ pyyaml>=6.0
 
 No SSH keys, private credentials, API tokens, or cloud infrastructure are required to run the artifact.
 
->[!IMPORTANT]
+>[!NOTE]
 > The time required to complete the process may vary depending on the host's resources and the available internet speed.
 
 ## Safety Considerations
 
-This artifact runs scanners, brute-force tools, fuzzers, floods, and other attack behaviors. Use it only in an environment that you own, isolate, and are authorized to test.
+This artifact runs scanners, brute-force tools, fuzzers, floods, and other attack behaviors. **Use it only in an environment that you own, isolate, and are authorized to test.**
 
 Safe review recommendations:
 
 - Run the artifact in a VM or dedicated machine.
-  - **It is strongly advised against using the operating system directly on the device where the repository will be installed.**
+  - **It is strongly advised against installing the testbed directly on the machine's operating system.**
 - Do not point attacks at external addresses, third-party networks, or services without explicit authorization.
 - Prefer internal testbed targets, such as the `server-*` containers.
 - Avoid exposing the host directly to the Internet during review.
@@ -184,15 +184,13 @@ Safe review recommendations:
 - Stop attack containers after validation with `python3 attackzoo.py stop <attack_id>` or `docker rm -f <container>`.
 
 Ports that may be exposed on the host:
+**TCP**: 139, 445, 1883, 2222, 2323, 5683, 7447, 8080, 8443, 9001, 11080.
+**UDP**: 137, 138, 5683, 8888.
 
-```text
-TCP: 139, 445, 1883, 2222, 2323, 5683, 7447, 8080, 8443, 9001, 11080
-UDP: 137, 138, 5683, 8888
-```
+>[!NOTE]
+> Weak passwords and intentionally vulnerable configurations in the containers are disposable lab values. Do not reuse them anywhere else.
 
-Weak passwords and intentionally vulnerable configurations in the containers are disposable lab values. Do not reuse them anywhere else.
-
-## Installation
+## Installation process
 
 The steps below assume a clean Ubuntu 24.04 LTS machine or an equivalent environment.
 
@@ -203,7 +201,7 @@ git clone https://github.com/ljbitzki/attackzoo-sbseg26.git
 cd attackzoo-sbseg26
 ```
 
-Or if the artifact repository was already downloads, just enter its root:
+If repository was already downloads, just enter its root directory:
 
 ```bash
 cd /path/to/attackzoo-sbseg26
@@ -225,28 +223,31 @@ newgrp docker
 >[!NOTE]
 > This command will reload the shell session. It's mandatory to reload the current shell before continue.
 
-Logging out and back in also applies the group change.
+_Logging out and back in also applies the group change._
 
 ### 3. Build Images And Start Servers
 
-We offer 2 options: A `Full` and a `Reduced` Testbed's version.
+Here we have 2 options:
+- A `Full Version`: (60 attackers, 9 servers, 2 client types and all dependencies); or
+- A `Reduced Version`: (7 attackers, 3 servers and dependencies).
 
-#### Full testbed (60 attackers, 9 servers, 2 client types and all dependencies)
+#### Full Testbed Installation
 
 >[!CAUTION]
 > This builds all server, attacker, and client images, starts target servers, and other elements. The first build depends on machine and network speed: on a machine similar to the one previously described as the test environment used by the authors, **reserve 20 to 60 minutes** because many Docker images and packages will be downloaded and compiled.
 
 ```bash
 chmod +x setup.sh
-./setup.sh
+./setup.sh full
 ```
 
-#### Reduced testbed (7 attackers, 3 servers and dependencies)
+#### Reduced Testbed Installation 
 
 >[!TIP]
->For a faster reviewer demonstration, the repository provides a reduced profile with seven attacks, one from each catalog category, and only the HTTP, SSH, and MQTT target servers: yet they still manage to demonstrate all of the tool's capabilities.
+>For a faster reviewer demonstration, the repository provides this reduced profile with seven attacks, one from each catalog category, and only the HTTP, SSH, and MQTT target servers: yet they still manage to demonstrate all of the tool's capabilities.
 
 ```bash
+chmod +x setup.sh
 ./setup.sh redux
 ```
 
@@ -258,74 +259,16 @@ The reduced profile does not build benign client images. See [contrib/docs/REDUX
 source .venv/bin/activate
 ```
 
-### 5. Check The Installation
+### 5. Simples Installation Check
 
 ```bash
 python3 attackzoo.py status
-python3 attackzoo.py list
 ```
 
-Expected `status` output:
+Expected output: `docker_available=true`
 
-```text
-docker_available=true
-```
-
-If Docker is not accessible, check whether the service is running and whether Docker group permissions have been applied.
-
-### 6. Control Servers And Clients
-
-```bash
-./servers.sh start
-./servers.sh restart
-./servers.sh stop
-
-./clients.sh start all
-./clients.sh restart random
-./clients.sh stop super
-```
-
-`clients.sh` accepts `all`, `random`, or `super` as the target. The `client-random` container requires the standard HTTP, SSH, SMB, MQTT, CoAP, Telnet, and SSL/Heartbleed servers to be running. The `client-super` container can be directed with environment variables:
-
-```bash
-CLIENT_SUPER_SERVICE=mqtt
-./clients.sh start super
-
-CLIENT_SUPER_SERVICE=zenoh
-CLIENT_SUPER_TOTAL=30
-./clients.sh restart super
-
-CLIENT_SUPER_TARGET_IP=172.17.0.2
-CLIENT_SUPER_TARGET_PORT=443
-./clients.sh start super
-```
-
-The scripts also accept the previous Portuguese aliases (`iniciar`, `reiniciar`, and `parar`) for compatibility.
-
-To open the Streamlit interface directly:
-
-```bash
-source .venv/bin/activate
-streamlit run modules/attackzoo_st.py --theme.base="dark" --server.headless true
-```
-
-To restart the environment and Streamlit UI together:
-
-```bash
-./environment.sh restart
-```
-
-### 7. List The Full Catalog
-
-```bash
-python3 attackzoo.py list
-python3 attackzoo.py list --json
-python3 attackzoo.py list --category "IoT"
-python3 attackzoo.py list --id dos_syn_flood
-```
-
->[!TIP]
->All possible parameters have tips for completion. Run `python3 attackzoo.py` without any parameter e follow the output for the available options!
+>[!NOTE]
+>If Docker is not accessible, check whether the service is running and whether Docker group permissions have been applied. Some help could be found in [Troubleshooting section](#troubleshooting).
 
 ## Minimal Test
 

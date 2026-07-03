@@ -1,12 +1,8 @@
 # AttackZoo Reduced Lab
 
-The reduced lab is a fast demonstration profile for reviewers who want to
-exercise the complete AttackZoo workflow without building the full attack and
-client catalog.
+The reduced lab is a fast demonstration profile for reviewers who want to exercise the complete AttackZoo workflow without building the full attack and client catalog.
 
-It builds only seven attacker images, one representative attack from each
-catalog category, plus the three target servers needed by those attacks. Benign
-client images are not built in this profile.
+It builds only seven attacker images, one representative attack from each catalog category, plus the three target servers needed by those attacks. Benign client images are not built in this profile.
 
 ## Included Scope
 
@@ -35,12 +31,9 @@ chmod +x setup.sh
 ./setup.sh redux
 ```
 
-This installs the normal system and Python dependencies, installs Docker when
-needed, builds only the reduced Docker image set, and starts the reduced target
-servers.
+This installs the normal system and Python dependencies, installs Docker when needed, builds only the reduced Docker image set, and starts the reduced target servers.
 
-If dependencies are already installed and only the Docker images need to be
-rebuilt, run:
+If dependencies are already installed and only the Docker images need to be rebuilt, run:
 
 ```bash
 ./build.sh redux
@@ -87,9 +80,7 @@ Outputs are written under:
 experiments/redux_campaign_<timestamp>/
 ```
 
-The wrapper accepts the same optional arguments as
-`contrib/scripts/run_full_campaign.py`, so reviewers can override defaults when
-needed. For example:
+The wrapper accepts the same optional arguments as `contrib/scripts/run_full_campaign.py`, so reviewers can override defaults when needed. For example:
 
 ```bash
 python3 contrib/scripts/run_redux_campaign.py --out reviewer_quick_check --levels L0
@@ -98,6 +89,5 @@ python3 contrib/scripts/run_redux_campaign.py --out reviewer_quick_check --level
 ## Notes
 
 - The reduced lab is intended for quick functional review and demonstration.
-- The full artifact remains available through `./setup.sh`, `./build.sh`, and
-  `contrib/scripts/run_full_campaign.py`.
+- The full artifact remains available through `./setup.sh`, `./build.sh`, and   `contrib/scripts/run_full_campaign.py`.
 - Benign background clients are intentionally excluded from the reduced build.
