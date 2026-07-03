@@ -23,27 +23,27 @@ The associated paper, "Containerized Attack Testbed: A Reproducible Approach for
 
 This document is organized as follows:
 
-1. [Project summary and artifact scope](#attackzoo-a-reproducible-testbed-for-the-execution-of-attacks-and-the-generation-of-network-traffic-datasets).
-2. [This README Structure](#readme-structure).
-3. [Artifact Badges Considered](#artifact-badges-considered).
-4. [Basic environment information, components, and requirements](#basic-information).
-5. [Dependencies and external resources used during installation](#dependencies).
-6. [Safety and isolation guidance](#safety-considerations).
-7. [Installation on a clean machine](#installation).
-8. [Minimal validation test](#minimal-test).
-9. [Reproducible experiment claims](#reproducible-experiment-claims).
-10. [Basic code and repository documentation](#basic-documentation).
-11. [Troubleshooting](#troubleshooting).
-12. [License](#license).
+1. [Project summary and artifact scope](#attackzoo-a-reproducible-testbed-for-the-execution-of-attacks-and-the-generation-of-network-traffic-datasets)
+2. [This README Structure](#readme-structure)
+3. [Artifact Badges Considered](#artifact-badges-considered)
+4. [Basic environment information, components, and requirements](#basic-information)
+5. [Dependencies and external resources used during installation](#dependencies)
+6. [Safety and isolation guidance](#safety-considerations)
+7. [Installation on a clean machine](#installation)
+8. [Minimal validation test](#minimal-test)
+9. [Reproducible experiment claims](#reproducible-experiment-claims)
+10. [Basic code and repository documentation](#basic-documentation)
+11. [Troubleshooting](#troubleshooting)
+12. [License](#license)
 
 ## Artifact Badges Considered
 
 The artifact is intended to support the following review badges:
 
-- Artifacts Available. <img src="./contrib/assets/SeloD.png" width="20"/>
-- Artifacts Functional. <img src="./contrib/assets/SeloF.png" width="20"/>
-- Artifacts Sustainable. <img src="./contrib/assets/SeloS.png" width="20"/>
-- Experiments Reproducible. <img src="./contrib/assets/SeloR.png" width="20"/>
+- Artifacts Available (Artefatos Disponíveis): **`SeloD`** <img src="./contrib/assets/SeloD.png" width="20"/>
+- Artifacts Functional (Artefatos Funcionais): **`SeloF`** <img src="./contrib/assets/SeloF.png" width="20"/>
+- Artifacts Sustainable (Artefatos Sustentáveis): **`SeloS`** <img src="./contrib/assets/SeloS.png" width="20"/>
+- Experiments Reproducible (Experimentos Reprodutíveis): **`SeloR`** <img src="./contrib/assets/SeloR.png" width="20"/>
 
 ## Basic Information
 
