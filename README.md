@@ -51,21 +51,21 @@ The artifact is intended to support the following review badges:
 
 | Component | Location | Purpose |
 | --- | --- | --- |
-| Main CLI | `attackzoo.py` | Command-line entry point for listing, running, stopping, and inspecting attacks, captures, features, datasets, and experiments. |
+| Main CLI | `attackzoo.py` | Command-line entry point for the AttackZoo Testbed. |
 | CLI parser and commands | `modules/attackzoo/` | Implementation of `status`, `list`, `run`, `stop`, `ps`, `logs`, `captures`, `features`, `dataset`, `experiment`, and `report`. |
 | Dynamic attack catalog | `docker/attackers/*/attack.yaml` | Plug-and-play attack definitions loaded automatically by the tool. |
 | Target servers | `docker/servers/` | Docker images for HTTP, SSH, SMB, MQTT, CoAP, XRCE-DDS, Zenoh, Telnet, and SSL/Heartbleed services. |
 | Benign clients | `docker/clients/` | Containers that generate benign background traffic. |
 | Web UI | `modules/attackzoo_st.py` | Streamlit interface for interactive use. |
-| Helper scripts | `setup.sh`, `build.sh`, `servers.sh`, `clients.sh`, `environment.sh` | Dependency installation, Docker image builds, server/client control, and Streamlit environment control. |
+| Helper scripts | `setup.sh`, `build.sh`, `servers.sh`, `clients.sh`, `environment.sh` | Dependency installation, Docker image builds, server/client control, environment control and Streamlit optional Web UI. |
 | Outputs | `captures/`, `features/`, `datasets/`, `experiments/`, `logs/` | Artifacts generated during runs and experiments. |
 
 ### Current Catalog
 
-The current repository contains 60 attacks declared through `attack.yaml`, organized into the following categories:
+The current repository contains 60 attacks declared through individual `attack.yaml`, organized into the following categories:
 
 | Category | Count |
-| --- | ---: |
+| --- | :---: |
 | `1) Reconnaissance and Discovery` | 9 |
 | `2) Network Interception and Exploitation` | 8 |
 | `3) Web Application Attacks` | 10 |
@@ -74,9 +74,8 @@ The current repository contains 60 attacks declared through `attack.yaml`, organ
 | `6) Denial of Service and Impact` | 8 |
 | `7) IoT` | 21 |
 
-The current MITRE ATT&CK metadata covers 9 tactics, 21 top-level techniques,
-and 35 technique/sub-technique entries when sub-techniques are counted
-separately.
+>[!INFO]
+>The current MITRE ATT&CK metadata covers 9 tactics, 21 top-level techniques, and 35 technique/sub-technique entries when sub-techniques are counted separately. See the [full mapping documentation](./MITRE_ATTACK_MAPPING.md).
 
 ### Target Servers
 
@@ -92,7 +91,8 @@ separately.
 | Telnet | `server-telnet-server` | `2323/tcp -> 23/tcp` |
 | SSL/Heartbleed | `server-ssl-heartbleed` | `8443/tcp -> 443/tcp` |
 
-The build script may also start [Dozzle](https://dozzle.dev/) on `11080/tcp` to make Docker logs easier to inspect from a browser.
+>[!INFO]
+>More details about [Safety and port isolation guidance](#safety-considerations).
 
 ### Recommended Execution Environment
 
@@ -124,18 +124,21 @@ Environment used by the authors for local tests:
 
 ### System Dependencies
 
-`setup.sh` installs or configures the main dependencies on Ubuntu/Debian systems:
+`setup.sh` installs and/or configures the main dependencies on Ubuntu/Debian-like systems:
 
 - `ca-certificates`
 - `curl`
 - `cmake`
 - `git`
-- `python3-venv`
+- `python3-venv`S
 - `tcpdump`
 - `tshark`
 - `wireshark`
 - `redis`
 - Docker Engine (`docker-ce`, `docker-ce-cli`, `containerd.io`, `docker-buildx-plugin`, `docker-compose-plugin`)
+
+>[!CAUTION]
+>Please note that **this repository depends** on `Docker Engine` being installed as described in the [official documentation](https://docs.docker.com/engine/install/ubuntu/) and also on the [post-installation instructions for Linux](https://docs.docker.com/engine/install/linux-postinstall). Be advised that installation via `apt install` **might not be compatible**.
 
 The script also adds the current user to the `docker` group, configures capture permissions for `tcpdump`/`dumpcap`, creates `.venv/`, installs Python dependencies, and installs latest NTLFlowLyzer Project direct from GitHub repository cloning.
 
