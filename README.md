@@ -256,7 +256,10 @@ The reduced testbed profile does not build benign client images. See [contrib/do
 ### 4. Activate The Python Environment
 
 ```bash
-source .venv/bin/activate
+cd /path/to/sbseg26
+if [[ -z "${VIRTUAL_ENV}" ]]; then
+  source .venv/bin/activate
+fi
 ```
 
 ### 5. Simples Installation Check
@@ -278,7 +281,7 @@ This section runs a short validation to confirm that the CLI loads the catalog, 
 
 ```bash
 cd /path/to/sbseg26
-if [[ -z "$VIRTUAL_ENV" ]]; then
+if [[ -z "${VIRTUAL_ENV}" ]]; then
   source .venv/bin/activate
 fi
 ```
@@ -369,7 +372,10 @@ Goal: show that the tool automatically discovers attacks declared in `docker/att
 Commands:
 
 ```bash
-source .venv/bin/activate
+cd /path/to/sbseg26
+if [[ -z "${VIRTUAL_ENV}" ]]; then
+  source .venv/bin/activate
+fi
 python3 attackzoo.py list
 python3 attackzoo.py list --json > /tmp/attackzoo-catalog.json
 python3 -m json.tool /tmp/attackzoo-catalog.json > /tmp/attackzoo-catalog-formatted.json
@@ -402,7 +408,10 @@ Goal: demonstrate functional attack execution against services inside the testbe
 Preparation:
 
 ```bash
-source .venv/bin/activate
+cd /path/to/sbseg26
+if [[ -z "${VIRTUAL_ENV}" ]]; then
+  source .venv/bin/activate
+fi
 ./servers.sh start
 docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}" | grep -E '^server-'
 ```
