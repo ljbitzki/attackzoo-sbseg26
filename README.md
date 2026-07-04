@@ -74,7 +74,7 @@ The current repository contains 60 attacks declared through individual `attack.y
 | `6) Denial of Service and Impact` | 8 |
 | `7) IoT` | 21 |
 
->[!INFO]
+>[!NOTE]
 >The current MITRE ATT&CK metadata covers 9 tactics, 21 top-level techniques, and 35 technique/sub-technique entries when sub-techniques are counted separately. See the [full mapping documentation](./MITRE_ATTACK_MAPPING.md).
 
 ### Target Servers
@@ -91,7 +91,7 @@ The current repository contains 60 attacks declared through individual `attack.y
 | Telnet | `server-telnet-server` | `2323/tcp -> 23/tcp` |
 | SSL/Heartbleed | `server-ssl-heartbleed` | `8443/tcp -> 443/tcp` |
 
->[!INFO]
+>[!NOTE]
 >More details about [Safety and port isolation guidance](#safety-considerations).
 
 ### Recommended Execution Environment
