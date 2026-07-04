@@ -15,9 +15,11 @@ from typing import Optional
 from urllib.request import urlopen
 
 def run(cmd: list[str], timeout: Optional[float] = None) -> subprocess.CompletedProcess:
+    """Execute a subprocess command and capture its text output."""
     return subprocess.run(cmd, capture_output=True, text=True, timeout=timeout)
 
 def ensure_network(name: str) -> None:
+    """Ensure that the Docker network used by the benchmark exists."""
     res = run(["docker", "network", "inspect", name])
     if res.returncode != 0:
         res = run(["docker", "network", "create", name])
@@ -25,9 +27,11 @@ def ensure_network(name: str) -> None:
             raise RuntimeError(res.stderr)
 
 def remove_container(name: str) -> None:
+    """Remove a Docker container if it exists, ignoring missing containers."""
     run(["docker", "rm", "-f", name])
 
 def start_target(name: str, image: str, network: str, host_port: int) -> None:
+    """Start one HTTP target container on the benchmark network and host port."""
     remove_container(name)
     res = run([
         "docker", "run", "-d", "--rm",
@@ -41,6 +45,7 @@ def start_target(name: str, image: str, network: str, host_port: int) -> None:
 
 
 def wait_http(port: int, timeout_s: float = 10.0) -> bool:
+    """Poll a local HTTP endpoint until it responds or the timeout expires."""
     deadline = time.time() + timeout_s
     url = f"http://127.0.0.1:{port}/"
     while time.time() < deadline:
@@ -54,6 +59,7 @@ def wait_http(port: int, timeout_s: float = 10.0) -> bool:
 
 
 def probe_http(port: int) -> bool:
+    """Run one quick availability probe against a local HTTP target."""
     try:
         with urlopen(f"http://127.0.0.1:{port}/", timeout=1.0) as r:
             r.read(32)
@@ -63,12 +69,14 @@ def probe_http(port: int) -> bool:
 
 
 def read_proc_cpu(pid: int) -> tuple[int, int]:
+    """Read user and system CPU ticks for a process from procfs."""
     # utime=14, stime=15 em /proc/<pid>/stat
     parts = Path(f"/proc/{pid}/stat").read_text().split()
     return int(parts[13]), int(parts[14])
 
 
 def read_proc_rss_mb(pid: int) -> float:
+    """Read the resident memory size of a process in megabytes."""
     status = Path(f"/proc/{pid}/status").read_text().splitlines()
     for line in status:
         if line.startswith("VmRSS:"):
@@ -78,6 +86,7 @@ def read_proc_rss_mb(pid: int) -> float:
 
 
 def read_host_cpu() -> tuple[int, int]:
+    """Read aggregate host CPU total and idle ticks from procfs."""
     parts = [int(x) for x in Path("/proc/stat").read_text().splitlines()[0].split()[1:]]
     idle = parts[3] + (parts[4] if len(parts) > 4 else 0)
     total = sum(parts)
@@ -85,6 +94,7 @@ def read_host_cpu() -> tuple[int, int]:
 
 
 def read_host_mem() -> dict[str, float]:
+    """Read host memory usage metrics needed by scalability samples."""
     vals = {}
     for line in Path("/proc/meminfo").read_text().splitlines():
         if ":" not in line:
@@ -103,11 +113,19 @@ def read_host_mem() -> dict[str, float]:
 
 
 def cleanup(prefix: str, max_n: int) -> None:
+    """Remove all benchmark target containers for the configured prefix."""
     for i in range(1, max_n + 1):
         remove_container(f"{prefix}-{i:03d}")
 
 
 def main() -> int:
+    """
+    Run the scalability benchmark and persist raw samples plus per-run metadata.
+
+    The benchmark starts increasing numbers of HTTP target containers, waits for
+    readiness, samples orchestrator and host resource usage during a steady
+    phase, then tears the targets down before the next run.
+    """
     ap = argparse.ArgumentParser()
     ap.add_argument("--counts", default="1,5,10,20,30,40,50")
     ap.add_argument("--runs", type=int, default=5)

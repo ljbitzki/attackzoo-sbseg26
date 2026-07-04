@@ -662,6 +662,10 @@ python3 attackzoo.py list --id example_ping
 `-- LICENSE                       # BSD 3-Clause License
 ```
 
+### Code Documentation
+
+This project was developed with code documentation as built-in function comments, using mainly **`Python docstring`**.
+
 ### Main CLI
 
 ```bash
