@@ -231,7 +231,7 @@ Here we have 2 options:
 - A `Full Version`: (60 attackers, 9 servers, 2 client types and all dependencies); or
 - A `Reduced Version`: (7 attackers, 3 servers and dependencies).
 
-#### Full Testbed Installation
+#### \*\* Full Testbed Installation \*\*
 
 >[!CAUTION]
 > This builds all server, attacker, and client images, starts target servers, and other elements. The first build depends on machine and network speed: on a machine similar to the one previously described as the test environment used by the authors, **reserve 20 to 60 minutes** because many Docker images and packages will be downloaded and compiled.
@@ -241,7 +241,7 @@ chmod +x setup.sh
 ./setup.sh full
 ```
 
-#### Reduced Testbed Installation 
+#### \*\* Reduced Testbed Installation \*\* 
 
 >[!TIP]
 >For a faster reviewer demonstration, the repository provides this reduced profile with seven attacks, one from each catalog category, and only the HTTP, SSH, and MQTT target servers: yet they still manage to demonstrate all of the tool's capabilities.
@@ -251,7 +251,7 @@ chmod +x setup.sh
 ./setup.sh redux
 ```
 
-The reduced profile does not build benign client images. See [contrib/docs/REDUX_LAB.md](contrib/docs/REDUX_LAB.md) for more information about the included attack list, server profile, and campaign defaults.
+The reduced testbed profile does not build benign client images. See [contrib/docs/REDUX_LAB.md](contrib/docs/REDUX_LAB.md) for more information about the included attack list, server profile, and campaign defaults.
 
 ### 4. Activate The Python Environment
 
@@ -272,13 +272,15 @@ Expected output: `docker_available=true`
 
 ## Minimal Test
 
-This section runs a short validation to confirm that the CLI loads the catalog, that target servers are active, and that a simple attack can be launched againstserverocal testbed.
+This section runs a short validation to confirm that the CLI loads the catalog, that target servers are active, and a simple attack can be launched against a testbed server.
 
 ### 1. Prepare The Session
 
 ```bash
 cd /path/to/sbseg26
-source .venv/bin/activate
+if [[ -z "$VIRTUAL_ENV" ]]; then
+  source .venv/bin/activate
+fi
 ```
 
 ### 2. Confirm Docker And The Catalog
@@ -291,7 +293,7 @@ python3 attackzoo.py list --category "Denial"
 Expected results:
 
 - `docker_available=true`.
-- A list of attacks from `6) Denial of Service and Impact`, including `dos_http_simple` andserversyn_flood`.
+- A list of attacks from `6) Denial of Service and Impact`, including `dos_http_simple`.
 
 ### 3. Confirm That The HTTP Server Is Active
 
@@ -352,7 +354,7 @@ Expected outputs:
 - `experiments/smoke_http/dos_http_simple/L0/run01/`.
 - `probe_http.csv` with HTTP probe data.
 - A `.pcap` file if `tcpdump` is installed and authorized.
-- `experiments/smoke_http/reports/` with tables and figures when enough data is available.
+- `experiments/smoke_http/reports/` with tables and charts when enough data is available.
 
 Accepted availability probes for `--probes` are `http`, `https`, `ssh`, `smb`, `mqtt`, `coap`, `xrce`, `zenoh`, and `telnet`. Use `all` to enable all probes or `none` to disable them. For service-specific endpoints, repeat `--probe-endpoint`, for example `--probe-endpoint ssh=172.17.0.3:22`.
 
@@ -372,8 +374,13 @@ python3 attackzoo.py list
 python3 attackzoo.py list --json > /tmp/attackzoo-catalog.json
 python3 -m json.tool /tmp/attackzoo-catalog.json > /tmp/attackzoo-catalog-formatted.json
 ```
+To check the full output:
 
-To check the count:
+```bash
+cat /tmp/attackzoo-catalog-formatted.json | jq
+```
+
+To check the count by categories:
 
 ```bash
 python3 - <<'PY'
@@ -384,11 +391,9 @@ for category, attacks in CATEGORIES.items():
 PY
 ```
 
-Expected time: less than 1 minute.
-
-Expected resources: negligible CPU and memory. Docker does not need to be running for catalog serverg, but Python dependencies must be installed.
-
-Expected result: 60 attacks loaded across 7 categories. The JSON outpserveruld contain `id`, `name`, `image`, `container`, `params`, `mitre`, and `max_runtime_s` for each attack.
+**Expected time**: less than 1 minute.
+**Expected resources**: negligible CPU and memory. Docker does not need to be running for catalog listing, but Python dependencies must be installed.
+**Expected result**: 60 attacks loaded across 7 categories. The JSON output contains `id`, `name`, `image`, `container`, `params`, `mitre`, and `max_runtime_s` for each attack.
 
 ### Claim 2: The Environment Runs Attacks Against Containerized Target Servers
 
@@ -399,35 +404,35 @@ Preparation:
 ```bash
 source .venv/bin/activate
 ./servers.sh start
-docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}" | grep server
+docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}" | grep -E '^server-'
 ```
 
-HTTP example:
+Simple HTTP DoS against th HTTP Server (for example):
 
 ```bash
 HTTP_IP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' server-http-server)
 python3 attackzoo.py run dos_http_simple --target "$HTTP_IP" --port 80
 ```
 
-TCP reconnaissance example:
+TCP Port Knocking Reconnaissance against the HTTP Server (for example):
 
 ```bash
 python3 attackzoo.py run recon_port_scanner_tcp --target "$HTTP_IP"
 ```
 
-Continuous attack example, stopped manually:
+Check running attacks and stop manually:
 
 ```bash
-python3 attackzoo.py run dos_syn_flood --target "$HTTP_IP" --port 80
 python3 attackzoo.py ps
-python3 attackzoo.py stop dos_syn_flood
+python3 attackzoo.py stop dos_http_simple
+python3 attackzoo.py stop recon_port_scanner_tcp
 ```
 
 Expected time: 1 to 5 minutes after images have already been built.
 
 Expected resources: 1 to 2 vCPUs and up to 2 GB of additional RAM for short tests. Flood attacks may increase CPU and network usage; keep durations short.
 
-Expected result: the CLI prints `[OK] Container started`, containers appear in `ps` while active, and servers remain manageable through `servers.sh`.
+Expected result: the CLI prints `[OK] Container started` and `[OK] Container stoped`, containers appear in `ps` while active, and servers remain manageable through `servers.sh`.
 
 ### Claim 3: The Artifact Generates Traffic Evidence, Features, And Datasets
 
@@ -454,34 +459,30 @@ python3 attackzoo.py experiment \
   --tools-scapy
 ```
 
-List captures:
+>[!NOTE]
+> This experimente takes 15 seconds to complete. Please wait until terminal prints something like:
+>`[OK] dos_http_simple L0 run01`
+>`experiments/http_features/reports`
+
+**Expected time**: 1 to 10 minutes for short experiments. NTLFlowLyzer may take longer on large PCAP files.
+**Expected resources**: disk use proportional to captured traffic. Short tests usually need less than 1 GB; full repetitions may require tens of GB.
+**Expected result**:
+- Probes, tables, charts, telemetry and more under `experiments/http_features/dos_http_simple/...`
+- Stored PCAP captures under `captures/`.
+- Features CSVs under `features/`.
+- Dataset CSVs under `datasets/`.
+- Per-run metadata in `meta.json`.
+
+To list resulting captures:
 
 ```bash
 python3 attackzoo.py captures
 python3 attackzoo.py captures --latest --json
 ```
 
-Extract features manually from an existing PCAP:
-
-```bash
-python3 attackzoo.py features --pcap <FILE.pcap> --tools tshark,scapy --outdir features/
-python3 attackzoo.py dataset --pcap <FILE.pcap> --features-dir features --outdir datasets
-```
-
-Expected time: 1 to 10 minutes for short experiments. NTLFlowLyzer may take longer on large PCAP files.
-
-Expected resources: disk use proportional to captured traffic. Short tests usually need less than 1 GB; full repetitions may require tens of GB.
-
-Expected result:
-
-servers under `experiments/http_features/.../*.pcap` or `captures/`.
-- Features under `features/`.
-- Dataset CSVs under `datasets/`.
-- Per-run metadata in `meta.json`.
-
 ### Claim 4: The Artifact Reproduces Warmup-Attack-Cooldown Batches And T3-T8 Reports
 
-Goal: reproduce the tool's experimental organization with warmup, attack, and cooldown phases, availability probes, and consolidated reports.serverple with an HTTP attack and hooks:
+Goal: reproduce a more complex experimental scenario with warmup, attack, and cooldown phases, multi throughput levels, availability probes, hooks, filter and consolidated reports:
 
 ```bash
 
@@ -489,7 +490,7 @@ HTTP_IP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{
 
 python3 attackzoo.py experiment \
   --attack-id dos_http_simple \
-  --out paper_http \
+  --out full_http \
   --service http \
   --runs 3 \
   --levels L0,L1 \
@@ -508,21 +509,31 @@ python3 attackzoo.py experiment \
   --attack-stop-hook "python3 attackzoo.py stop dos_http_simple"
 ```
 
-Regenerate reports from collected data:
+>[!NOTE]
+> This experimente takes 12~15 minutes to complete. It will execute 3 runs of 2 throughput levels with 30s+60s+30s seconds per run:
+>`3 x 2 x (30 + 60 + 30) = 720 seconds (12 minutes)`.
+>Please wait until terminal prints something like:
+>`[OK] dos_http_simple L0 run01`
+>`[OK] dos_http_simple L0 run02`
+>`[OK] dos_http_simple L0 run03`
+>`[OK] dos_http_simple L1 run01`
+>`[OK] dos_http_simple L1 run02`
+>`[OK] dos_http_simple L1 run03`
+>`experiments/full_http/reports`
+
+If you already have data from a previous experiment, you can regenerate reports from collected/stored data:
 
 ```bash
 python3 attackzoo.py report \
-  --input experiments/paper_http/ \
+  --input experiments/full_http/ \
   --warmup 30 \
   --attack 60 \
   --cooldown 30
 ```
 
-Expected time: approximately `(warmup + attack + cooldown) * runs * levels`, plus post-processing. The example above takes about 12 minutes before report generation.
-
-Expected resources: 4 vCPUs, 8 GB RAM, and a few GB of free space for PCAPs/CSVs. Increase disk and memory for more levels, more repetitions, or higher-intensity attacks.
-
-Expected result:
+**Expected time**: approximately `(warmup + attack + cooldown) * runs * levels`, plus post-processing. The example above takes about 12 minutes before report generation.
+**Expected resources**: 4 vCPUs, 8 GB RAM, and a few GB of free space for PCAPs/CSVs. Increase disk and memory for more levels, more repetitions, or higher-intensity attacks.
+**Expected result**:
 
 ```text
 experiments/paper_http/
@@ -571,9 +582,44 @@ params:
     placeholder: __HOST_IP__
 ```
 
-Expeserverime: less than 5 minutes for a simple attack, plus Docker image build time.
+Full example `copy-and-paste`: 
 
-Expected result: the new attack appears in the CLI without editing `modules/registry.py`, `modules/loader.py`, or any other Python file.
+```bash
+# Create attack dir
+mkdir -p docker/attackers/example-ping
+# Create Dockerfile
+cat > docker/attackers/example-ping/Dockerfile <<'EOF'
+FROM alpine:3.20
+
+RUN apk add --no-cache iputils
+
+ENTRYPOINT ["ping", "-c", "4"]
+EOF
+# Create attack.yaml attack declaration
+cat > docker/attackers/example-ping/attack.yaml <<'EOF'
+id: example_ping
+name: Example Ping
+category: 1) Reconnaissance and Discovery
+description: Example attack used to validate dynamic discovery.
+image: attack-example-ping:latest
+container_name: attack-example-ping
+max_runtime_s: 10
+target_mapping:
+  target: target_ip
+params:
+  - key: target_ip
+    label: Target IP address or FQDN
+    kind: ip
+    placeholder: __HOST_IP__
+EOF
+# Build the new container
+docker build -t attack-example-ping:latest docker/attackers/example-ping
+# List attack from catalog
+python3 attackzoo.py list --id example_ping
+```
+
+**Expected time**: less than 5 minutes for a simple attack, plus Docker image build time.
+**Expected result**: the new "attack" appears in the CLI without changing any core Python file in the Project.
 
 ## Basic Documentation
 
@@ -589,7 +635,7 @@ Expected result: the new attack appears in the CLI without editing `modules/regi
 |-- environment.sh                # Streamlit/environment helper
 |-- requirements.txt              # Python dependencies
 |-- modules/
-|   |-- attackzoo_st.py                   # Streamlit UI
+|   |-- attackzoo_st.py           # Streamlit UI
 |   |-- loader.py                 # Dynamic attack.yaml discovery
 |   |-- registry.py               # AttackSpec/ParamSpec dataclasses and loaded catalog
 |   |-- runners.py                # Docker wrappers
@@ -633,7 +679,7 @@ python3 attackzoo.py experiment --attack-id ID --out DIR [options]
 python3 attackzoo.py report --input DIR --warmup N --attack N --cooldown N [--outdir DIR]
 ```
 
-### Summary Of The `attack.yaml` Schema
+### Summary of the `attack.yaml` Basic Schema
 
 | Field | Required | Description |
 | --- | --- | --- |
@@ -661,7 +707,7 @@ Fields for each item in `params`:
 
 ## Troubleshooting
 
-### `docker_available=false`
+### Docker isn't running or not available
 
 Check that Docker is installed, running, and accessible by your user:
 
@@ -682,20 +728,20 @@ sudo ss -tulpn | grep -E ':8080|:1883|:2222|:2323|:5683|:8443|:7447|:9001|:11080
 
 Stop the conflicting service or change the port mapping in the corresponding script/YAML.
 
-### Misserverocker Image
+### Missing Docker Image
 
 If the CLI reports that an image cannot be found:
 
 ```bash
-cd docker
-./build-images.sh
-cd ..
+cd cd /path/to/attackzoo-sbseg/docker/
+./build-images.sh full
 ```
 
 Or run the wrapper again:
 
 ```bash
-./build.sh
+cd /path/to/attackzoo-sbseg/
+./build.sh full
 ```
 
 ### Packet Capture Permission Problems
@@ -711,6 +757,7 @@ sudo setcap cap_net_raw,cap_net_admin=eip "$(command -v tcpdump)"
 ### Servers Stopped After Reboot
 
 ```bash
+cd /path/to/attackzoo-sbseg/
 ./servers.sh start
 docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}" | grep server
 ```
