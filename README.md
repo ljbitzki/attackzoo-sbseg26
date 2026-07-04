@@ -17,7 +17,7 @@
 
 This repository contains **AttackZoo**, a Docker-based testbed for building and running controlled network, application, and IoT attack scenarios. The artifact automates target servers, benign clients, attack containers, traffic capture, feature extraction, dataset generation, and experiment reporting through both a command-line (CLI) interface and an optional Streamlit Web UI.
 
-The associated paper, "Containerized Attack Testbed: A Reproducible Approach for Generating Traffic Evidence," presents an environment for producing reproducible traffic evidence from parameterized Docker attacks. The artifact is intended to let reviewers inspect the testbed, run attacks in an isolated lab, capture PCAP files, and regenerate metrics and reports used to support the paper's claims.
+The associated paper, `"AttackZoo: A Reproducible Testbed for Attack Execution and Network Traffic Datasets Generation"` presents an environment for producing reproducible traffic evidence from parameterized Docker attacks. The artifact is intended to let reviewers inspect the testbed, run attacks in an isolated lab, capture PCAP files, extract traffic features, generate datasets, telemetry metrics, reports, charts and experimental campaigns metadata.
 
 ## README Structure
 
@@ -40,10 +40,10 @@ This document is organized as follows:
 
 The artifact is intended to support the following review badges:
 
-- Available Artifacts (Artefatos Disponíveis): **`SeloD`** <img src="./contrib/assets/SeloD.png" width="20"/>
-- Functional Artifacts (Artefatos Funcionais): **`SeloF`** <img src="./contrib/assets/SeloF.png" width="20"/>
-- Sustainable Artifacts (Artefatos Sustentáveis): **`SeloS`** <img src="./contrib/assets/SeloS.png" width="20"/>
-- Reproducible Experiments (Experimentos Reprodutíveis): **`SeloR`** <img src="./contrib/assets/SeloR.png" width="20"/>
+- Available Artifacts (Artefatos Disponíveis): **`SeloD`** <img src="./contrib/assets/SeloD.png" width="23"/>
+- Functional Artifacts (Artefatos Funcionais): **`SeloF`** <img src="./contrib/assets/SeloF.png" width="23"/>
+- Sustainable Artifacts (Artefatos Sustentáveis): **`SeloS`** <img src="./contrib/assets/SeloS.png" width="23"/>
+- Reproducible Experiments (Experimentos Reprodutíveis): **`SeloR`** <img src="./contrib/assets/SeloR.png" width="23"/>
 
 ## Basic Information
 
@@ -192,7 +192,14 @@ Ports that may be exposed on the host:
 
 ## Installation process
 
-The steps below assume a clean Ubuntu 24.04 LTS machine or an equivalent environment.
+### Demonstration video of the installation process
+
+[![installation-process-video](https://img.youtube.com/vi/fx2Z5ZD_Rbo/0.jpg)](https://www.youtube.com/watch?v=fx2Z5ZD_Rbo)
+
+>[!TIP]
+>This video demonstrates and follows all the steps listed below.
+
+The steps below assume a **clean Ubuntu 24.04 LTS machine** or an equivalent environment.
 
 ### 1. Clone the repository and enters it
 
@@ -201,13 +208,7 @@ git clone https://github.com/ljbitzki/attackzoo-sbseg26.git
 cd attackzoo-sbseg26
 ```
 
-If repository was already downloads, just enter its root directory:
-
-```bash
-cd /path/to/attackzoo-sbseg26
-```
-
-### 2. Install system and Python dependencies
+### 2. Install system and Python dependencies with an _`one-script-setup`_
 
 ```bash
 chmod +x setup.sh
@@ -225,13 +226,13 @@ newgrp docker
 
 _Logging out and back in also applies the group change._
 
-### 3. Build Images And Start Servers
+### 3. Build the Docker Images Catalog and Start Servers
 
 Here we have 2 options:
 - A `Full Version`: (60 attackers, 9 servers, 2 client types and all dependencies); or
 - A `Reduced Version`: (7 attackers, 3 servers and dependencies).
 
-#### \*\* Full Testbed Installation \*\*
+#### \*\* Full Version Installation \*\*
 
 >[!CAUTION]
 > This builds all server, attacker, and client images, starts target servers, and other elements. The first build depends on machine and network speed: on a machine similar to the one previously described as the test environment used by the authors, **reserve 20 to 60 minutes** because many Docker images and packages will be downloaded and compiled.
@@ -241,7 +242,7 @@ chmod +x setup.sh
 ./setup.sh full
 ```
 
-#### \*\* Reduced Testbed Installation \*\* 
+#### \*\* Reduced Version Installation \*\* 
 
 >[!TIP]
 >For a faster reviewer demonstration, the repository provides this reduced profile with seven attacks, one from each catalog category, and only the HTTP, SSH, and MQTT target servers: yet they still manage to demonstrate all of the tool's capabilities.
