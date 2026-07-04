@@ -6,6 +6,7 @@ from modules.attackzoo.parser import build_parser
 
 
 def main(argv: Optional[List[str]] = None) -> int:
+    """Parse CLI arguments and dispatch to the selected subcommand handler."""
     parser = build_parser()
     args, extra = parser.parse_known_args(argv)
     args.extra = extra

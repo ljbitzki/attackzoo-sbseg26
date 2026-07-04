@@ -69,6 +69,7 @@ _TRUNC_PCAP_PATTERNS = (
 )
 
 def looks_like_truncated_pcap(stderr: str) -> bool:
+    """Detect tool errors that commonly indicate a truncated PCAP file."""
     s = (stderr or "").lower()
     return any(p in s for p in _TRUNC_PCAP_PATTERNS)
 
@@ -147,6 +148,7 @@ def extract_with_ntlflowlyzer(pcap_path: Path, out_csv: Path) -> Dict[str, Any]:
     _ensure_output_parent(out_csv)
 
     def _run_ntl(pcap_in: Path) -> Tuple[int, str, str, Path]:
+        """Run NTLFlowLyzer for one PCAP using a generated config file."""
         cfg = {
             "pcap_file_address": str(pcap_in.resolve()),
             "output_file_address": str(out_csv.resolve()),

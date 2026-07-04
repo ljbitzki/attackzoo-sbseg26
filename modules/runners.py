@@ -97,6 +97,7 @@ def docker_container_status(name: str) -> Dict[str, Any]:
     return {"exists": True, "name": name, "id": cid[:12], "status": status}
 
 def docker_logs(name_or_id: str, tail: int = 200) -> Dict[str, Any]:
+    """Fetch recent logs from a Docker container for CLI inspection."""
     rc, out, err = _run(["docker", "logs", "--tail", str(tail), name_or_id])
     return {
         "ok": rc == 0,

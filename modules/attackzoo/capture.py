@@ -12,11 +12,13 @@ CAPTURES_DIR = Path("captures")
 
 
 def build_capture_path(prefix: str) -> Path:
+    """Build a timestamped PCAP output path under the captures directory."""
     _ensure_dir(CAPTURES_DIR)
     return CAPTURES_DIR / f"{prefix}-{_now_ts()}.pcap"
 
 
 def start_tcpdump(pcap_path: Path, iface: str, bpf: str = "") -> subprocess.Popen:
+    """Start tcpdump as a background process writing to the requested PCAP."""
     _ensure_dir(pcap_path.parent)
     cmd = ["tcpdump", "-i", iface, "-U", "-s", "0", "-w", str(pcap_path)]
     if bpf.strip():

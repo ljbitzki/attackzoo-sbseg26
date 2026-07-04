@@ -35,6 +35,7 @@ width = 0.35
 
 # Extract values in the correct order
 def vals(metric, level):
+    """Return one metric ordered by phase for a selected intensity level."""
     sub = df[df["level"] == level].set_index("phase")
     return [sub.loc[p, metric] if p in sub.index else np.nan for p in phases]
 
@@ -74,4 +75,3 @@ plt.savefig(OUT_PATH, dpi=200, bbox_inches="tight")
 plt.show()
 
 print(f"Figura salva em: {Path(OUT_PATH).resolve()}")
-

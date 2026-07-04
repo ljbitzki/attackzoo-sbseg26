@@ -29,6 +29,7 @@ def _csv_data_row_count(path: Path) -> int:
 
 
 def _safe_file_size_mb(path: Path) -> float:
+    """Return a file size in megabytes, or NaN when it cannot be read."""
     try:
         return path.stat().st_size / (1024.0 * 1024.0)
     except Exception:
@@ -36,6 +37,7 @@ def _safe_file_size_mb(path: Path) -> float:
 
 
 def _read_meta_json(run_dir: Path) -> Dict[str, Any]:
+    """Read a run's meta.json file, returning an empty dict on failure."""
     meta_path = run_dir / "meta.json"
     if not meta_path.exists():
         return {}
@@ -46,6 +48,7 @@ def _read_meta_json(run_dir: Path) -> Dict[str, Any]:
 
 
 def _first_existing_path(paths: Iterable[Any]) -> Optional[Path]:
+    """Return the first existing path from a loose list of path-like values."""
     for raw in paths:
         if not raw:
             continue
@@ -59,6 +62,7 @@ def _first_existing_path(paths: Iterable[Any]) -> Optional[Path]:
 
 
 def _guess_pcap_path(run_dir: Path, meta: Dict[str, Any]) -> Optional[Path]:
+    """Locate the PCAP associated with a run using metadata and local files."""
     candidates: List[Any] = []
     candidates.append(meta.get("pcap"))
     candidates.append(meta.get("pcap_path"))
@@ -72,6 +76,7 @@ def _guess_pcap_path(run_dir: Path, meta: Dict[str, Any]) -> Optional[Path]:
 
 
 def _probe_files_for_run(run_dir: Path, meta: Dict[str, Any]) -> List[Path]:
+    """Collect all probe CSV files referenced by or present in a run folder."""
     paths: List[Path] = []
     artifacts = meta.get("artifacts") if isinstance(meta.get("artifacts"), dict) else {}
     for raw in (meta.get("probe_files") or []) + (artifacts.get("probes") or []):
@@ -116,6 +121,7 @@ def _feature_status(meta: Dict[str, Any]) -> Tuple[bool, int, int]:
 
 
 def _dataset_status(meta: Dict[str, Any]) -> Tuple[bool, str, bool, int]:
+    """Summarize whether a dataset was requested, exists, and has data rows."""
     requested = bool(meta.get("build_dataset"))
     ds = str(meta.get("dataset") or "")
     if ds:
@@ -126,6 +132,7 @@ def _dataset_status(meta: Dict[str, Any]) -> Tuple[bool, str, bool, int]:
 
 
 def _phase_counts(df: "pd.DataFrame") -> Dict[str, int]:  # type: ignore[name-defined]
+    """Count probe rows per experiment phase."""
     out = {"warmup": 0, "attack": 0, "cooldown": 0}
     if "phase" not in df.columns:
         return out
@@ -136,6 +143,7 @@ def _phase_counts(df: "pd.DataFrame") -> Dict[str, int]:  # type: ignore[name-de
 
 
 def _latency_censored_values(g: "pd.DataFrame", timeout_marker_ms: float) -> Any:  # type: ignore[name-defined]
+    """Replace failed probe latencies with a timeout marker for statistics."""
     lat = g["latency_ms"].copy()
     lat.loc[g["ok"] != 1] = timeout_marker_ms
     return lat.dropna().values
@@ -219,6 +227,7 @@ def generate_reexecution_stability_reports(
         return
 
     def pctl(x: Any, q: float) -> float:
+        """Return a percentile value for a numeric sequence."""
         arr = np.asarray(x, dtype=float)
         return float(np.percentile(arr, q)) if arr.size else float("nan")
 

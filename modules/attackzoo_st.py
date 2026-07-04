@@ -110,6 +110,7 @@ def start_attack_logs_watcher(
     """
 
     def _worker() -> None:
+        """Mirror Docker attack logs into the persistent Streamlit log file."""
         try:
             _log_attack_event(
                 "ATTACK_START",
@@ -165,6 +166,7 @@ def start_attack_timeout_watchdog(container_ref: str, spec: AttackSpec, max_runt
     """
 
     def _worker() -> None:
+        """Wait for the runtime limit and stop the attack container if needed."""
         try:
             time.sleep(max_runtime_s)
             rc, out, _ = _run(["docker", "inspect", "-f", "{{.State.Running}}", container_ref])
@@ -351,6 +353,7 @@ def start_benign_logs_watcher(container_ref: str, kind: str, *, container_name: 
     :type cmd: Optional[List[str]], optional
     """
     def _worker() -> None:
+        """Mirror benign-client Docker logs and record its lifecycle events."""
         ref = container_ref or (container_name or "")
         name = container_name or container_ref
 
@@ -2021,6 +2024,7 @@ def get_servers_status() -> List[dict]:
 # tcpdump capture
 # -----------------------------
 def _file_size_stable(path: Path, checks: int = 5, sleep_s: float = 0.10) -> bool:
+    """Check whether a capture file stopped growing before post-processing."""
     try:
         last = path.stat().st_size
     except Exception:
@@ -2042,6 +2046,7 @@ def _file_size_stable(path: Path, checks: int = 5, sleep_s: float = 0.10) -> boo
 
 
 def _tshark_rewrite_pcap_if_needed(pcap_path: Path, tmp_dir: Path) -> Tuple[bool, str]:
+    """Use tshark to rewrite a PCAP when validation reports corruption."""
     p = subprocess.run(["tshark", "-r", str(pcap_path), "-q"], capture_output=True)
     if p.returncode == 0:
         return False, "pcap_ok"
@@ -2065,6 +2070,7 @@ def _tshark_rewrite_pcap_if_needed(pcap_path: Path, tmp_dir: Path) -> Tuple[bool
     return False, "pcap_invalid_and_rewrite_failed"
 
 def start_tcpdump_capture(pcap_path: Path, iface: str = "docker0") -> Dict[str, Any]:
+    """Start tcpdump for the Streamlit UI and return process metadata."""
     _ensure_dirs()
 
     cmd = ["tcpdump", "-i", iface, "-U", "-s", "0", "-w", str(pcap_path)]
@@ -2097,6 +2103,7 @@ def start_tcpdump_capture(pcap_path: Path, iface: str = "docker0") -> Dict[str, 
 
 
 def stop_tcpdump_capture(p: subprocess.Popen, pcap_path: Optional[Path] = None, timeout: float = 10.0) -> Dict[str, Any]:
+    """Stop a tcpdump process and optionally repair the resulting PCAP."""
     try:
         if p.poll() is None:
             # graceful: SIGINT
@@ -2266,6 +2273,7 @@ def run_attack_from_spec(
     pcap_path = build_capture_path(spec.id) if capture_enabled else None
 
     def _start_attack_only() -> Dict[str, Any]:
+        """Run the selected attack and attach log/timeout watchers."""
         with st.spinner("Running attack..."):
             result = spec.runner(resolved_params)
 

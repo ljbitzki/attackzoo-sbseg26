@@ -26,6 +26,7 @@ def _read_proc_stat_totals() -> Tuple[int, int]:
 
 
 def _sample_cpu_percent(prev_total: Optional[int], prev_idle: Optional[int]) -> Tuple[float, int, int]:
+    """Compute host CPU usage since the previous procfs sample."""
     total, idle = _read_proc_stat_totals()
     if prev_total is None or prev_idle is None or total <= prev_total:
         return float("nan"), total, idle
@@ -37,6 +38,7 @@ def _sample_cpu_percent(prev_total: Optional[int], prev_idle: Optional[int]) -> 
 
 
 def _read_meminfo() -> Dict[str, float]:
+    """Read host memory totals and usage percentages from /proc/meminfo."""
     vals: Dict[str, int] = {}
     for line in Path("/proc/meminfo").read_text(encoding="utf-8").splitlines():
         if not line.strip() or ":" not in line:
@@ -59,6 +61,7 @@ def _read_meminfo() -> Dict[str, float]:
 
 
 def _read_loadavg() -> Tuple[float, float, float]:
+    """Read 1, 5, and 15 minute host load averages."""
     try:
         a, b, c = os.getloadavg()
         return float(a), float(b), float(c)

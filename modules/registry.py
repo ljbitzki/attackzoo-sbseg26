@@ -13,6 +13,7 @@ _TARGET_KNOWN_KEYS = {"target_ip", "target", "target_server", "host"}
 
 
 def _is_loopback_target(value: Any) -> bool:
+    """Check whether a resolved target value refers to the local host."""
     text = str(value).strip().lower()
     if text in _LOOPBACK_NAMES:
         return True
@@ -51,6 +52,7 @@ class AttackSpec:
     docker_network: Optional[str] = None
 
     def runner(self, resolved_params: Dict[str, Any]) -> Dict[str, Any]:
+        """Launch this attack image with resolved positional args and env vars."""
         args = self.positional_args(resolved_params)
         env = self.env_vars(resolved_params)
         return docker_run_detached(
@@ -62,6 +64,7 @@ class AttackSpec:
         )
 
     def positional_args(self, resolved_params: Dict[str, Any]) -> List[str]:
+        """Return resolved parameters that must be passed as container arguments."""
         return [
             str(resolved_params[p.key])
             for p in self.params
@@ -69,6 +72,7 @@ class AttackSpec:
         ]
 
     def env_vars(self, resolved_params: Dict[str, Any]) -> Dict[str, str]:
+        """Return resolved parameters that should be injected as environment vars."""
         return {
             p.env_var: str(resolved_params[p.key])
             for p in self.params
@@ -76,6 +80,7 @@ class AttackSpec:
         }
 
     def network_mode(self, resolved_params: Dict[str, Any]) -> Optional[str]:
+        """Select the Docker network mode required for this attack invocation."""
         if self.docker_network:
             return self.docker_network
 

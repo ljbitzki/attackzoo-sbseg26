@@ -7,9 +7,11 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 def p95(x):
+    """Return the 95th percentile for a pandas Series."""
     return x.quantile(0.95)
 
 def main():
+    """Generate scalability summary tables and CPU/memory figures."""
     ap = argparse.ArgumentParser()
     ap.add_argument("--input", default="experiments/scalability/tables/scalability_raw.csv")
     ap.add_argument("--out", default="experiments/scalability")

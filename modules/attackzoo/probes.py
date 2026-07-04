@@ -42,6 +42,7 @@ SUPPORTED_PROBES: Tuple[str, ...] = tuple(DEFAULT_PROBE_PORTS.keys())
 
 
 def normalize_probe_service(service: str) -> str:
+    """Normalize a probe service name and reject unsupported services."""
     svc = service.strip().lower().replace("_", "-")
     svc = PROBE_ALIASES.get(svc, svc)
     if svc not in DEFAULT_PROBE_PORTS:
@@ -51,10 +52,12 @@ def normalize_probe_service(service: str) -> str:
 
 
 def probe_default_port(service: str) -> int:
+    """Return the default network port for a normalized probe service."""
     return DEFAULT_PROBE_PORTS[normalize_probe_service(service)]
 
 
 def _ssl_context() -> ssl.SSLContext:
+    """Create a permissive TLS context for availability-only HTTPS probes."""
     ctx = ssl._create_unverified_context()
     try:
         ctx.set_ciphers("ALL:@SECLEVEL=0")
@@ -64,6 +67,7 @@ def _ssl_context() -> ssl.SSLContext:
 
 
 def probe_http(url: str, timeout_s: float = 2.0) -> ProbeResult:
+    """Probe an HTTP or HTTPS URL and return success, latency, and error text."""
     from urllib.request import Request, urlopen
     from urllib.error import HTTPError, URLError
 
@@ -87,15 +91,18 @@ def probe_http(url: str, timeout_s: float = 2.0) -> ProbeResult:
 
 
 def probe_https(url: str, timeout_s: float = 2.0) -> ProbeResult:
+    """Probe an HTTPS URL using the same request logic as the HTTP probe."""
     return probe_http(url, timeout_s=timeout_s)
 
 
 def _mqtt_encode_str(s: str) -> bytes:
+    """Encode an MQTT length-prefixed UTF-8 string."""
     b = s.encode("utf-8")
     return len(b).to_bytes(2, "big") + b
 
 
 def _mqtt_remaining_length(n: int) -> bytes:
+    """Encode an MQTT variable-length remaining-length field."""
     out = bytearray()
     while True:
         digit = n % 128
@@ -148,6 +155,7 @@ def probe_mqtt(host: str, port: int, timeout_s: float = 2.0, client_id: str = "S
 
 
 def probe_ssh(host: str, port: int, timeout_s: float = 2.0) -> ProbeResult:
+    """Probe SSH availability by opening a socket and checking the banner."""
     t0 = time.perf_counter()
     ok = 0
     err = ""
@@ -172,6 +180,7 @@ def probe_ssh(host: str, port: int, timeout_s: float = 2.0) -> ProbeResult:
 
 
 def probe_telnet(host: str, port: int, timeout_s: float = 2.0) -> ProbeResult:
+    """Probe Telnet availability by opening a TCP connection."""
     t0 = time.perf_counter()
     ok = 0
     err = ""
@@ -196,6 +205,7 @@ def probe_telnet(host: str, port: int, timeout_s: float = 2.0) -> ProbeResult:
 
 
 def _smb2_negotiate_packet() -> bytes:
+    """Build a minimal SMB negotiate packet for an availability probe."""
     header = (
         b"\xfeSMB"
         + struct.pack(
@@ -234,6 +244,7 @@ def _smb2_negotiate_packet() -> bytes:
 
 
 def probe_smb(host: str, port: int, timeout_s: float = 2.0) -> ProbeResult:
+    """Probe SMB availability by sending a minimal negotiate request."""
     t0 = time.perf_counter()
     ok = 0
     err = ""
@@ -259,6 +270,7 @@ def probe_smb(host: str, port: int, timeout_s: float = 2.0) -> ProbeResult:
 
 
 def _coap_uri_path_options(path: str) -> bytes:
+    """Encode simple CoAP Uri-Path options for the probe request."""
     out = bytearray()
     last_opt = 0
     for raw_segment in path.strip("/").split("/"):
@@ -276,6 +288,7 @@ def _coap_uri_path_options(path: str) -> bytes:
 
 
 def probe_coap(host: str, port: int, timeout_s: float = 2.0, path: str = "/.well-known/core") -> ProbeResult:
+    """Probe CoAP availability with a confirmable GET request."""
     t0 = time.perf_counter()
     ok = 0
     err = ""
@@ -316,6 +329,7 @@ def probe_coap(host: str, port: int, timeout_s: float = 2.0, path: str = "/.well
 
 
 def probe_xrce(host: str, port: int, timeout_s: float = 2.0) -> ProbeResult:
+    """Probe Micro XRCE-DDS UDP reachability with a lightweight datagram."""
     t0 = time.perf_counter()
     ok = 0
     err = ""
@@ -346,6 +360,7 @@ def probe_xrce(host: str, port: int, timeout_s: float = 2.0) -> ProbeResult:
 
 
 def probe_zenoh(host: str, port: int, timeout_s: float = 2.0) -> ProbeResult:
+    """Probe Zenoh availability by opening a TCP connection."""
     t0 = time.perf_counter()
     ok = 0
     err = ""
@@ -365,6 +380,7 @@ def probe_zenoh(host: str, port: int, timeout_s: float = 2.0) -> ProbeResult:
 
 
 def probe_service(service: str, endpoint: Mapping[str, Any], timeout_s: float = 2.0) -> ProbeResult:
+    """Dispatch a generic probe request to the implementation for one service."""
     svc = normalize_probe_service(service)
     url = str(endpoint.get("url") or "")
     host = str(endpoint.get("host") or "127.0.0.1")
@@ -405,6 +421,7 @@ def probe_loop(
     timeout_s: float,
     stop_evt: threading.Event,
 ) -> None:
+    """Continuously sample one service probe and write phase-labeled CSV rows."""
     service = normalize_probe_service(service)
     t_start = time.time()
     _ensure_dir(out_csv.parent)

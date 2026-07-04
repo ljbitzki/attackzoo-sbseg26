@@ -21,6 +21,7 @@ from modules.attackzoo.probes import SUPPORTED_PROBES
 
 
 def build_parser() -> argparse.ArgumentParser:
+    """Build the top-level AttackZoo CLI parser and all subcommands."""
     p = argparse.ArgumentParser(prog="attackzoo.py")
     sub = p.add_subparsers(dest="cmd", required=True)
 
@@ -71,6 +72,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
 
     def _exp_error(message, _s=s):
+        """Print experiment-specific parser errors with the subcommand usage."""
         _s.print_usage(sys.stderr)
         _s.exit(2, f"\nexperiment: error: {message}\n")
     s.error = _exp_error  # type: ignore[method-assign]

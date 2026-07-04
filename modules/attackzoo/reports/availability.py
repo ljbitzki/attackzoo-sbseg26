@@ -63,6 +63,7 @@ def generate_reports(probe_csv_files: Iterable[Path], outdir: Path, warmup: floa
                 resources[col] = pd.to_numeric(resources[col], errors="coerce")
 
     def pctl(x, q):
+        """Return a percentile value, or NaN when the input is empty."""
         x = np.asarray(x, dtype=float)
         return float(np.percentile(x, q)) if x.size else np.nan
 
@@ -115,6 +116,7 @@ def generate_reports(probe_csv_files: Iterable[Path], outdir: Path, warmup: floa
         return max(base, observed_max)
 
     def _rolling_window_n(g: "pd.DataFrame", window_s: float = 5.0) -> int:
+        """Estimate how many samples fit in a rolling time window."""
         t = g["t_rel_s"].dropna().values
         if len(t) < 3:
             return 1
@@ -205,6 +207,7 @@ def generate_reports(probe_csv_files: Iterable[Path], outdir: Path, warmup: floa
     # F4 (v1) — CDF for successful probes only
     # ------------------------------------------------------------------
     def cdf(x):
+        """Build x/y arrays for an empirical cumulative distribution."""
         x = np.sort(x)
         y = np.arange(1, len(x) + 1) / len(x)
         return x, y

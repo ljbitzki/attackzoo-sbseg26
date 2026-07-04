@@ -21,6 +21,7 @@ from modules.runners import docker_available, docker_container_status, docker_lo
 
 
 def cmd_status(_: argparse.Namespace) -> int:
+    """Check whether Docker is reachable and report CLI readiness."""
     ok = docker_available()
     print("docker_available=" + ("true" if ok else "false"))
     return 0 if ok else 2
@@ -81,6 +82,7 @@ def cmd_list(args: argparse.Namespace) -> int:
 
 
 def cmd_captures(args: argparse.Namespace) -> int:
+    """List captured PCAP files and any generated feature/dataset artifacts."""
     _ensure_dir(CAPTURES_DIR)
     pcaps = sorted(CAPTURES_DIR.glob("*.pcap"), key=lambda p: p.stat().st_mtime, reverse=True)
     if args.latest and pcaps:
@@ -117,6 +119,7 @@ def cmd_captures(args: argparse.Namespace) -> int:
 
 
 def cmd_features(args: argparse.Namespace) -> int:
+    """Extract configured feature sets from a PCAP capture."""
     pcap = Path(args.pcap)
     if not pcap.exists():
         print(f"PCAP not found: {pcap}", file=sys.stderr)
@@ -138,6 +141,7 @@ def cmd_features(args: argparse.Namespace) -> int:
 
 
 def cmd_dataset(args: argparse.Namespace) -> int:
+    """Build an unsupervised dataset CSV for a capture."""
     from modules.datasets import build_dataset_unsupervised_for_capture
 
     pcap = Path(args.pcap)

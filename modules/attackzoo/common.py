@@ -8,14 +8,17 @@ from pathlib import Path
 from typing import List, Optional, Tuple
 
 def _ensure_dir(p: Path) -> None:
+    """Create a directory tree when a command needs an output location."""
     p.mkdir(parents=True, exist_ok=True)
 
 
 def _now_ts() -> str:
+    """Return a timestamp string suitable for filenames and run folders."""
     return datetime.now().strftime("%Y%m%d_%H%M%S")
 
 
 def _run(cmd: List[str]) -> Tuple[int, str, str]:
+    """Run a command and return decoded stdout/stderr with its exit code."""
     p = subprocess.run(cmd, capture_output=True)
     out = (p.stdout or b"").decode("utf-8", errors="replace").strip()
     err = (p.stderr or b"").decode("utf-8", errors="replace").strip()
@@ -23,6 +26,7 @@ def _run(cmd: List[str]) -> Tuple[int, str, str]:
 
 
 def _stop_proc(p: Optional[subprocess.Popen], timeout: float = 5.0) -> None:
+    """Stop a child process group gracefully before falling back to termination."""
     if not p:
         return
     try:
@@ -59,6 +63,7 @@ def _stop_proc(p: Optional[subprocess.Popen], timeout: float = 5.0) -> None:
 
 
 def _phase_of(t_rel: float, warmup: float, attack: float, cooldown: float) -> str:
+    """Map elapsed experiment time to warmup, attack, cooldown, or done."""
     if t_rel < warmup:
         return "warmup"
     if t_rel < warmup + attack:

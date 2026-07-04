@@ -84,6 +84,7 @@ def load_attacks(attacks_dir: pathlib.Path) -> dict:
 
 
 def _build_spec(d: dict):
+    """Convert one parsed attack.yaml dictionary into an AttackSpec."""
     from modules.registry import AttackSpec, ParamSpec
 
     params = [_param_from_dict(p, ParamSpec) for p in d.get("params", [])]
@@ -105,6 +106,7 @@ def _build_spec(d: dict):
 
 
 def _param_from_dict(p: dict, param_cls):
+    """Build a ParamSpec-like object from a YAML parameter dictionary."""
     return param_cls(
         key=p["key"],
         label=p.get("label", p["key"]),
@@ -119,6 +121,7 @@ def _param_from_dict(p: dict, param_cls):
 
 
 def _build_intensity_params(items, param_cls):
+    """Expand reusable intensity parameter names declared by an attack YAML."""
     params = []
     for item in items or []:
         if isinstance(item, str):

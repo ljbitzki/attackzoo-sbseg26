@@ -16,6 +16,7 @@ _KIND_PATTERNS = {
 
 
 def _all_specs() -> Dict[str, Any]:
+    """Flatten the categorized registry into an attack-id lookup table."""
     return {s.id: s for specs in CATEGORIES.values() for s in specs}
 
 

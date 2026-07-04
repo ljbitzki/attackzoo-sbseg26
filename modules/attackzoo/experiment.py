@@ -23,6 +23,7 @@ from modules.attackzoo.telemetry import docker_stats_loop, resource_loop
 
 
 def _start_hook(cmd_template: str, vars_: Dict[str, Any]) -> Optional[subprocess.Popen]:
+    """Start a formatted experiment hook command, if one was configured."""
     if not cmd_template.strip():
         return None
     cmd = cmd_template.format(**vars_)
@@ -30,6 +31,7 @@ def _start_hook(cmd_template: str, vars_: Dict[str, Any]) -> Optional[subprocess
     return subprocess.Popen(cmd, shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, preexec_fn=os.setsid)
 
 def _parse_probe_services(raw: str) -> List[str]:
+    """Parse a comma-separated probe list, expanding aliases such as all/none."""
     services: List[str] = []
     for item in (raw or "").split(","):
         token = item.strip().lower()
@@ -47,6 +49,7 @@ def _parse_probe_services(raw: str) -> List[str]:
 
 
 def _split_host_port(value: str) -> Dict[str, Any]:
+    """Split host[:port] endpoint text into a dictionary used by probes."""
     value = value.strip()
     if not value:
         return {}
@@ -61,6 +64,7 @@ def _split_host_port(value: str) -> Dict[str, Any]:
 
 
 def _parse_probe_endpoints(raw_items: List[str]) -> Dict[str, Dict[str, Any]]:
+    """Parse explicit service endpoint overrides from CLI arguments."""
     endpoints: Dict[str, Dict[str, Any]] = {}
     for raw in raw_items or []:
         if "=" not in raw:
@@ -76,6 +80,7 @@ def _parse_probe_endpoints(raw_items: List[str]) -> Dict[str, Dict[str, Any]]:
 
 
 def _url_from_endpoint(scheme: str, endpoint: Dict[str, Any], default_url: str) -> str:
+    """Build a probe URL from endpoint fields or fall back to a default URL."""
     if endpoint.get("url"):
         return str(endpoint["url"])
     if endpoint.get("host"):
@@ -92,6 +97,7 @@ def _probe_endpoint_for(
     explicit_endpoints: Dict[str, Dict[str, Any]],
     probe_count: int,
 ) -> Dict[str, Any]:
+    """Resolve the concrete endpoint used by one probe service."""
     endpoint = dict(explicit_endpoints.get(service, {}))
     if service == "http":
         return {"url": _url_from_endpoint("http", endpoint, args.http_url)}
