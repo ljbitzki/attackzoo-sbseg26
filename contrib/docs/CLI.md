@@ -619,6 +619,58 @@ Example:
 --levels L0,L2
 ```
 
+From the implementation point of view, levels are primarily experiment labels. They determine the directory layout, metadata, report grouping, plot grouping, and hook substitution value exposed as `{level}`.
+
+The only level with special behavior in `attackzoo.py experiment` is `L0`:
+
+| Level | Practical meaning in the current CLI | Attack hook behavior |
+| --- | --- | --- |
+| `L0` | Baseline/control condition. Probes, PCAP capture, resource collection, Docker stats, feature extraction, dataset generation, and reports still run, but no attack is started by experiment hooks. This level is used to measure normal service behavior under the same timing and capture conditions. | `--attack-start-hook` and `--attack-stop-hook` are not called. |
+| `L1` | Attack condition label, conventionally used for a low-intensity attack scenario. The CLI does not automatically reduce or increase attack parameters for this level. | Hooks are called if configured. |
+| `L2` | Attack condition label, conventionally used for a medium-intensity attack scenario. The CLI treats it the same way as any non-`L0` level unless the hook command uses `{level}` to change behavior. | Hooks are called if configured. |
+| `L3` | Attack condition label, conventionally used for a high-intensity attack scenario. The CLI treats it the same way as `L1` and `L2` unless external hook logic maps it to stronger parameters. | Hooks are called if configured. |
+
+This means that `L1`, `L2`, and `L3` do not automatically change `--rate`, `--duration`, `--threads`, `--concurrency`, or any attack-specific parameter by themselves. They are useful because every output row and artifact records the level, allowing later comparisons such as baseline versus attack or low/medium/high conditions.
+
+To make levels represent actual attack intensity, encode the mapping in the hook command or in a wrapper script. For example:
+
+```bash
+python3 attackzoo.py experiment \
+  --attack-id dos_udp_flood \
+  --out udp_levels \
+  --levels L0,L1,L2,L3 \
+  --attack-start-hook './hooks/level_attack_start.sh {attack_id} {level} {host} {port} {duration_s}' \
+  --attack-stop-hook 'python3 attackzoo.py stop {attack_id}'
+```
+
+In that example, `level_attack_start.sh` could map `L1`, `L2`, and `L3` to different `--rate` or attack-specific parameters before calling `python3 attackzoo.py run`.
+
+A simpler inline pattern is possible when the same fixed parameter is acceptable for every non-`L0` level:
+
+```bash
+--attack-start-hook "python3 attackzoo.py run dos_http_simple --target {host} --port {port} --duration {duration_s}"
+```
+
+With this inline hook, `L1`, `L2`, and `L3` all execute the same attack command. They remain separate labels in the resulting directories, `meta.json`, probe CSVs, telemetry CSVs, generated datasets, and reports.
+
+Per-level output directories are created as:
+
+```text
+experiments/<out>/<attack_id>/L0/run01/
+experiments/<out>/<attack_id>/L1/run01/
+experiments/<out>/<attack_id>/L2/run01/
+experiments/<out>/<attack_id>/L3/run01/
+```
+
+For documentation and paper terminology, a practical interpretation is:
+
+- `L0`: no-attack baseline;
+- `L1`: attack present, low intensity when the hook/wrapper maps it that way;
+- `L2`: attack present, medium intensity when the hook/wrapper maps it that way;
+- `L3`: attack present, high intensity when the hook/wrapper maps it that way.
+
+When no explicit intensity mapping is configured, describe `L1`, `L2`, and `L3` as repeated attack-condition labels rather than guaranteed increasing intensities.
+
 ### Capture Parameters
 
 | Parameter | Required | Default | Description |
