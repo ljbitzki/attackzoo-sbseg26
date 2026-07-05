@@ -74,7 +74,16 @@ LEVEL_COLORS = {
     "L3": "#d62728",
 }
 
-PLOT_CHOICES = ("protocol", "ports", "pps", "bps", "heatmap", "dataset_rows")
+PLOT_CHOICES = (
+    "protocol",
+    "ports",
+    "pps",
+    "bps",
+    "heatmap",
+    "dataset_rows",
+    "stability",
+    "phase_metrics",
+)
 PLOT_ALIASES = {
     "all": set(PLOT_CHOICES),
     "protocols": {"protocol"},
@@ -85,6 +94,11 @@ PLOT_ALIASES = {
     "datasets": {"dataset_rows"},
     "dataset": {"dataset_rows"},
     "rows": {"dataset_rows"},
+    "reexecution": {"stability"},
+    "reproducibility": {"stability"},
+    "availability": {"phase_metrics"},
+    "latency": {"phase_metrics"},
+    "phases": {"phase_metrics"},
 }
 
 CATEGORY_SHORT_LABELS = {
@@ -157,8 +171,8 @@ def parse_args(argv: Optional[Sequence[str]] = None) -> argparse.Namespace:
         "--plots",
         default="all",
         help=(
-            "Comma-separated plots to generate: all, protocol, ports, pps, bps, heatmap, dataset_rows. "
-            "Example: --plots heatmap or --plots protocol,ports,pps,dataset_rows. Default: all."
+            "Comma-separated plots to generate: all, protocol, ports, pps, bps, heatmap, "
+            "dataset_rows, stability, phase_metrics. Example: --plots stability,phase_metrics. Default: all."
         ),
     )
     parser.add_argument(
@@ -171,6 +185,14 @@ def parse_args(argv: Optional[Sequence[str]] = None) -> argparse.Namespace:
         "--variability-metric",
         default="dataset_rows",
         help="Metric from T6_reexecution_stability.csv used in the textual variability table. Default: dataset_rows.",
+    )
+    parser.add_argument(
+        "--stability-metrics",
+        default="dataset_rows,pcap_size_mb,execution_time_s,lat_p95_attack_censored_ms",
+        help=(
+            "Comma-separated metrics from T6_reexecution_stability.csv used in the cv_pct stability "
+            "heatmap. Default: dataset_rows,pcap_size_mb,execution_time_s,lat_p95_attack_censored_ms."
+        ),
     )
     parser.add_argument(
         "--progress-interval",
@@ -606,6 +628,10 @@ def parse_plot_selection(value: str) -> set[str]:
     return selected or set(PLOT_CHOICES)
 
 
+def parse_csv_list(value: str) -> list[str]:
+    return [item.strip() for item in value.split(",") if item.strip()]
+
+
 def read_csv_dicts(path: Path) -> Iterable[dict[str, str]]:
     with path.open("r", encoding="utf-8", newline="") as handle:
         reader = csv.DictReader(handle)
@@ -778,6 +804,138 @@ def write_dataset_and_variability_outputs(
         "category_level_dataset_rows_csv": dataset_rows_csv,
         "run_variability_csv": variability_csv,
         "run_variability_markdown": variability_md,
+    }
+
+
+def write_stability_and_phase_outputs(
+    campaign_dir: Path,
+    report_dir: Path,
+    attack_categories: dict[str, str],
+    stability_metrics: Sequence[str],
+) -> dict[str, Path]:
+    data_dir = report_dir / "data"
+    selected_metrics = set(stability_metrics)
+
+    stability_rows = []
+    for path in table_paths(campaign_dir, "T6_reexecution_stability.csv"):
+        for row in read_csv_dicts(path):
+            metric = row.get("metric", "")
+            if selected_metrics and metric not in selected_metrics:
+                continue
+            attack_id = row.get("attack_id", "")
+            category = attack_categories.get(attack_id, "Unmapped")
+            stability_rows.append(
+                (
+                    category,
+                    short_category_label(category).replace("\n", " "),
+                    row.get("service", ""),
+                    attack_id,
+                    row.get("level", ""),
+                    metric,
+                    int(to_float(row.get("n_runs", "")) or 0),
+                    to_float(row.get("mean", "")) or 0.0,
+                    to_float(row.get("std_dev", "")) or 0.0,
+                    to_float(row.get("cv_pct", "")) or 0.0,
+                    to_float(row.get("min", "")) or 0.0,
+                    to_float(row.get("max", "")) or 0.0,
+                    to_float(row.get("range", "")) or 0.0,
+                )
+            )
+
+    stability_csv = data_dir / "reexecution_stability_cv_pct.csv"
+    write_csv(
+        stability_csv,
+        (
+            "category",
+            "category_label",
+            "service",
+            "attack_id",
+            "level",
+            "metric",
+            "n_runs",
+            "mean",
+            "std_dev",
+            "cv_pct",
+            "min",
+            "max",
+            "range",
+        ),
+        stability_rows,
+    )
+
+    phase_rows = []
+    phase_summary: dict[tuple[str, str], dict[str, list[float]]] = {}
+    for path in table_paths(campaign_dir, "T6_run_metrics.csv"):
+        for row in read_csv_dicts(path):
+            attack_id = row.get("attack_id", "")
+            category = attack_categories.get(attack_id, "Unmapped")
+            level = row.get("level", "")
+            for phase in ("warmup", "attack", "cooldown"):
+                success_rate = to_float(row.get(f"success_rate_{phase}_pct", "")) or 0.0
+                lat_p95 = (
+                    to_float(row.get(f"lat_p95_{phase}_censored_ms", ""))
+                    or to_float(row.get(f"lat_p95_{phase}_ms", ""))
+                    or 0.0
+                )
+                phase_rows.append(
+                    (
+                        category,
+                        short_category_label(category).replace("\n", " "),
+                        row.get("service", ""),
+                        attack_id,
+                        level,
+                        row.get("run_id", ""),
+                        phase,
+                        success_rate,
+                        lat_p95,
+                    )
+                )
+                key = (level, phase)
+                bucket = phase_summary.setdefault(key, {"success": [], "lat_p95": []})
+                bucket["success"].append(success_rate)
+                bucket["lat_p95"].append(lat_p95)
+
+    phase_metrics_csv = data_dir / "phase_success_latency_metrics.csv"
+    write_csv(
+        phase_metrics_csv,
+        (
+            "category",
+            "category_label",
+            "service",
+            "attack_id",
+            "level",
+            "run_id",
+            "phase",
+            "success_rate_pct",
+            "lat_p95_ms",
+        ),
+        phase_rows,
+    )
+
+    phase_summary_rows = []
+    for level in LEVEL_ORDER:
+        for phase in ("warmup", "attack", "cooldown"):
+            values = phase_summary.get((level, phase), {"success": [], "lat_p95": []})
+            phase_summary_rows.append(
+                (
+                    level,
+                    phase,
+                    len(values["success"]),
+                    mean(values["success"]),
+                    mean(values["lat_p95"]),
+                )
+            )
+    phase_summary_csv = data_dir / "phase_success_latency_summary_by_level.csv"
+    write_csv(
+        phase_summary_csv,
+        ("level", "phase", "sample_count", "mean_success_rate_pct", "mean_lat_p95_ms"),
+        phase_summary_rows,
+    )
+
+    return {
+        "reexecution_stability_cv_pct_csv": stability_csv,
+        "phase_success_latency_metrics_csv": phase_metrics_csv,
+        "phase_success_latency_summary_csv": phase_summary_csv,
     }
 
 
@@ -1066,6 +1224,7 @@ def plot_outputs(
     top_protocols: int,
     selected_plots: set[str],
     heatmap_metric: str,
+    stability_metrics: Sequence[str],
 ) -> dict[str, Path]:
     plt, pd = import_plotting()
     figures_dir = report_dir / "figures"
@@ -1264,6 +1423,108 @@ def plot_outputs(
         plt.close(fig)
         outputs["category_level_dataset_rows_plot"] = path
 
+    if "stability" in selected_plots:
+        stability_df = pd.read_csv(csv_paths["reexecution_stability_cv_pct_csv"])
+        metric_order = [metric for metric in stability_metrics if metric in set(stability_df["metric"])]
+        if not metric_order:
+            metric_order = sorted(stability_df["metric"].dropna().unique())
+        attack_order_df = (
+            stability_df[["category", "attack_id"]]
+            .drop_duplicates()
+            .sort_values(["category", "attack_id"], key=lambda series: series.map(sort_category_key) if series.name == "category" else series)
+        )
+        attack_order = attack_order_df["attack_id"].tolist()
+
+        fig_height = max(8.0, len(attack_order) * 0.22)
+        fig, axes = plt.subplots(
+            1,
+            len(metric_order),
+            figsize=(max(5.0 * len(metric_order), 8.0), fig_height),
+            constrained_layout=True,
+            squeeze=False,
+        )
+        all_values = stability_df["cv_pct"].astype(float)
+        vmax = float(all_values.quantile(0.95)) if not all_values.empty else 1.0
+        vmax = max(vmax, 1.0)
+
+        for index, metric in enumerate(metric_order):
+            ax = axes[0][index]
+            metric_df = stability_df[stability_df["metric"] == metric]
+            pivot = (
+                metric_df.pivot_table(
+                    index="attack_id",
+                    columns="level",
+                    values="cv_pct",
+                    aggfunc="mean",
+                    fill_value=0,
+                )
+                .reindex(index=attack_order, columns=list(LEVEL_ORDER), fill_value=0)
+            )
+            image = ax.imshow(pivot.to_numpy(dtype=float), cmap="YlOrRd", aspect="auto", vmin=0, vmax=vmax)
+            ax.set_title(metric.replace("_", " "))
+            ax.set_xlabel("Level")
+            ax.set_xticks(range(len(LEVEL_ORDER)), labels=LEVEL_ORDER)
+            if index == 0:
+                ax.set_ylabel("Attack")
+                ax.set_yticks(range(len(attack_order)), labels=attack_order)
+                ax.tick_params(axis="y", labelsize=5)
+            else:
+                ax.set_yticks([])
+        colorbar = fig.colorbar(image, ax=axes.ravel().tolist(), shrink=0.75)
+        colorbar.set_label("Coefficient of variation (%)")
+        path = figures_dir / "06_reexecution_cv_pct_heatmap.png"
+        fig.savefig(path, dpi=180, bbox_inches="tight")
+        plt.close(fig)
+        outputs["reexecution_cv_pct_heatmap_plot"] = path
+
+    if "phase_metrics" in selected_plots:
+        phase_df = pd.read_csv(csv_paths["phase_success_latency_metrics_csv"])
+        phase_order = ("warmup", "attack", "cooldown")
+        phase_labels = ("Warmup", "Attack", "Cooldown")
+        success_data = [
+            phase_df[phase_df["phase"] == phase]["success_rate_pct"].astype(float).dropna().to_numpy()
+            for phase in phase_order
+        ]
+        latency_data = [
+            phase_df[phase_df["phase"] == phase]["lat_p95_ms"].astype(float).dropna().to_numpy()
+            for phase in phase_order
+        ]
+
+        fig, axes = plt.subplots(1, 2, figsize=(11, 5), constrained_layout=True)
+        boxprops = {"linewidth": 1.1}
+        medianprops = {"color": "#222222", "linewidth": 1.3}
+        success_box = axes[0].boxplot(
+            success_data,
+            tick_labels=phase_labels,
+            patch_artist=True,
+            boxprops=boxprops,
+            medianprops=medianprops,
+        )
+        for patch, color in zip(success_box["boxes"], ("#b8e1ff", "#fdd49e", "#c7e9c0")):
+            patch.set_facecolor(color)
+        axes[0].set_title("Service Availability by Phase")
+        axes[0].set_ylabel("Success rate (%)")
+        axes[0].set_ylim(-2, 102)
+        axes[0].grid(axis="y", alpha=0.25)
+
+        latency_box = axes[1].boxplot(
+            latency_data,
+            tick_labels=phase_labels,
+            patch_artist=True,
+            boxprops=boxprops,
+            medianprops=medianprops,
+        )
+        for patch, color in zip(latency_box["boxes"], ("#b8e1ff", "#fdd49e", "#c7e9c0")):
+            patch.set_facecolor(color)
+        axes[1].set_title("P95 Latency by Phase")
+        axes[1].set_ylabel("P95 latency (ms)")
+        axes[1].grid(axis="y", alpha=0.25)
+
+        path = figures_dir / "07_phase_success_latency_boxplots.png"
+        fig.savefig(path, dpi=180, bbox_inches="tight")
+        plt.close(fig)
+        outputs["phase_success_latency_boxplots_plot"] = path
+
     return outputs
 
 
@@ -1278,6 +1539,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     except ValueError as exc:
         print(f"[ERROR] {exc}", file=sys.stderr)
         return 2
+    stability_metrics = parse_csv_list(args.stability_metrics)
 
     campaign_dir = args.campaign_dir.resolve()
     if not campaign_dir.is_dir():
@@ -1317,6 +1579,14 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             args.variability_metric,
         )
     )
+    csv_paths.update(
+        write_stability_and_phase_outputs(
+            campaign_dir,
+            report_dir,
+            attack_categories,
+            stability_metrics,
+        )
+    )
     plot_paths: dict[str, Path] = {}
     plot_error = ""
     if not args.no_plots:
@@ -1328,6 +1598,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
                 args.top_protocols,
                 selected_plots,
                 args.heatmap_metric,
+                stability_metrics,
             )
         except ModuleNotFoundError as exc:
             plot_error = f"plot dependencies missing: {exc}"
@@ -1349,6 +1620,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         "selected_plots": sorted(selected_plots),
         "heatmap_metric": args.heatmap_metric,
         "variability_metric": args.variability_metric,
+        "stability_metrics": stability_metrics,
         "first_epoch_second": aggregate["first_second"],
         "last_epoch_second": aggregate["last_second"],
         "csv_outputs": {key: str(value) for key, value in csv_paths.items()},
