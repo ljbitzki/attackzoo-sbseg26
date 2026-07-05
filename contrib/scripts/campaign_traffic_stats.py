@@ -74,7 +74,7 @@ LEVEL_COLORS = {
     "L3": "#d62728",
 }
 
-PLOT_CHOICES = ("protocol", "ports", "pps", "bps", "heatmap")
+PLOT_CHOICES = ("protocol", "ports", "pps", "bps", "heatmap", "dataset_rows")
 PLOT_ALIASES = {
     "all": set(PLOT_CHOICES),
     "protocols": {"protocol"},
@@ -82,6 +82,9 @@ PLOT_ALIASES = {
     "pps_by_level": {"pps"},
     "bytes": {"bps"},
     "category_heatmap": {"heatmap"},
+    "datasets": {"dataset_rows"},
+    "dataset": {"dataset_rows"},
+    "rows": {"dataset_rows"},
 }
 
 CATEGORY_SHORT_LABELS = {
@@ -154,8 +157,8 @@ def parse_args(argv: Optional[Sequence[str]] = None) -> argparse.Namespace:
         "--plots",
         default="all",
         help=(
-            "Comma-separated plots to generate: all, protocol, ports, pps, bps, heatmap. "
-            "Example: --plots heatmap or --plots protocol,ports,heatmap. Default: all."
+            "Comma-separated plots to generate: all, protocol, ports, pps, bps, heatmap, dataset_rows. "
+            "Example: --plots heatmap or --plots protocol,ports,pps,dataset_rows. Default: all."
         ),
     )
     parser.add_argument(
@@ -163,6 +166,11 @@ def parse_args(argv: Optional[Sequence[str]] = None) -> argparse.Namespace:
         choices=("byte_count", "packet_count", "pcap_size_mb"),
         default="byte_count",
         help="Metric used in the category/level heatmap. Default: byte_count.",
+    )
+    parser.add_argument(
+        "--variability-metric",
+        default="dataset_rows",
+        help="Metric from T6_reexecution_stability.csv used in the textual variability table. Default: dataset_rows.",
     )
     parser.add_argument(
         "--progress-interval",
@@ -596,6 +604,181 @@ def parse_plot_selection(value: str) -> set[str]:
             valid = ", ".join(("all", *PLOT_CHOICES))
             raise ValueError(f"unknown plot '{item}'. Valid values: {valid}")
     return selected or set(PLOT_CHOICES)
+
+
+def read_csv_dicts(path: Path) -> Iterable[dict[str, str]]:
+    with path.open("r", encoding="utf-8", newline="") as handle:
+        reader = csv.DictReader(handle)
+        yield from reader
+
+
+def table_paths(campaign_dir: Path, table_name: str) -> list[Path]:
+    return sorted(campaign_dir.glob(f"*/reports/tables/{table_name}"))
+
+
+def mean(values: Sequence[float]) -> float:
+    return sum(values) / len(values) if values else 0.0
+
+
+def write_markdown_table(path: Path, header: Sequence[str], rows: Iterable[Sequence[Any]]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    row_list = [tuple(str(value) for value in row) for row in rows]
+    widths = [len(str(value)) for value in header]
+    for row in row_list:
+        for index, value in enumerate(row):
+            widths[index] = max(widths[index], len(value))
+
+    def render_row(values: Sequence[Any]) -> str:
+        return "| " + " | ".join(str(value).ljust(widths[index]) for index, value in enumerate(values)) + " |"
+
+    with path.open("w", encoding="utf-8") as handle:
+        handle.write(render_row(header) + "\n")
+        handle.write("| " + " | ".join("-" * width for width in widths) + " |\n")
+        for row in row_list:
+            handle.write(render_row(row) + "\n")
+
+
+def write_dataset_and_variability_outputs(
+    campaign_dir: Path,
+    report_dir: Path,
+    attack_categories: dict[str, str],
+    variability_metric: str,
+) -> dict[str, Path]:
+    data_dir = report_dir / "data"
+    tables_dir = report_dir / "tables"
+    known_categories = set(attack_categories.values())
+
+    dataset_by_category_level: dict[tuple[str, str], dict[str, float]] = {}
+    for path in table_paths(campaign_dir, "T8_artifact_summary.csv"):
+        for row in read_csv_dicts(path):
+            attack_id = row.get("attack_id", "")
+            level = row.get("level", "")
+            if not level:
+                continue
+            category = attack_categories.get(attack_id, "Unmapped")
+            known_categories.add(category)
+            key = (category, level)
+            bucket = dataset_by_category_level.setdefault(
+                key,
+                {
+                    "run_count": 0.0,
+                    "dataset_rows": 0.0,
+                },
+            )
+            rows_value = to_float(row.get("dataset_rows", "")) or 0.0
+            bucket["run_count"] += 1
+            bucket["dataset_rows"] += rows_value
+
+    dataset_rows = []
+    for category in sorted(known_categories, key=sort_category_key):
+        for level in LEVEL_ORDER:
+            values = dataset_by_category_level.get((category, level), {"run_count": 0.0, "dataset_rows": 0.0})
+            run_count = int(values["run_count"])
+            dataset_count = int(values["dataset_rows"])
+            dataset_rows.append(
+                (
+                    category,
+                    short_category_label(category).replace("\n", " "),
+                    level,
+                    run_count,
+                    dataset_count,
+                    dataset_count / run_count if run_count else 0.0,
+                )
+            )
+
+    dataset_rows_csv = data_dir / "category_level_dataset_rows.csv"
+    write_csv(
+        dataset_rows_csv,
+        ("category", "category_label", "level", "run_count", "dataset_rows", "mean_dataset_rows_per_run"),
+        dataset_rows,
+    )
+
+    variability_by_level: dict[str, dict[str, list[float]]] = {
+        level: {"means": [], "std_devs": [], "cv_pcts": [], "n_runs": []}
+        for level in LEVEL_ORDER
+    }
+    for path in table_paths(campaign_dir, "T6_reexecution_stability.csv"):
+        for row in read_csv_dicts(path):
+            if row.get("metric") != variability_metric:
+                continue
+            level = row.get("level", "")
+            if level not in variability_by_level:
+                continue
+            std_dev = to_float(row.get("std_dev", "")) or 0.0
+            cv_pct = to_float(row.get("cv_pct", "")) or 0.0
+            mean_value = to_float(row.get("mean", "")) or 0.0
+            n_runs = to_float(row.get("n_runs", "")) or 0.0
+            variability_by_level[level]["means"].append(mean_value)
+            variability_by_level[level]["std_devs"].append(std_dev)
+            variability_by_level[level]["cv_pcts"].append(cv_pct)
+            variability_by_level[level]["n_runs"].append(n_runs)
+
+    variability_rows = []
+    variability_markdown_rows = []
+    for level in LEVEL_ORDER:
+        values = variability_by_level[level]
+        attack_count = len(values["means"])
+        mean_value = mean(values["means"])
+        std_dev_mean = mean(values["std_devs"])
+        cv_pct_mean = mean(values["cv_pcts"])
+        n_runs_mean = mean(values["n_runs"])
+        variability_rows.append(
+            (
+                level,
+                variability_metric,
+                attack_count,
+                n_runs_mean,
+                mean_value,
+                std_dev_mean,
+                cv_pct_mean,
+            )
+        )
+        variability_markdown_rows.append(
+            (
+                level,
+                attack_count,
+                f"{n_runs_mean:.1f}",
+                f"{mean_value:.1f}",
+                f"{std_dev_mean:.2f}",
+                f"{cv_pct_mean:.2f}%",
+            )
+        )
+
+    variability_csv = data_dir / f"{variability_metric}_run_variability_by_level.csv"
+    write_csv(
+        variability_csv,
+        (
+            "level",
+            "metric",
+            "attack_count",
+            "mean_n_runs",
+            "mean_value",
+            "mean_std_dev_between_runs",
+            "mean_cv_pct_between_runs",
+        ),
+        variability_rows,
+    )
+
+    variability_md = tables_dir / f"{variability_metric}_run_variability_by_level.md"
+    mean_column = "Mean dataset rows" if variability_metric == "dataset_rows" else f"Mean {variability_metric}"
+    write_markdown_table(
+        variability_md,
+        (
+            "Level",
+            "Attacks",
+            "Runs",
+            mean_column,
+            "Std. dev.",
+            "CV",
+        ),
+        variability_markdown_rows,
+    )
+
+    return {
+        "category_level_dataset_rows_csv": dataset_rows_csv,
+        "run_variability_csv": variability_csv,
+        "run_variability_markdown": variability_md,
+    }
 
 
 def aggregate_summaries(summaries: list[dict[str, Any]]) -> dict[str, Any]:
@@ -1033,6 +1216,54 @@ def plot_outputs(
         plt.close(fig)
         outputs["category_level_heatmap_plot"] = path
 
+    if "dataset_rows" in selected_plots:
+        dataset_df = pd.read_csv(csv_paths["category_level_dataset_rows_csv"])
+        category_order = sorted(dataset_df["category"].dropna().unique(), key=sort_category_key)
+        category_labels = [short_category_label(category) for category in category_order]
+        pivot = (
+            dataset_df.pivot_table(
+                index="category",
+                columns="level",
+                values="dataset_rows",
+                aggfunc="sum",
+                fill_value=0,
+            )
+            .reindex(index=category_order, columns=list(LEVEL_ORDER), fill_value=0)
+        )
+        values = pivot.astype(float) / 1_000_000
+        max_value = float(values.to_numpy().max()) if not values.empty else 0.0
+        annotation_format = "{:.3f}" if 0 < max_value < 1 else "{:.1f}"
+
+        fig, ax = plt.subplots(figsize=(10, 5.8), constrained_layout=True)
+        image = ax.imshow(values.to_numpy(), cmap="PuBuGn", aspect="auto")
+        ax.set_title("Dataset Rows by Attack Category and Level")
+        ax.set_xlabel("Experiment level")
+        ax.set_ylabel("Attack category")
+        ax.set_xticks(range(len(LEVEL_ORDER)), labels=LEVEL_ORDER)
+        ax.set_yticks(range(len(category_labels)), labels=category_labels)
+        ax.tick_params(axis="y", labelsize=9)
+        colorbar = fig.colorbar(image, ax=ax, shrink=0.88)
+        colorbar.set_label("Dataset rows (millions)")
+
+        threshold = max_value * 0.55
+        for row_index, category in enumerate(values.index):
+            for col_index, level in enumerate(values.columns):
+                value = float(values.loc[category, level])
+                text_color = "white" if value > threshold else "black"
+                ax.text(
+                    col_index,
+                    row_index,
+                    annotation_format.format(value),
+                    ha="center",
+                    va="center",
+                    color=text_color,
+                    fontsize=8,
+                )
+        path = figures_dir / "05_category_level_dataset_rows.png"
+        fig.savefig(path, dpi=180, bbox_inches="tight")
+        plt.close(fig)
+        outputs["category_level_dataset_rows_plot"] = path
+
     return outputs
 
 
@@ -1078,6 +1309,14 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     aggregate = aggregate_summaries(summaries)
     attack_categories = load_attack_categories(campaign_dir)
     csv_paths = write_outputs(report_dir, summaries, aggregate, attack_categories)
+    csv_paths.update(
+        write_dataset_and_variability_outputs(
+            campaign_dir,
+            report_dir,
+            attack_categories,
+            args.variability_metric,
+        )
+    )
     plot_paths: dict[str, Path] = {}
     plot_error = ""
     if not args.no_plots:
@@ -1109,6 +1348,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         "byte_total": byte_total,
         "selected_plots": sorted(selected_plots),
         "heatmap_metric": args.heatmap_metric,
+        "variability_metric": args.variability_metric,
         "first_epoch_second": aggregate["first_second"],
         "last_epoch_second": aggregate["last_second"],
         "csv_outputs": {key: str(value) for key, value in csv_paths.items()},
