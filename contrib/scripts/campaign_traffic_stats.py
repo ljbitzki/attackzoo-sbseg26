@@ -599,6 +599,34 @@ def write_outputs(report_dir: Path, summaries: list[dict[str, Any]], aggregate: 
         level_rows,
     )
 
+    campaign_second_packets: Counter[int] = Counter()
+    campaign_second_bytes: Counter[int] = Counter()
+    campaign_second_epoch: dict[int, int] = {}
+    for (level, epoch_second), packet_count in aggregate["level_second_packets"].items():
+        byte_count = aggregate["level_second_bytes"].get((level, epoch_second), 0)
+        campaign_second = epoch_second - first_second if first_second is not None else 0
+        campaign_second_packets[campaign_second] += int(packet_count)
+        campaign_second_bytes[campaign_second] += int(byte_count)
+        campaign_second_epoch[campaign_second] = epoch_second
+
+    campaign_rate_rows = [
+        (
+            campaign_second,
+            campaign_second_epoch[campaign_second],
+            campaign_second_packets[campaign_second],
+            campaign_second_bytes[campaign_second],
+            campaign_second_packets[campaign_second],
+            campaign_second_bytes[campaign_second],
+        )
+        for campaign_second in sorted(campaign_second_packets)
+    ]
+    campaign_rate_csv = data_dir / "campaign_second_rates.csv"
+    write_csv(
+        campaign_rate_csv,
+        ("campaign_second", "epoch_second", "packet_count", "byte_count", "pps", "Bps"),
+        campaign_rate_rows,
+    )
+
     file_rows = []
     for summary in summaries:
         file_rows.append(
@@ -642,6 +670,7 @@ def write_outputs(report_dir: Path, summaries: list[dict[str, Any]], aggregate: 
         "port_csv": port_csv,
         "port_aggregate_csv": port_aggregate_csv,
         "level_csv": level_csv,
+        "campaign_rate_csv": campaign_rate_csv,
         "file_csv": file_csv,
     }
 
@@ -692,33 +721,57 @@ def plot_outputs(report_dir: Path, csv_paths: dict[str, Path], top_ports: int, t
     outputs["port_plot"] = path
 
     rates_df = pd.read_csv(csv_paths["level_csv"])
-    for metric, ylabel, filename, title in (
-        ("pps", "Packets per second (pps)", "03_pps_by_level_over_campaign_seconds.png", "PPS by Level over Campaign Seconds"),
-        ("Bps", "Bytes per second (Bps)", "04_Bps_by_level_over_campaign_seconds.png", "Bps by Level over Campaign Seconds"),
-    ):
-        fig, ax = plt.subplots(figsize=(12, 6), constrained_layout=True)
-        for level in LEVEL_ORDER:
-            sub = rates_df[rates_df["level"] == level].sort_values("campaign_second")
-            if sub.empty:
-                continue
-            ax.plot(
-                sub["campaign_second"],
-                sub[metric],
-                label=level,
-                color=LEVEL_COLORS.get(level),
-                linewidth=1.2,
-                alpha=0.85,
-            )
-        ax.set_title(title)
-        ax.set_xlabel("Campaign second")
-        ax.set_ylabel(ylabel)
-        ax.ticklabel_format(axis="y", style="plain")
-        ax.grid(alpha=0.25)
-        ax.legend(title="Level")
-        path = figures_dir / filename
-        fig.savefig(path, dpi=180, bbox_inches="tight")
-        plt.close(fig)
-        outputs[f"{metric}_plot"] = path
+    fig, ax = plt.subplots(figsize=(12, 6), constrained_layout=True)
+    for level in LEVEL_ORDER:
+        sub = rates_df[rates_df["level"] == level].sort_values("campaign_second")
+        if sub.empty:
+            continue
+        ax.plot(
+            sub["campaign_second"],
+            sub["pps"],
+            label=level,
+            color=LEVEL_COLORS.get(level),
+            linewidth=1.2,
+            alpha=0.85,
+        )
+    ax.set_title("PPS by Level over Campaign Seconds")
+    ax.set_xlabel("Campaign second")
+    ax.set_ylabel("Packets per second (pps)")
+    ax.ticklabel_format(axis="y", style="plain")
+    ax.grid(alpha=0.25)
+    ax.legend(title="Level")
+    path = figures_dir / "03_pps_by_level_over_campaign_seconds.png"
+    fig.savefig(path, dpi=180, bbox_inches="tight")
+    plt.close(fig)
+    outputs["pps_plot"] = path
+
+    campaign_rates_df = pd.read_csv(csv_paths["campaign_rate_csv"]).sort_values("campaign_second")
+    fig, ax = plt.subplots(figsize=(10, 5), constrained_layout=True)
+    ax.plot(
+        campaign_rates_df["campaign_second"],
+        campaign_rates_df["Bps"],
+        color="#4c9ed9",
+        linewidth=0.9,
+        alpha=0.9,
+    )
+    ax.set_xlabel("Time in seconds")
+    ax.set_ylabel("Bytes per second")
+    ax.ticklabel_format(axis="y", style="plain")
+    ax.grid(False)
+    fig.text(
+        0.5,
+        -0.03,
+        "(d) Experiment Bytes rate (BPS)",
+        ha="center",
+        va="top",
+        fontsize=14,
+        fontweight="bold",
+        family="serif",
+    )
+    path = figures_dir / "04_Bps_over_campaign_seconds.png"
+    fig.savefig(path, dpi=180, bbox_inches="tight")
+    plt.close(fig)
+    outputs["Bps_plot"] = path
 
     return outputs
 
