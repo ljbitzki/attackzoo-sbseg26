@@ -74,6 +74,26 @@ LEVEL_COLORS = {
     "L3": "#d62728",
 }
 
+PLOT_CHOICES = ("protocol", "ports", "pps", "bps", "heatmap")
+PLOT_ALIASES = {
+    "all": set(PLOT_CHOICES),
+    "protocols": {"protocol"},
+    "port": {"ports"},
+    "pps_by_level": {"pps"},
+    "bytes": {"bps"},
+    "category_heatmap": {"heatmap"},
+}
+
+CATEGORY_SHORT_LABELS = {
+    "1) Reconnaissance and Discovery": "Recon. and\nDiscovery",
+    "2) Network Interception and Exploitation": "Network\nInterception",
+    "3) Web Application Attacks": "Web\nApplications",
+    "4) Brute Force Against Remote Access Applications": "Remote Access\nBrute Force",
+    "5) Exfiltration and Tunneling": "Exfiltration and\nTunneling",
+    "6) Denial of Service and Impact": "DoS and\nImpact",
+    "7) IoT": "IoT",
+}
+
 
 def parse_args(argv: Optional[Sequence[str]] = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
@@ -116,19 +136,33 @@ def parse_args(argv: Optional[Sequence[str]] = None) -> argparse.Namespace:
     parser.add_argument(
         "--top-ports",
         type=int,
-        default=30,
+        default=10,
         help="Number of ports shown in the port plot. CSVs include all ports.",
     )
     parser.add_argument(
         "--top-protocols",
         type=int,
-        default=20,
+        default=10,
         help="Number of protocols shown in the protocol plot. CSV includes all protocols.",
     )
     parser.add_argument(
         "--no-plots",
         action="store_true",
         help="Only write CSV/JSON outputs, without PNG plots.",
+    )
+    parser.add_argument(
+        "--plots",
+        default="all",
+        help=(
+            "Comma-separated plots to generate: all, protocol, ports, pps, bps, heatmap. "
+            "Example: --plots heatmap or --plots protocol,ports,heatmap. Default: all."
+        ),
+    )
+    parser.add_argument(
+        "--heatmap-metric",
+        choices=("byte_count", "packet_count", "pcap_size_mb"),
+        default="byte_count",
+        help="Metric used in the category/level heatmap. Default: byte_count.",
     )
     parser.add_argument(
         "--progress-interval",
@@ -475,6 +509,95 @@ def split_port_key(key: str) -> tuple[str, int]:
     return protocol, int(port)
 
 
+def sort_category_key(category: str) -> tuple[int, str]:
+    prefix = category.split(")", 1)[0]
+    try:
+        return (int(prefix), category)
+    except ValueError:
+        return (999, category)
+
+
+def short_category_label(category: str) -> str:
+    if category in CATEGORY_SHORT_LABELS:
+        return CATEGORY_SHORT_LABELS[category]
+    return category.split(")", 1)[-1].strip() or category
+
+
+def load_categories_from_campaign_config(campaign_dir: Path) -> dict[str, str]:
+    config = read_json(campaign_dir / "_campaign" / "campaign_config.json") or {}
+    categories: dict[str, str] = {}
+    for plan in config.get("plans", []):
+        if not isinstance(plan, dict):
+            continue
+        attack_id = str(plan.get("attack_id") or "")
+        category = str(plan.get("category") or "")
+        if attack_id and category:
+            categories[attack_id] = category
+    return categories
+
+
+def load_categories_from_catalog_snapshot(campaign_dir: Path) -> dict[str, str]:
+    snapshot = read_json(campaign_dir / "_campaign" / "catalog_snapshot.json") or {}
+    catalog = snapshot.get("stdout_json")
+    categories: dict[str, str] = {}
+    if not isinstance(catalog, dict):
+        return categories
+    for category, attacks in catalog.items():
+        if not isinstance(attacks, list):
+            continue
+        for attack in attacks:
+            if not isinstance(attack, dict):
+                continue
+            attack_id = str(attack.get("id") or "")
+            if attack_id:
+                categories[attack_id] = str(category)
+    return categories
+
+
+def load_categories_from_attack_yaml(repo_root: Path) -> dict[str, str]:
+    categories: dict[str, str] = {}
+    for path in sorted((repo_root / "docker" / "attackers").glob("*/attack.yaml")):
+        attack_id = ""
+        category = ""
+        try:
+            lines = path.read_text(encoding="utf-8").splitlines()
+        except OSError:
+            continue
+        for line in lines:
+            if line.startswith("id:"):
+                attack_id = line.split(":", 1)[1].strip().strip("'\"")
+            elif line.startswith("category:"):
+                category = line.split(":", 1)[1].strip().strip("'\"")
+            if attack_id and category:
+                categories[attack_id] = category
+                break
+    return categories
+
+
+def load_attack_categories(campaign_dir: Path) -> dict[str, str]:
+    categories = load_categories_from_catalog_snapshot(campaign_dir)
+    categories.update(load_categories_from_campaign_config(campaign_dir))
+    fallback = load_categories_from_attack_yaml(REPO_ROOT)
+    fallback.update(categories)
+    return fallback
+
+
+def parse_plot_selection(value: str) -> set[str]:
+    selected: set[str] = set()
+    for raw_item in value.split(","):
+        item = raw_item.strip().lower()
+        if not item:
+            continue
+        if item in PLOT_ALIASES:
+            selected.update(PLOT_ALIASES[item])
+        elif item in PLOT_CHOICES:
+            selected.add(item)
+        else:
+            valid = ", ".join(("all", *PLOT_CHOICES))
+            raise ValueError(f"unknown plot '{item}'. Valid values: {valid}")
+    return selected or set(PLOT_CHOICES)
+
+
 def aggregate_summaries(summaries: list[dict[str, Any]]) -> dict[str, Any]:
     protocol_counts: Counter[str] = Counter()
     protocol_bytes: Counter[str] = Counter()
@@ -515,7 +638,12 @@ def aggregate_summaries(summaries: list[dict[str, Any]]) -> dict[str, Any]:
     }
 
 
-def write_outputs(report_dir: Path, summaries: list[dict[str, Any]], aggregate: dict[str, Any]) -> dict[str, Path]:
+def write_outputs(
+    report_dir: Path,
+    summaries: list[dict[str, Any]],
+    aggregate: dict[str, Any],
+    attack_categories: dict[str, str],
+) -> dict[str, Path]:
     data_dir = report_dir / "data"
     protocol_counts: Counter[str] = aggregate["protocol_counts"]
     protocol_bytes: Counter[str] = aggregate["protocol_bytes"]
@@ -665,6 +793,68 @@ def write_outputs(report_dir: Path, summaries: list[dict[str, Any]], aggregate: 
         file_rows,
     )
 
+    category_level: dict[tuple[str, str], dict[str, float]] = {}
+    for summary in summaries:
+        if not summary.get("ok", False):
+            continue
+        attack_id = str(summary.get("attack_id") or "")
+        level = str(summary.get("level") or "UNKNOWN")
+        category = attack_categories.get(attack_id, "Unmapped")
+        key = (category, level)
+        bucket = category_level.setdefault(
+            key,
+            {
+                "file_count": 0.0,
+                "packet_count": 0.0,
+                "byte_count": 0.0,
+                "pcap_size_mb": 0.0,
+            },
+        )
+        bucket["file_count"] += 1
+        bucket["packet_count"] += float(summary.get("packet_count") or 0)
+        bucket["byte_count"] += float(summary.get("byte_count") or 0)
+        bucket["pcap_size_mb"] += float(summary.get("pcap_size_bytes") or 0) / (1024 * 1024)
+
+    known_categories = set(attack_categories.values())
+    known_categories.update(key[0] for key in category_level)
+    category_rows = []
+    for category in sorted(known_categories, key=sort_category_key):
+        for level in LEVEL_ORDER:
+            values = category_level.get(
+                (category, level),
+                {
+                    "file_count": 0.0,
+                    "packet_count": 0.0,
+                    "byte_count": 0.0,
+                    "pcap_size_mb": 0.0,
+                },
+            )
+            category_rows.append(
+                (
+                    category,
+                    short_category_label(category).replace("\n", " "),
+                    level,
+                    int(values["file_count"]),
+                    int(values["packet_count"]),
+                    int(values["byte_count"]),
+                    values["pcap_size_mb"],
+                )
+            )
+    category_level_csv = data_dir / "category_level_traffic.csv"
+    write_csv(
+        category_level_csv,
+        (
+            "category",
+            "category_label",
+            "level",
+            "file_count",
+            "packet_count",
+            "byte_count",
+            "pcap_size_mb",
+        ),
+        category_rows,
+    )
+
     return {
         "protocol_csv": protocol_csv,
         "port_csv": port_csv,
@@ -672,6 +862,7 @@ def write_outputs(report_dir: Path, summaries: list[dict[str, Any]], aggregate: 
         "level_csv": level_csv,
         "campaign_rate_csv": campaign_rate_csv,
         "file_csv": file_csv,
+        "category_level_csv": category_level_csv,
     }
 
 
@@ -685,93 +876,162 @@ def import_plotting():
     return plt, pd
 
 
-def plot_outputs(report_dir: Path, csv_paths: dict[str, Path], top_ports: int, top_protocols: int) -> dict[str, Path]:
+def plot_outputs(
+    report_dir: Path,
+    csv_paths: dict[str, Path],
+    top_ports: int,
+    top_protocols: int,
+    selected_plots: set[str],
+    heatmap_metric: str,
+) -> dict[str, Path]:
     plt, pd = import_plotting()
     figures_dir = report_dir / "figures"
     figures_dir.mkdir(parents=True, exist_ok=True)
     outputs: dict[str, Path] = {}
-
-    protocol_df = pd.read_csv(csv_paths["protocol_csv"]).head(top_protocols)
-    fig, ax = plt.subplots(figsize=(10, 5), constrained_layout=True)
     colors = plt.get_cmap("tab20").colors
-    ax.bar(protocol_df["protocol"], protocol_df["packet_count"], color=colors[: len(protocol_df)])
-    ax.set_title("Packet Count by Protocol")
-    ax.set_xlabel("Protocol")
-    ax.set_ylabel("Packet count")
-    ax.ticklabel_format(axis="y", style="plain")
-    ax.grid(axis="y", alpha=0.25)
-    ax.tick_params(axis="x", rotation=35)
-    path = figures_dir / "01_protocol_packet_counts.png"
-    fig.savefig(path, dpi=180, bbox_inches="tight")
-    plt.close(fig)
-    outputs["protocol_plot"] = path
 
-    port_df = pd.read_csv(csv_paths["port_csv"]).head(top_ports)
-    fig, ax = plt.subplots(figsize=(12, 6), constrained_layout=True)
-    ax.bar(port_df["port_label"], port_df["packet_count"], color=colors[: len(port_df)])
-    ax.set_title("Packet Count by Port")
-    ax.set_xlabel("Port")
-    ax.set_ylabel("Packet count")
-    ax.ticklabel_format(axis="y", style="plain")
-    ax.grid(axis="y", alpha=0.25)
-    ax.tick_params(axis="x", rotation=45)
-    path = figures_dir / "02_port_packet_counts.png"
-    fig.savefig(path, dpi=180, bbox_inches="tight")
-    plt.close(fig)
-    outputs["port_plot"] = path
+    if "protocol" in selected_plots:
+        protocol_df = pd.read_csv(csv_paths["protocol_csv"]).head(top_protocols)
+        fig, ax = plt.subplots(figsize=(10, 5), constrained_layout=True)
+        ax.bar(protocol_df["protocol"], protocol_df["packet_count"], color=colors[: len(protocol_df)])
+        ax.set_title("Packet Count by Protocol")
+        ax.set_xlabel("Protocol")
+        ax.set_ylabel("Packet count")
+        ax.ticklabel_format(axis="y", style="plain")
+        ax.grid(axis="y", alpha=0.25)
+        ax.tick_params(axis="x", rotation=35)
+        path = figures_dir / "01_protocol_packet_counts.png"
+        fig.savefig(path, dpi=180, bbox_inches="tight")
+        plt.close(fig)
+        outputs["protocol_plot"] = path
 
-    rates_df = pd.read_csv(csv_paths["level_csv"])
-    fig, ax = plt.subplots(figsize=(12, 6), constrained_layout=True)
-    for level in LEVEL_ORDER:
-        sub = rates_df[rates_df["level"] == level].sort_values("campaign_second")
-        if sub.empty:
-            continue
+    if "ports" in selected_plots:
+        port_df = pd.read_csv(csv_paths["port_aggregate_csv"]).head(top_ports)
+        fig, ax = plt.subplots(figsize=(12, 6), constrained_layout=True)
+        ax.bar(port_df["port"].astype(str), port_df["packet_count"], color=colors[: len(port_df)])
+        ax.set_title("Packet Count by Port")
+        ax.set_xlabel("Port")
+        ax.set_ylabel("Packet count")
+        ax.ticklabel_format(axis="y", style="plain")
+        ax.grid(axis="y", alpha=0.25)
+        ax.tick_params(axis="x", rotation=45)
+        path = figures_dir / "02_port_packet_counts.png"
+        fig.savefig(path, dpi=180, bbox_inches="tight")
+        plt.close(fig)
+        outputs["port_plot"] = path
+
+    if "pps" in selected_plots:
+        rates_df = pd.read_csv(csv_paths["level_csv"])
+        fig, ax = plt.subplots(figsize=(12, 6), constrained_layout=True)
+        for level in LEVEL_ORDER:
+            sub = rates_df[rates_df["level"] == level].sort_values("campaign_second")
+            if sub.empty:
+                continue
+            ax.plot(
+                sub["campaign_second"],
+                sub["pps"],
+                label=level,
+                color=LEVEL_COLORS.get(level),
+                linewidth=1.2,
+                alpha=0.85,
+            )
+        ax.set_title("PPS by Level over Campaign Seconds")
+        ax.set_xlabel("Campaign second")
+        ax.set_ylabel("Packets per second (pps)")
+        ax.ticklabel_format(axis="y", style="plain")
+        ax.grid(alpha=0.25)
+        ax.legend(title="Level")
+        path = figures_dir / "03_pps_by_level_over_campaign_seconds.png"
+        fig.savefig(path, dpi=180, bbox_inches="tight")
+        plt.close(fig)
+        outputs["pps_plot"] = path
+
+    if "bps" in selected_plots:
+        campaign_rates_df = pd.read_csv(csv_paths["campaign_rate_csv"]).sort_values("campaign_second")
+        fig, ax = plt.subplots(figsize=(10, 5), constrained_layout=True)
         ax.plot(
-            sub["campaign_second"],
-            sub["pps"],
-            label=level,
-            color=LEVEL_COLORS.get(level),
-            linewidth=1.2,
-            alpha=0.85,
+            campaign_rates_df["campaign_second"],
+            campaign_rates_df["Bps"],
+            color="#4c9ed9",
+            linewidth=0.9,
+            alpha=0.9,
         )
-    ax.set_title("PPS by Level over Campaign Seconds")
-    ax.set_xlabel("Campaign second")
-    ax.set_ylabel("Packets per second (pps)")
-    ax.ticklabel_format(axis="y", style="plain")
-    ax.grid(alpha=0.25)
-    ax.legend(title="Level")
-    path = figures_dir / "03_pps_by_level_over_campaign_seconds.png"
-    fig.savefig(path, dpi=180, bbox_inches="tight")
-    plt.close(fig)
-    outputs["pps_plot"] = path
+        ax.set_xlabel("Time in seconds")
+        ax.set_ylabel("Bytes per second")
+        ax.ticklabel_format(axis="y", style="plain")
+        ax.grid(False)
+        fig.text(
+            0.5,
+            -0.03,
+            "(d) Experiment Bytes rate (BPS)",
+            ha="center",
+            va="top",
+            fontsize=14,
+            fontweight="bold",
+            family="serif",
+        )
+        path = figures_dir / "04_Bps_over_campaign_seconds.png"
+        fig.savefig(path, dpi=180, bbox_inches="tight")
+        plt.close(fig)
+        outputs["Bps_plot"] = path
 
-    campaign_rates_df = pd.read_csv(csv_paths["campaign_rate_csv"]).sort_values("campaign_second")
-    fig, ax = plt.subplots(figsize=(10, 5), constrained_layout=True)
-    ax.plot(
-        campaign_rates_df["campaign_second"],
-        campaign_rates_df["Bps"],
-        color="#4c9ed9",
-        linewidth=0.9,
-        alpha=0.9,
-    )
-    ax.set_xlabel("Time in seconds")
-    ax.set_ylabel("Bytes per second")
-    ax.ticklabel_format(axis="y", style="plain")
-    ax.grid(False)
-    fig.text(
-        0.5,
-        -0.03,
-        "(d) Experiment Bytes rate (BPS)",
-        ha="center",
-        va="top",
-        fontsize=14,
-        fontweight="bold",
-        family="serif",
-    )
-    path = figures_dir / "04_Bps_over_campaign_seconds.png"
-    fig.savefig(path, dpi=180, bbox_inches="tight")
-    plt.close(fig)
-    outputs["Bps_plot"] = path
+    if "heatmap" in selected_plots:
+        category_df = pd.read_csv(csv_paths["category_level_csv"])
+        category_order = sorted(category_df["category"].dropna().unique(), key=sort_category_key)
+        category_labels = [short_category_label(category) for category in category_order]
+        pivot = (
+            category_df.pivot_table(
+                index="category",
+                columns="level",
+                values=heatmap_metric,
+                aggfunc="sum",
+                fill_value=0,
+            )
+            .reindex(index=category_order, columns=list(LEVEL_ORDER), fill_value=0)
+        )
+
+        values = pivot.astype(float)
+        if heatmap_metric == "byte_count":
+            values = values / (1024 ** 3)
+            colorbar_label = "Traffic volume (GiB)"
+        elif heatmap_metric == "pcap_size_mb":
+            values = values / 1024
+            colorbar_label = "PCAP size (GiB)"
+        else:
+            values = values / 1_000_000
+            colorbar_label = "Packets (millions)"
+        max_value = float(values.to_numpy().max()) if not values.empty else 0.0
+        annotation_format = "{:.3f}" if 0 < max_value < 1 else "{:.1f}"
+
+        fig, ax = plt.subplots(figsize=(10, 5.8), constrained_layout=True)
+        image = ax.imshow(values.to_numpy(), cmap="YlGnBu", aspect="auto")
+        ax.set_title("Traffic Volume by Attack Category and Level")
+        ax.set_xlabel("Experiment level")
+        ax.set_ylabel("Attack category")
+        ax.set_xticks(range(len(LEVEL_ORDER)), labels=LEVEL_ORDER)
+        ax.set_yticks(range(len(category_labels)), labels=category_labels)
+        ax.tick_params(axis="y", labelsize=9)
+        colorbar = fig.colorbar(image, ax=ax, shrink=0.88)
+        colorbar.set_label(colorbar_label)
+
+        threshold = max_value * 0.55
+        for row_index, category in enumerate(values.index):
+            for col_index, level in enumerate(values.columns):
+                value = float(values.loc[category, level])
+                text_color = "white" if value > threshold else "black"
+                ax.text(
+                    col_index,
+                    row_index,
+                    annotation_format.format(value),
+                    ha="center",
+                    va="center",
+                    color=text_color,
+                    fontsize=8,
+                )
+        path = figures_dir / "04_category_level_heatmap.png"
+        fig.savefig(path, dpi=180, bbox_inches="tight")
+        plt.close(fig)
+        outputs["category_level_heatmap_plot"] = path
 
     return outputs
 
@@ -782,6 +1042,12 @@ def utc_now() -> str:
 
 def main(argv: Optional[Sequence[str]] = None) -> int:
     args = parse_args(argv)
+    try:
+        selected_plots = parse_plot_selection(args.plots)
+    except ValueError as exc:
+        print(f"[ERROR] {exc}", file=sys.stderr)
+        return 2
+
     campaign_dir = args.campaign_dir.resolve()
     if not campaign_dir.is_dir():
         print(f"[ERROR] Campaign directory not found: {campaign_dir}", file=sys.stderr)
@@ -810,12 +1076,20 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             print(f"[progress] {index}/{len(pcaps)} {status} {pcap.relative_to(campaign_dir)}", file=sys.stderr)
 
     aggregate = aggregate_summaries(summaries)
-    csv_paths = write_outputs(report_dir, summaries, aggregate)
+    attack_categories = load_attack_categories(campaign_dir)
+    csv_paths = write_outputs(report_dir, summaries, aggregate, attack_categories)
     plot_paths: dict[str, Path] = {}
     plot_error = ""
     if not args.no_plots:
         try:
-            plot_paths = plot_outputs(report_dir, csv_paths, args.top_ports, args.top_protocols)
+            plot_paths = plot_outputs(
+                report_dir,
+                csv_paths,
+                args.top_ports,
+                args.top_protocols,
+                selected_plots,
+                args.heatmap_metric,
+            )
         except ModuleNotFoundError as exc:
             plot_error = f"plot dependencies missing: {exc}"
             print(f"[WARN] {plot_error}; CSV outputs were still written.", file=sys.stderr)
@@ -833,6 +1107,8 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         "error_pcap_count": len(summaries) - ok_count,
         "packet_total": packet_total,
         "byte_total": byte_total,
+        "selected_plots": sorted(selected_plots),
+        "heatmap_metric": args.heatmap_metric,
         "first_epoch_second": aggregate["first_second"],
         "last_epoch_second": aggregate["last_second"],
         "csv_outputs": {key: str(value) for key, value in csv_paths.items()},
