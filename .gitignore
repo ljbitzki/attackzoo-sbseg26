@@ -100,9 +100,8 @@ logs/*
 !logs/README.md
 
 # Keep the reports directory documented, but do not version generated smoke outputs.
-!contrib/reports/
-contrib/reports/*
-!contrib/reports/README.md
+/contrib/reports/*/file_summaries
+/contrib/reports/*/manifest.json
 
 # Experiment/output file types that may be created outside the standard dirs.
 *.pcap
