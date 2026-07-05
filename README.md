@@ -77,7 +77,7 @@ The current repository contains 60 attacks declared through individual `attack.y
 | `7) IoT` | 21 |
 
 >[!NOTE]
->The current MITRE ATT&CK metadata covers 9 tactics, 21 top-level techniques, and 35 technique/sub-technique entries when sub-techniques are counted separately. See the [full mapping documentation](./MITRE_ATTACK_MAPPING.md).
+>The current MITRE ATT&CK metadata covers 9 tactics, 21 top-level techniques, and 35 technique/sub-technique entries when sub-techniques are counted separately. See the [full mapping documentation](contrib/docs/MITRE_ATTACK_MAPPING.md).
 
 ### Target Servers
 
@@ -670,7 +670,9 @@ python3 attackzoo.py list --id example_ping
 |   |-- attack_start.sh           # Attack-window start hook helper
 |   `-- attack_stop.sh            # Attack-window stop hook helper
 |-- logs/                         # Runtime logs
-|-- contrib/docs/                 # Additional artifact-review documentation
+|-- contrib/docs/
+|   |-- REDUX_LAB.md              # Reduced reviewer lab profile
+|   `-- CATALOG_MAINTENANCE.md    # Notes for maintaining the attack catalog
 `-- LICENSE                       # BSD 3-Clause License
 ```
 
