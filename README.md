@@ -671,7 +671,9 @@ python3 attackzoo.py list --id example_ping
 |   `-- attack_stop.sh            # Attack-window stop hook helper
 |-- logs/                         # Runtime logs
 |-- contrib/docs/
+|   |-- CLI.md                    # Detailed attackzoo.py command reference
 |   |-- REDUX_LAB.md              # Reduced reviewer lab profile
+|   |-- MITRE_ATTACK_MAPPING.md   # MITRE ATT&CK coverage reference
 |   `-- CATALOG_MAINTENANCE.md    # Notes for maintaining the attack catalog
 `-- LICENSE                       # BSD 3-Clause License
 ```
