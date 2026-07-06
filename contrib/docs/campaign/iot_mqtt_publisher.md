@@ -1,88 +1,88 @@
 # MQTT Publisher Flood (`iot_mqtt_publisher`)
 
-[Índice da campanha](README.md)
+[Campaign index](README.md)
 
-Na campanha `experiments/60att_5runs_l0l1l2l3`, este documento consolida a execução do ataque `iot_mqtt_publisher`. No catálogo local, o ataque é descrito como: MQTT publish flood to evaluate broker availability and behavior under load. A documentação abaixo usa apenas artefatos já presentes no repositório, principalmente as tabelas e figuras de `experiments/60att_5runs_l0l1l2l3/iot_mqtt_publisher`.
+In campaign `experiments/60att_5runs_l0l1l2l3`, this document consolidates the execution of attack `iot_mqtt_publisher`. In the local catalog, the attack is described as: MQTT publish flood to evaluate broker availability and behavior under load. The documentation below uses only artifacts already present in the repository, mainly the tables and figures from `experiments/60att_5runs_l0l1l2l3/iot_mqtt_publisher`.
 
-## Metadados do ataque
+## Attack Metadata
 
-| Campo | Valor |
+| Field | Value |
 | --- | --- |
 | ID | `iot_mqtt_publisher` |
-| Categoria | 7) IoT |
-| Subcategoria | 7.1 IoT Protocols / MQTT |
-| Serviços alvo | mqtt-broker |
-| Imagem | `attack-mqtt-publisher:latest` |
+| Category | 7) IoT |
+| Subcategory | 7.1 IoT Protocols / MQTT |
+| Target services | mqtt-broker |
+| Image | `attack-mqtt-publisher:latest` |
 | Container | `attack-mqtt-publisher` |
-| Runtime máximo do catálogo | 10 s |
-| Parâmetros de intensidade | count, delay_ms, payload_size |
+| Catalog max runtime | 10 s |
+| Intensity parameters | count, delay_ms, payload_size |
 | MITRE ATT&CK | [https://attack.mitre.org/tactics/TA0040/](https://attack.mitre.org/tactics/TA0040/)<br>[https://attack.mitre.org/techniques/T1499/](https://attack.mitre.org/techniques/T1499/)<br>[https://attack.mitre.org/techniques/T1499/002/](https://attack.mitre.org/techniques/T1499/002/) |
 
-## Resumo estatístico por nível
+## Statistical Summary by Level
 
-| Nível | Serviço | Runs | Amostras attack | Sucesso médio | Falha média | Lat p50/p95 ms | PCAP total MB | Dataset médio (min-max) | Exec média s | Extratores ok/total | CPU média/máx | Mem MB média |
+| Level | Service | Runs | Attack samples | Mean success | Mean failure | Lat p50/p95 ms | Total PCAP MB | Mean dataset (min-max) | Mean exec s | Extractors ok/total | Mean/max CPU | Mean mem MB |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | L0 | mqtt | 5 | 200 | 0% | 100% | 2.000 / 2.000 | 1,06 | 4.778 (4.766-4.788) | 42,52 | 3/3 | 0,09% / 0,12% | 5,2 |
 | L1 | mqtt | 5 | 200 | 0% | 100% | 2.000 / 2.000 | 14,28 | 64.859 (64.778-65.002) | 49,89 | 3/3 | 0,88% / 4,39% | 5,22 |
 | L2 | mqtt | 5 | 200 | 0% | 100% | 2.000 / 2.000 | 14,28 | 64.870 (64.858-64.886) | 49,9 | 3/3 | 0,83% / 4,72% | 5,25 |
 | L3 | mqtt | 5 | 200 | 0% | 100% | 2.000 / 2.000 | 14,28 | 64.884 (64.846-64.924) | 49,94 | 3/3 | 0,81% / 5,4% | 5,27 |
 
-## Estabilidade entre reexecuções
+## Stability Across Reruns
 
-| Nível | Métrica | Runs | Média | Desvio | CV | Min | Max |
+| Level | Metric | Runs | Mean | Deviation | CV | Min | Max |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| L0 | CPU média na fase attack | 5 | 0,09 | 0,01 | 14,37% | 0,07 | 0,1 |
-| L0 | Linhas do dataset | 5 | 4.777,6 | 8,65 | 0,18% | 4.766 | 4.788 |
-| L0 | Tempo de execução | 5 | 42,52 | 0,33 | 0,77% | 42,32 | 43,1 |
-| L0 | Falha na fase attack | 5 | 100 | 0 | 0% | 100 | 100 |
-| L0 | Latência p95 censurada | 5 | 2.000 | 0 | 0% | 2.000 | 2.000 |
-| L1 | CPU média na fase attack | 5 | 0,88 | 0,09 | 10,19% | 0,77 | 0,96 |
-| L1 | Linhas do dataset | 5 | 64.858,8 | 87,56 | 0,14% | 64.778 | 65.002 |
-| L1 | Tempo de execução | 5 | 49,89 | 0,13 | 0,27% | 49,66 | 49,97 |
-| L1 | Falha na fase attack | 5 | 100 | 0 | 0% | 100 | 100 |
-| L1 | Latência p95 censurada | 5 | 2.000 | 0 | 0% | 2.000 | 2.000 |
-| L2 | CPU média na fase attack | 5 | 0,83 | 0,05 | 5,95% | 0,77 | 0,89 |
-| L2 | Linhas do dataset | 5 | 64.870,4 | 11,35 | 0,02% | 64.858 | 64.886 |
-| L2 | Tempo de execução | 5 | 49,9 | 0,06 | 0,12% | 49,83 | 49,99 |
-| L2 | Falha na fase attack | 5 | 100 | 0 | 0% | 100 | 100 |
-| L2 | Latência p95 censurada | 5 | 2.000 | 0 | 0% | 2.000 | 2.000 |
-| L3 | CPU média na fase attack | 5 | 0,81 | 0,04 | 4,82% | 0,77 | 0,86 |
-| L3 | Linhas do dataset | 5 | 64.883,6 | 36,75 | 0,06% | 64.846 | 64.924 |
-| L3 | Tempo de execução | 5 | 49,94 | 0,12 | 0,24% | 49,82 | 50,07 |
-| L3 | Falha na fase attack | 5 | 100 | 0 | 0% | 100 | 100 |
-| L3 | Latência p95 censurada | 5 | 2.000 | 0 | 0% | 2.000 | 2.000 |
+| L0 | Mean CPU in attack phase | 5 | 0,09 | 0,01 | 14,37% | 0,07 | 0,1 |
+| L0 | Dataset rows | 5 | 4.777,6 | 8,65 | 0,18% | 4.766 | 4.788 |
+| L0 | Execution time | 5 | 42,52 | 0,33 | 0,77% | 42,32 | 43,1 |
+| L0 | Failure in attack phase | 5 | 100 | 0 | 0% | 100 | 100 |
+| L0 | Censored p95 latency | 5 | 2.000 | 0 | 0% | 2.000 | 2.000 |
+| L1 | Mean CPU in attack phase | 5 | 0,88 | 0,09 | 10,19% | 0,77 | 0,96 |
+| L1 | Dataset rows | 5 | 64.858,8 | 87,56 | 0,14% | 64.778 | 65.002 |
+| L1 | Execution time | 5 | 49,89 | 0,13 | 0,27% | 49,66 | 49,97 |
+| L1 | Failure in attack phase | 5 | 100 | 0 | 0% | 100 | 100 |
+| L1 | Censored p95 latency | 5 | 2.000 | 0 | 0% | 2.000 | 2.000 |
+| L2 | Mean CPU in attack phase | 5 | 0,83 | 0,05 | 5,95% | 0,77 | 0,89 |
+| L2 | Dataset rows | 5 | 64.870,4 | 11,35 | 0,02% | 64.858 | 64.886 |
+| L2 | Execution time | 5 | 49,9 | 0,06 | 0,12% | 49,83 | 49,99 |
+| L2 | Failure in attack phase | 5 | 100 | 0 | 0% | 100 | 100 |
+| L2 | Censored p95 latency | 5 | 2.000 | 0 | 0% | 2.000 | 2.000 |
+| L3 | Mean CPU in attack phase | 5 | 0,81 | 0,04 | 4,82% | 0,77 | 0,86 |
+| L3 | Dataset rows | 5 | 64.883,6 | 36,75 | 0,06% | 64.846 | 64.924 |
+| L3 | Execution time | 5 | 49,94 | 0,12 | 0,24% | 49,82 | 50,07 |
+| L3 | Failure in attack phase | 5 | 100 | 0 | 0% | 100 | 100 |
+| L3 | Censored p95 latency | 5 | 2.000 | 0 | 0% | 2.000 | 2.000 |
 
-## Validação de artefatos
+## Artifact Validation
 
-| Nível | Runs | Captura | Probe | Features | Dataset | Recursos | Server stats | Aceite |
+| Level | Runs | Capture | Probe | Features | Dataset | Resources | Server stats | Acceptance |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | L0 | 5 | 5/5 | 5/5 | 5/5 | 5/5 | 5/5 | 5/5 | 5/5 |
 | L1 | 5 | 5/5 | 5/5 | 5/5 | 5/5 | 5/5 | 5/5 | 5/5 |
 | L2 | 5 | 5/5 | 5/5 | 5/5 | 5/5 | 5/5 | 5/5 | 5/5 |
 | L3 | 5 | 5/5 | 5/5 | 5/5 | 5/5 | 5/5 | 5/5 | 5/5 |
 
-## Figuras selecionadas
+## Selected Figures
 
 <table>
 <tr>
-<td><img src="../../assets/campaign_doc/iot_mqtt_publisher/F3_v1_timeseries_mqtt_iot_mqtt_publisher_L0_run01.png" alt="Série temporal L0 run01" width="420"><br><sub>Série temporal L0 run01</sub></td>
-<td><img src="../../assets/campaign_doc/iot_mqtt_publisher/F3_v1_timeseries_mqtt_iot_mqtt_publisher_L1_run01.png" alt="Série temporal L1 run01" width="420"><br><sub>Série temporal L1 run01</sub></td>
+<td><img src="../../assets/campaign_doc/iot_mqtt_publisher/F3_v1_timeseries_mqtt_iot_mqtt_publisher_L0_run01.png" alt="Time series L0 run01" width="420"><br><sub>Time series L0 run01</sub></td>
+<td><img src="../../assets/campaign_doc/iot_mqtt_publisher/F3_v1_timeseries_mqtt_iot_mqtt_publisher_L1_run01.png" alt="Time series L1 run01" width="420"><br><sub>Time series L1 run01</sub></td>
 </tr>
 <tr>
-<td><img src="../../assets/campaign_doc/iot_mqtt_publisher/F3_v1_timeseries_mqtt_iot_mqtt_publisher_L2_run01.png" alt="Série temporal L2 run01" width="420"><br><sub>Série temporal L2 run01</sub></td>
-<td><img src="../../assets/campaign_doc/iot_mqtt_publisher/F3_v1_timeseries_mqtt_iot_mqtt_publisher_L3_run01.png" alt="Série temporal L3 run01" width="420"><br><sub>Série temporal L3 run01</sub></td>
+<td><img src="../../assets/campaign_doc/iot_mqtt_publisher/F3_v1_timeseries_mqtt_iot_mqtt_publisher_L2_run01.png" alt="Time series L2 run01" width="420"><br><sub>Time series L2 run01</sub></td>
+<td><img src="../../assets/campaign_doc/iot_mqtt_publisher/F3_v1_timeseries_mqtt_iot_mqtt_publisher_L3_run01.png" alt="Time series L3 run01" width="420"><br><sub>Time series L3 run01</sub></td>
 </tr>
 <tr>
-<td><img src="../../assets/campaign_doc/iot_mqtt_publisher/F5_resources_mqtt_iot_mqtt_publisher_L0_run01.png" alt="Recursos L0 run01" width="420"><br><sub>Recursos L0 run01</sub></td>
-<td><img src="../../assets/campaign_doc/iot_mqtt_publisher/F5_resources_mqtt_iot_mqtt_publisher_L3_run01.png" alt="Recursos L3 run01" width="420"><br><sub>Recursos L3 run01</sub></td>
+<td><img src="../../assets/campaign_doc/iot_mqtt_publisher/F5_resources_mqtt_iot_mqtt_publisher_L0_run01.png" alt="Resources L0 run01" width="420"><br><sub>Resources L0 run01</sub></td>
+<td><img src="../../assets/campaign_doc/iot_mqtt_publisher/F5_resources_mqtt_iot_mqtt_publisher_L3_run01.png" alt="Resources L3 run01" width="420"><br><sub>Resources L3 run01</sub></td>
 </tr>
 <tr>
-<td><img src="../../assets/campaign_doc/iot_mqtt_publisher/F4_v2_failrate_mqtt_iot_mqtt_publisher_L0.png" alt="Taxa de falha L0" width="420"><br><sub>Taxa de falha L0</sub></td>
-<td><img src="../../assets/campaign_doc/iot_mqtt_publisher/F4_v2_failrate_mqtt_iot_mqtt_publisher_L3.png" alt="Taxa de falha L3" width="420"><br><sub>Taxa de falha L3</sub></td>
+<td><img src="../../assets/campaign_doc/iot_mqtt_publisher/F4_v2_failrate_mqtt_iot_mqtt_publisher_L0.png" alt="Failure rate L0" width="420"><br><sub>Failure rate L0</sub></td>
+<td><img src="../../assets/campaign_doc/iot_mqtt_publisher/F4_v2_failrate_mqtt_iot_mqtt_publisher_L3.png" alt="Failure rate L3" width="420"><br><sub>Failure rate L3</sub></td>
 </tr>
 </table>
 
-## Fontes utilizadas
+## Sources Used
 
-- Catálogo do ataque: `docker/attackers/mqtt-publisher-flood/attack.yaml`
-- Artefatos da campanha: `experiments/60att_5runs_l0l1l2l3/iot_mqtt_publisher`
+- Attack catalog: `docker/attackers/mqtt-publisher-flood/attack.yaml`
+- Campaign artifacts: `experiments/60att_5runs_l0l1l2l3/iot_mqtt_publisher`

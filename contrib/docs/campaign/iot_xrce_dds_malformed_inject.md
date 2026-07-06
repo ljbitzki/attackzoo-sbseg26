@@ -1,88 +1,88 @@
 # XRCE-DDS Malformed Injection (`iot_xrce_dds_malformed_inject`)
 
-[Índice da campanha](README.md)
+[Campaign index](README.md)
 
-Na campanha `experiments/60att_5runs_l0l1l2l3`, este documento consolida a execução do ataque `iot_xrce_dds_malformed_inject`. No catálogo local, o ataque é descrito como: Injection of malformed XRCE-DDS publications or messages against the agent to trigger errors, exceptions, or crashes. A documentação abaixo usa apenas artefatos já presentes no repositório, principalmente as tabelas e figuras de `experiments/60att_5runs_l0l1l2l3/iot_xrce_dds_malformed_inject`.
+In campaign `experiments/60att_5runs_l0l1l2l3`, this document consolidates the execution of attack `iot_xrce_dds_malformed_inject`. In the local catalog, the attack is described as: Injection of malformed XRCE-DDS publications or messages against the agent to trigger errors, exceptions, or crashes. The documentation below uses only artifacts already present in the repository, mainly the tables and figures from `experiments/60att_5runs_l0l1l2l3/iot_xrce_dds_malformed_inject`.
 
-## Metadados do ataque
+## Attack Metadata
 
-| Campo | Valor |
+| Field | Value |
 | --- | --- |
 | ID | `iot_xrce_dds_malformed_inject` |
-| Categoria | 7) IoT |
-| Subcategoria | 7.1 IoT Protocols / XRCE-DDS |
-| Serviços alvo | xrce-dds-agent |
-| Imagem | `attack-xrce-dds-malformed-inject:latest` |
+| Category | 7) IoT |
+| Subcategory | 7.1 IoT Protocols / XRCE-DDS |
+| Target services | xrce-dds-agent |
+| Image | `attack-xrce-dds-malformed-inject:latest` |
 | Container | `attack-xrce-dds-malformed-inject` |
-| Runtime máximo do catálogo | 30 s |
-| Parâmetros de intensidade | duration_s |
+| Catalog max runtime | 30 s |
+| Intensity parameters | duration_s |
 | MITRE ATT&CK | [https://attack.mitre.org/tactics/TA0043/](https://attack.mitre.org/tactics/TA0043/)<br>[https://attack.mitre.org/tactics/TA0001/](https://attack.mitre.org/tactics/TA0001/)<br>[https://attack.mitre.org/tactics/TA0040/](https://attack.mitre.org/tactics/TA0040/)<br>[https://attack.mitre.org/techniques/T1595/](https://attack.mitre.org/techniques/T1595/)<br>[https://attack.mitre.org/techniques/T1595/002/](https://attack.mitre.org/techniques/T1595/002/)<br>[https://attack.mitre.org/techniques/T1190/](https://attack.mitre.org/techniques/T1190/)<br>[https://attack.mitre.org/techniques/T1499/](https://attack.mitre.org/techniques/T1499/)<br>[https://attack.mitre.org/techniques/T1499/004/](https://attack.mitre.org/techniques/T1499/004/) |
 
-## Resumo estatístico por nível
+## Statistical Summary by Level
 
-| Nível | Serviço | Runs | Amostras attack | Sucesso médio | Falha média | Lat p50/p95 ms | PCAP total MB | Dataset médio (min-max) | Exec média s | Extratores ok/total | CPU média/máx | Mem MB média |
+| Level | Service | Runs | Attack samples | Mean success | Mean failure | Lat p50/p95 ms | Total PCAP MB | Mean dataset (min-max) | Mean exec s | Extractors ok/total | Mean/max CPU | Mean mem MB |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | L0 | xrce | 5 | 100 | 100% | 0% | 500,73 / 500,85 | 0,05 | 234 (234-234) | 41,95 | 3/3 | 34,28% / 48,76% | 1.719,06 |
 | L1 | xrce | 5 | 100 | 100% | 0% | 500,71 / 501,01 | 0,17 | 498 (498-498) | 41,79 | 3/3 | 36,78% / 54,3% | 1.717,75 |
 | L2 | xrce | 5 | 100 | 100% | 0% | 500,7 / 500,8 | 0,17 | 498 (498-498) | 41,77 | 3/3 | 36,17% / 63,3% | 1.715,99 |
 | L3 | xrce | 5 | 100 | 100% | 0% | 500,73 / 500,87 | 0,17 | 498 (498-498) | 41,77 | 3/3 | 35,21% / 49,81% | 1.716,03 |
 
-## Estabilidade entre reexecuções
+## Stability Across Reruns
 
-| Nível | Métrica | Runs | Média | Desvio | CV | Min | Max |
+| Level | Metric | Runs | Mean | Deviation | CV | Min | Max |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| L0 | CPU média na fase attack | 5 | 34,28 | 2,51 | 7,31% | 32,59 | 38,6 |
-| L0 | Linhas do dataset | 5 | 234 | 0 | 0% | 234 | 234 |
-| L0 | Tempo de execução | 5 | 41,95 | 0,4 | 0,94% | 41,73 | 42,65 |
-| L0 | Falha na fase attack | 5 | 0 | 0 | n/d | 0 | 0 |
-| L0 | Latência p95 censurada | 5 | 500,85 | 0,08 | 0,02% | 500,78 | 500,99 |
-| L1 | CPU média na fase attack | 5 | 36,78 | 2 | 5,45% | 33,75 | 39,12 |
-| L1 | Linhas do dataset | 5 | 498 | 0 | 0% | 498 | 498 |
-| L1 | Tempo de execução | 5 | 41,79 | 0,08 | 0,19% | 41,71 | 41,91 |
-| L1 | Falha na fase attack | 5 | 0 | 0 | n/d | 0 | 0 |
-| L1 | Latência p95 censurada | 5 | 501,01 | 0,21 | 0,04% | 500,8 | 501,29 |
-| L2 | CPU média na fase attack | 5 | 36,17 | 1,4 | 3,86% | 34,73 | 38,49 |
-| L2 | Linhas do dataset | 5 | 498 | 0 | 0% | 498 | 498 |
-| L2 | Tempo de execução | 5 | 41,77 | 0,02 | 0,05% | 41,75 | 41,8 |
-| L2 | Falha na fase attack | 5 | 0 | 0 | n/d | 0 | 0 |
-| L2 | Latência p95 censurada | 5 | 500,8 | 0,08 | 0,02% | 500,72 | 500,94 |
-| L3 | CPU média na fase attack | 5 | 35,21 | 2,61 | 7,41% | 33,56 | 39,77 |
-| L3 | Linhas do dataset | 5 | 498 | 0 | 0% | 498 | 498 |
-| L3 | Tempo de execução | 5 | 41,77 | 0,03 | 0,07% | 41,72 | 41,8 |
-| L3 | Falha na fase attack | 5 | 0 | 0 | n/d | 0 | 0 |
-| L3 | Latência p95 censurada | 5 | 500,87 | 0,09 | 0,02% | 500,75 | 500,96 |
+| L0 | Mean CPU in attack phase | 5 | 34,28 | 2,51 | 7,31% | 32,59 | 38,6 |
+| L0 | Dataset rows | 5 | 234 | 0 | 0% | 234 | 234 |
+| L0 | Execution time | 5 | 41,95 | 0,4 | 0,94% | 41,73 | 42,65 |
+| L0 | Failure in attack phase | 5 | 0 | 0 | n/a | 0 | 0 |
+| L0 | Censored p95 latency | 5 | 500,85 | 0,08 | 0,02% | 500,78 | 500,99 |
+| L1 | Mean CPU in attack phase | 5 | 36,78 | 2 | 5,45% | 33,75 | 39,12 |
+| L1 | Dataset rows | 5 | 498 | 0 | 0% | 498 | 498 |
+| L1 | Execution time | 5 | 41,79 | 0,08 | 0,19% | 41,71 | 41,91 |
+| L1 | Failure in attack phase | 5 | 0 | 0 | n/a | 0 | 0 |
+| L1 | Censored p95 latency | 5 | 501,01 | 0,21 | 0,04% | 500,8 | 501,29 |
+| L2 | Mean CPU in attack phase | 5 | 36,17 | 1,4 | 3,86% | 34,73 | 38,49 |
+| L2 | Dataset rows | 5 | 498 | 0 | 0% | 498 | 498 |
+| L2 | Execution time | 5 | 41,77 | 0,02 | 0,05% | 41,75 | 41,8 |
+| L2 | Failure in attack phase | 5 | 0 | 0 | n/a | 0 | 0 |
+| L2 | Censored p95 latency | 5 | 500,8 | 0,08 | 0,02% | 500,72 | 500,94 |
+| L3 | Mean CPU in attack phase | 5 | 35,21 | 2,61 | 7,41% | 33,56 | 39,77 |
+| L3 | Dataset rows | 5 | 498 | 0 | 0% | 498 | 498 |
+| L3 | Execution time | 5 | 41,77 | 0,03 | 0,07% | 41,72 | 41,8 |
+| L3 | Failure in attack phase | 5 | 0 | 0 | n/a | 0 | 0 |
+| L3 | Censored p95 latency | 5 | 500,87 | 0,09 | 0,02% | 500,75 | 500,96 |
 
-## Validação de artefatos
+## Artifact Validation
 
-| Nível | Runs | Captura | Probe | Features | Dataset | Recursos | Server stats | Aceite |
+| Level | Runs | Capture | Probe | Features | Dataset | Resources | Server stats | Acceptance |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | L0 | 5 | 5/5 | 5/5 | 5/5 | 5/5 | 5/5 | 5/5 | 5/5 |
 | L1 | 5 | 5/5 | 5/5 | 5/5 | 5/5 | 5/5 | 5/5 | 5/5 |
 | L2 | 5 | 5/5 | 5/5 | 5/5 | 5/5 | 5/5 | 5/5 | 5/5 |
 | L3 | 5 | 5/5 | 5/5 | 5/5 | 5/5 | 5/5 | 5/5 | 5/5 |
 
-## Figuras selecionadas
+## Selected Figures
 
 <table>
 <tr>
-<td><img src="../../assets/campaign_doc/iot_xrce_dds_malformed_inject/F3_v1_timeseries_xrce_iot_xrce_dds_malformed_inject_L0_run01.png" alt="Série temporal L0 run01" width="420"><br><sub>Série temporal L0 run01</sub></td>
-<td><img src="../../assets/campaign_doc/iot_xrce_dds_malformed_inject/F3_v1_timeseries_xrce_iot_xrce_dds_malformed_inject_L1_run01.png" alt="Série temporal L1 run01" width="420"><br><sub>Série temporal L1 run01</sub></td>
+<td><img src="../../assets/campaign_doc/iot_xrce_dds_malformed_inject/F3_v1_timeseries_xrce_iot_xrce_dds_malformed_inject_L0_run01.png" alt="Time series L0 run01" width="420"><br><sub>Time series L0 run01</sub></td>
+<td><img src="../../assets/campaign_doc/iot_xrce_dds_malformed_inject/F3_v1_timeseries_xrce_iot_xrce_dds_malformed_inject_L1_run01.png" alt="Time series L1 run01" width="420"><br><sub>Time series L1 run01</sub></td>
 </tr>
 <tr>
-<td><img src="../../assets/campaign_doc/iot_xrce_dds_malformed_inject/F3_v1_timeseries_xrce_iot_xrce_dds_malformed_inject_L2_run01.png" alt="Série temporal L2 run01" width="420"><br><sub>Série temporal L2 run01</sub></td>
-<td><img src="../../assets/campaign_doc/iot_xrce_dds_malformed_inject/F3_v1_timeseries_xrce_iot_xrce_dds_malformed_inject_L3_run01.png" alt="Série temporal L3 run01" width="420"><br><sub>Série temporal L3 run01</sub></td>
+<td><img src="../../assets/campaign_doc/iot_xrce_dds_malformed_inject/F3_v1_timeseries_xrce_iot_xrce_dds_malformed_inject_L2_run01.png" alt="Time series L2 run01" width="420"><br><sub>Time series L2 run01</sub></td>
+<td><img src="../../assets/campaign_doc/iot_xrce_dds_malformed_inject/F3_v1_timeseries_xrce_iot_xrce_dds_malformed_inject_L3_run01.png" alt="Time series L3 run01" width="420"><br><sub>Time series L3 run01</sub></td>
 </tr>
 <tr>
-<td><img src="../../assets/campaign_doc/iot_xrce_dds_malformed_inject/F5_resources_xrce_iot_xrce_dds_malformed_inject_L0_run01.png" alt="Recursos L0 run01" width="420"><br><sub>Recursos L0 run01</sub></td>
-<td><img src="../../assets/campaign_doc/iot_xrce_dds_malformed_inject/F5_resources_xrce_iot_xrce_dds_malformed_inject_L3_run01.png" alt="Recursos L3 run01" width="420"><br><sub>Recursos L3 run01</sub></td>
+<td><img src="../../assets/campaign_doc/iot_xrce_dds_malformed_inject/F5_resources_xrce_iot_xrce_dds_malformed_inject_L0_run01.png" alt="Resources L0 run01" width="420"><br><sub>Resources L0 run01</sub></td>
+<td><img src="../../assets/campaign_doc/iot_xrce_dds_malformed_inject/F5_resources_xrce_iot_xrce_dds_malformed_inject_L3_run01.png" alt="Resources L3 run01" width="420"><br><sub>Resources L3 run01</sub></td>
 </tr>
 <tr>
-<td><img src="../../assets/campaign_doc/iot_xrce_dds_malformed_inject/F4_v2_failrate_xrce_iot_xrce_dds_malformed_inject_L0.png" alt="Taxa de falha L0" width="420"><br><sub>Taxa de falha L0</sub></td>
-<td><img src="../../assets/campaign_doc/iot_xrce_dds_malformed_inject/F4_v2_failrate_xrce_iot_xrce_dds_malformed_inject_L3.png" alt="Taxa de falha L3" width="420"><br><sub>Taxa de falha L3</sub></td>
+<td><img src="../../assets/campaign_doc/iot_xrce_dds_malformed_inject/F4_v2_failrate_xrce_iot_xrce_dds_malformed_inject_L0.png" alt="Failure rate L0" width="420"><br><sub>Failure rate L0</sub></td>
+<td><img src="../../assets/campaign_doc/iot_xrce_dds_malformed_inject/F4_v2_failrate_xrce_iot_xrce_dds_malformed_inject_L3.png" alt="Failure rate L3" width="420"><br><sub>Failure rate L3</sub></td>
 </tr>
 </table>
 
-## Fontes utilizadas
+## Sources Used
 
-- Catálogo do ataque: `docker/attackers/xrce-dds-malformed-inject/attack.yaml`
-- Artefatos da campanha: `experiments/60att_5runs_l0l1l2l3/iot_xrce_dds_malformed_inject`
+- Attack catalog: `docker/attackers/xrce-dds-malformed-inject/attack.yaml`
+- Campaign artifacts: `experiments/60att_5runs_l0l1l2l3/iot_xrce_dds_malformed_inject`

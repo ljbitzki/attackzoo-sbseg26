@@ -1,88 +1,88 @@
 # Web Directory Enumeration (`web_dir_enumeration`)
 
-[Índice da campanha](README.md)
+[Campaign index](README.md)
 
-Na campanha `experiments/60att_5runs_l0l1l2l3`, este documento consolida a execução do ataque `web_dir_enumeration`. No catálogo local, o ataque é descrito como: Web server subdirectory and resource enumeration using a wordlist. A documentação abaixo usa apenas artefatos já presentes no repositório, principalmente as tabelas e figuras de `experiments/60att_5runs_l0l1l2l3/web_dir_enumeration`.
+In campaign `experiments/60att_5runs_l0l1l2l3`, this document consolidates the execution of attack `web_dir_enumeration`. In the local catalog, the attack is described as: Web server subdirectory and resource enumeration using a wordlist. The documentation below uses only artifacts already present in the repository, mainly the tables and figures from `experiments/60att_5runs_l0l1l2l3/web_dir_enumeration`.
 
-## Metadados do ataque
+## Attack Metadata
 
-| Campo | Valor |
+| Field | Value |
 | --- | --- |
 | ID | `web_dir_enumeration` |
-| Categoria | 3) Web Application Attacks |
-| Subcategoria | 3.1 General Web |
-| Serviços alvo | http-server |
-| Imagem | `attack-web-dir-enumeration:latest` |
+| Category | 3) Web Application Attacks |
+| Subcategory | 3.1 General Web |
+| Target services | http-server |
+| Image | `attack-web-dir-enumeration:latest` |
 | Container | `attack-web-dir-enumeration` |
-| Runtime máximo do catálogo | 10 s |
-| Parâmetros de intensidade | n/d |
+| Catalog max runtime | 10 s |
+| Intensity parameters | n/a |
 | MITRE ATT&CK | [https://attack.mitre.org/tactics/TA0043/](https://attack.mitre.org/tactics/TA0043/)<br>[https://attack.mitre.org/techniques/T1595/](https://attack.mitre.org/techniques/T1595/)<br>[https://attack.mitre.org/techniques/T1595/003/](https://attack.mitre.org/techniques/T1595/003/) |
 
-## Resumo estatístico por nível
+## Statistical Summary by Level
 
-| Nível | Serviço | Runs | Amostras attack | Sucesso médio | Falha média | Lat p50/p95 ms | PCAP total MB | Dataset médio (min-max) | Exec média s | Extratores ok/total | CPU média/máx | Mem MB média |
+| Level | Service | Runs | Attack samples | Mean success | Mean failure | Lat p50/p95 ms | Total PCAP MB | Mean dataset (min-max) | Mean exec s | Extractors ok/total | Mean/max CPU | Mean mem MB |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | L0 | http | 5 | 200 | 100% | 0% | 4,39 / 5,34 | 1,67 | 3.168 (3.160-3.200) | 42,34 | 3/3 | 0,7% / 0,83% | 782,9 |
 | L1 | http | 5 | 198 | 100% | 0% | 4,89 / 7,78 | 1.588,8 | 1.900.674 (1.704.782-2.407.134) | 326,79 | 3/3 | 268,21% / 294,43% | 1.301,76 |
 | L2 | http | 5 | 200 | 100% | 0% | 4,77 / 7,99 | 1.540,75 | 1.843.304 (1.775.942-1.909.856) | 319,39 | 3/3 | 267,2% / 299,83% | 1.341,23 |
 | L3 | http | 5 | 200 | 100% | 0% | 4,94 / 14,14 | 1.471,03 | 1.760.023 (1.583.034-1.905.876) | 306,81 | 3/3 | 271,39% / 308,52% | 989,08 |
 
-## Estabilidade entre reexecuções
+## Stability Across Reruns
 
-| Nível | Métrica | Runs | Média | Desvio | CV | Min | Max |
+| Level | Metric | Runs | Mean | Deviation | CV | Min | Max |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| L0 | CPU média na fase attack | 5 | 0,7 | 0,05 | 7,3% | 0,67 | 0,8 |
-| L0 | Linhas do dataset | 5 | 3.168 | 17,89 | 0,56% | 3.160 | 3.200 |
-| L0 | Tempo de execução | 5 | 42,34 | 0,47 | 1,11% | 42,06 | 43,17 |
-| L0 | Falha na fase attack | 5 | 0 | 0 | n/d | 0 | 0 |
-| L0 | Latência p95 censurada | 5 | 5,34 | 0,55 | 10,32% | 4,95 | 6,22 |
-| L1 | CPU média na fase attack | 5 | 268,21 | 9,59 | 3,57% | 259,89 | 283,64 |
-| L1 | Linhas do dataset | 5 | 1.900.673,6 | 289.220,98 | 15,22% | 1.704.782 | 2.407.134 |
-| L1 | Tempo de execução | 5 | 326,79 | 44,67 | 13,67% | 296,06 | 405,18 |
-| L1 | Falha na fase attack | 5 | 0 | 0 | n/d | 0 | 0 |
-| L1 | Latência p95 censurada | 5 | 7,78 | 2,37 | 30,42% | 6,22 | 11,75 |
-| L2 | CPU média na fase attack | 5 | 267,21 | 5,5 | 2,06% | 258,02 | 271,61 |
-| L2 | Linhas do dataset | 5 | 1.843.304 | 50.901,61 | 2,76% | 1.775.942 | 1.909.856 |
-| L2 | Tempo de execução | 5 | 319,39 | 7,16 | 2,24% | 309,5 | 328,06 |
-| L2 | Falha na fase attack | 5 | 0 | 0 | n/d | 0 | 0 |
-| L2 | Latência p95 censurada | 5 | 7,99 | 1,81 | 22,64% | 5,97 | 10,32 |
-| L3 | CPU média na fase attack | 5 | 271,39 | 26,18 | 9,65% | 232,8 | 296,15 |
-| L3 | Linhas do dataset | 5 | 1.760.022,8 | 116.958,86 | 6,65% | 1.583.034 | 1.905.876 |
-| L3 | Tempo de execução | 5 | 306,81 | 16,8 | 5,48% | 281,13 | 327,44 |
-| L3 | Falha na fase attack | 5 | 0 | 0 | n/d | 0 | 0 |
-| L3 | Latência p95 censurada | 5 | 14,14 | 10,54 | 74,54% | 7,18 | 31,49 |
+| L0 | Mean CPU in attack phase | 5 | 0,7 | 0,05 | 7,3% | 0,67 | 0,8 |
+| L0 | Dataset rows | 5 | 3.168 | 17,89 | 0,56% | 3.160 | 3.200 |
+| L0 | Execution time | 5 | 42,34 | 0,47 | 1,11% | 42,06 | 43,17 |
+| L0 | Failure in attack phase | 5 | 0 | 0 | n/a | 0 | 0 |
+| L0 | Censored p95 latency | 5 | 5,34 | 0,55 | 10,32% | 4,95 | 6,22 |
+| L1 | Mean CPU in attack phase | 5 | 268,21 | 9,59 | 3,57% | 259,89 | 283,64 |
+| L1 | Dataset rows | 5 | 1.900.673,6 | 289.220,98 | 15,22% | 1.704.782 | 2.407.134 |
+| L1 | Execution time | 5 | 326,79 | 44,67 | 13,67% | 296,06 | 405,18 |
+| L1 | Failure in attack phase | 5 | 0 | 0 | n/a | 0 | 0 |
+| L1 | Censored p95 latency | 5 | 7,78 | 2,37 | 30,42% | 6,22 | 11,75 |
+| L2 | Mean CPU in attack phase | 5 | 267,21 | 5,5 | 2,06% | 258,02 | 271,61 |
+| L2 | Dataset rows | 5 | 1.843.304 | 50.901,61 | 2,76% | 1.775.942 | 1.909.856 |
+| L2 | Execution time | 5 | 319,39 | 7,16 | 2,24% | 309,5 | 328,06 |
+| L2 | Failure in attack phase | 5 | 0 | 0 | n/a | 0 | 0 |
+| L2 | Censored p95 latency | 5 | 7,99 | 1,81 | 22,64% | 5,97 | 10,32 |
+| L3 | Mean CPU in attack phase | 5 | 271,39 | 26,18 | 9,65% | 232,8 | 296,15 |
+| L3 | Dataset rows | 5 | 1.760.022,8 | 116.958,86 | 6,65% | 1.583.034 | 1.905.876 |
+| L3 | Execution time | 5 | 306,81 | 16,8 | 5,48% | 281,13 | 327,44 |
+| L3 | Failure in attack phase | 5 | 0 | 0 | n/a | 0 | 0 |
+| L3 | Censored p95 latency | 5 | 14,14 | 10,54 | 74,54% | 7,18 | 31,49 |
 
-## Validação de artefatos
+## Artifact Validation
 
-| Nível | Runs | Captura | Probe | Features | Dataset | Recursos | Server stats | Aceite |
+| Level | Runs | Capture | Probe | Features | Dataset | Resources | Server stats | Acceptance |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | L0 | 5 | 5/5 | 5/5 | 5/5 | 5/5 | 5/5 | 5/5 | 5/5 |
 | L1 | 5 | 5/5 | 5/5 | 5/5 | 5/5 | 5/5 | 5/5 | 5/5 |
 | L2 | 5 | 5/5 | 5/5 | 5/5 | 5/5 | 5/5 | 5/5 | 5/5 |
 | L3 | 5 | 5/5 | 5/5 | 5/5 | 5/5 | 5/5 | 5/5 | 5/5 |
 
-## Figuras selecionadas
+## Selected Figures
 
 <table>
 <tr>
-<td><img src="../../assets/campaign_doc/web_dir_enumeration/F3_v1_timeseries_http_web_dir_enumeration_L0_run01.png" alt="Série temporal L0 run01" width="420"><br><sub>Série temporal L0 run01</sub></td>
-<td><img src="../../assets/campaign_doc/web_dir_enumeration/F3_v1_timeseries_http_web_dir_enumeration_L1_run01.png" alt="Série temporal L1 run01" width="420"><br><sub>Série temporal L1 run01</sub></td>
+<td><img src="../../assets/campaign_doc/web_dir_enumeration/F3_v1_timeseries_http_web_dir_enumeration_L0_run01.png" alt="Time series L0 run01" width="420"><br><sub>Time series L0 run01</sub></td>
+<td><img src="../../assets/campaign_doc/web_dir_enumeration/F3_v1_timeseries_http_web_dir_enumeration_L1_run01.png" alt="Time series L1 run01" width="420"><br><sub>Time series L1 run01</sub></td>
 </tr>
 <tr>
-<td><img src="../../assets/campaign_doc/web_dir_enumeration/F3_v1_timeseries_http_web_dir_enumeration_L2_run01.png" alt="Série temporal L2 run01" width="420"><br><sub>Série temporal L2 run01</sub></td>
-<td><img src="../../assets/campaign_doc/web_dir_enumeration/F3_v1_timeseries_http_web_dir_enumeration_L3_run01.png" alt="Série temporal L3 run01" width="420"><br><sub>Série temporal L3 run01</sub></td>
+<td><img src="../../assets/campaign_doc/web_dir_enumeration/F3_v1_timeseries_http_web_dir_enumeration_L2_run01.png" alt="Time series L2 run01" width="420"><br><sub>Time series L2 run01</sub></td>
+<td><img src="../../assets/campaign_doc/web_dir_enumeration/F3_v1_timeseries_http_web_dir_enumeration_L3_run01.png" alt="Time series L3 run01" width="420"><br><sub>Time series L3 run01</sub></td>
 </tr>
 <tr>
-<td><img src="../../assets/campaign_doc/web_dir_enumeration/F5_resources_http_web_dir_enumeration_L0_run01.png" alt="Recursos L0 run01" width="420"><br><sub>Recursos L0 run01</sub></td>
-<td><img src="../../assets/campaign_doc/web_dir_enumeration/F5_resources_http_web_dir_enumeration_L3_run01.png" alt="Recursos L3 run01" width="420"><br><sub>Recursos L3 run01</sub></td>
+<td><img src="../../assets/campaign_doc/web_dir_enumeration/F5_resources_http_web_dir_enumeration_L0_run01.png" alt="Resources L0 run01" width="420"><br><sub>Resources L0 run01</sub></td>
+<td><img src="../../assets/campaign_doc/web_dir_enumeration/F5_resources_http_web_dir_enumeration_L3_run01.png" alt="Resources L3 run01" width="420"><br><sub>Resources L3 run01</sub></td>
 </tr>
 <tr>
-<td><img src="../../assets/campaign_doc/web_dir_enumeration/F4_v2_failrate_http_web_dir_enumeration_L0.png" alt="Taxa de falha L0" width="420"><br><sub>Taxa de falha L0</sub></td>
-<td><img src="../../assets/campaign_doc/web_dir_enumeration/F4_v2_failrate_http_web_dir_enumeration_L3.png" alt="Taxa de falha L3" width="420"><br><sub>Taxa de falha L3</sub></td>
+<td><img src="../../assets/campaign_doc/web_dir_enumeration/F4_v2_failrate_http_web_dir_enumeration_L0.png" alt="Failure rate L0" width="420"><br><sub>Failure rate L0</sub></td>
+<td><img src="../../assets/campaign_doc/web_dir_enumeration/F4_v2_failrate_http_web_dir_enumeration_L3.png" alt="Failure rate L3" width="420"><br><sub>Failure rate L3</sub></td>
 </tr>
 </table>
 
-## Fontes utilizadas
+## Sources Used
 
-- Catálogo do ataque: `docker/attackers/web-dir-enumeration/attack.yaml`
-- Artefatos da campanha: `experiments/60att_5runs_l0l1l2l3/web_dir_enumeration`
+- Attack catalog: `docker/attackers/web-dir-enumeration/attack.yaml`
+- Campaign artifacts: `experiments/60att_5runs_l0l1l2l3/web_dir_enumeration`

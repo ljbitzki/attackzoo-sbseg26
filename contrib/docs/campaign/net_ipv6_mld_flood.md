@@ -1,60 +1,60 @@
 # IPv6 MLD Flood (`net_ipv6_mld_flood`)
 
-[Índice da campanha](README.md)
+[Campaign index](README.md)
 
-Na campanha `experiments/60att_5runs_l0l1l2l3`, este documento consolida a execução do ataque `net_ipv6_mld_flood`. No catálogo local, o ataque é descrito como: ICMPv6 Multicast Listener Report MLD (131) flood on the local network. A documentação abaixo usa apenas artefatos já presentes no repositório, principalmente as tabelas e figuras de `experiments/60att_5runs_l0l1l2l3/net_ipv6_mld_flood`.
+In campaign `experiments/60att_5runs_l0l1l2l3`, this document consolidates the execution of attack `net_ipv6_mld_flood`. In the local catalog, the attack is described as: ICMPv6 Multicast Listener Report MLD (131) flood on the local network. The documentation below uses only artifacts already present in the repository, mainly the tables and figures from `experiments/60att_5runs_l0l1l2l3/net_ipv6_mld_flood`.
 
-## Metadados do ataque
+## Attack Metadata
 
-| Campo | Valor |
+| Field | Value |
 | --- | --- |
 | ID | `net_ipv6_mld_flood` |
-| Categoria | 2) Network Interception and Exploitation |
-| Subcategoria | 2.2 IPv6 |
-| Serviços alvo | local IPv6 network |
-| Imagem | `attack-ipv6-mld-flood:latest` |
+| Category | 2) Network Interception and Exploitation |
+| Subcategory | 2.2 IPv6 |
+| Target services | local IPv6 network |
+| Image | `attack-ipv6-mld-flood:latest` |
 | Container | `attack-ipv6-mld-flood` |
-| Runtime máximo do catálogo | 10 s |
-| Parâmetros de intensidade | n/d |
+| Catalog max runtime | 10 s |
+| Intensity parameters | n/a |
 | MITRE ATT&CK | [https://attack.mitre.org/tactics/TA0040/](https://attack.mitre.org/tactics/TA0040/)<br>[https://attack.mitre.org/techniques/T1498/](https://attack.mitre.org/techniques/T1498/)<br>[https://attack.mitre.org/techniques/T1498/001/](https://attack.mitre.org/techniques/T1498/001/) |
 
-## Resumo estatístico por nível
+## Statistical Summary by Level
 
-| Nível | Serviço | Runs | Amostras attack | Sucesso médio | Falha média | Lat p50/p95 ms | PCAP total MB | Dataset médio (min-max) | Exec média s | Extratores ok/total | CPU média/máx | Mem MB média |
+| Level | Service | Runs | Attack samples | Mean success | Mean failure | Lat p50/p95 ms | Total PCAP MB | Mean dataset (min-max) | Mean exec s | Extractors ok/total | Mean/max CPU | Mean mem MB |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | L0 | http | 5 | 200 | 100% | 0% | 4,84 / 6,32 | 9,64 | 18.084 (11.370-20.238) | 40 | 2/3 | 0,32% / 1,44% | 153,86 |
 | L1 | http | 5 | 200 | 100% | 0% | 4,83 / 6,36 | 3.917,75 | 15.228.693 (13.952.550-17.001.768) | 40 | 2/3 | 7,76% / 9,57% | 122,47 |
 | L2 | http | 4 | 160 | 100% | 0% | 4,87 / 6,97 | 3.367,33 | 16.336.531 (15.818.810-16.750.290) | 40 | 2/3 | 7,68% / 8,77% | 116,12 |
 
-## Estabilidade entre reexecuções
+## Stability Across Reruns
 
-| Nível | Métrica | Runs | Média | Desvio | CV | Min | Max |
+| Level | Metric | Runs | Mean | Deviation | CV | Min | Max |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| L0 | Linhas do dataset | 5 | 18.084,4 | 3.367,82 | 18,62% | 11.370 | 20.238 |
-| L0 | Tempo de execução | 5 | 40 | 0 | 0% | 40 | 40 |
-| L0 | Falha na fase attack | 5 | 0 | 0 | n/d | 0 | 0 |
-| L0 | Latência p95 censurada | 5 | 6,32 | 0,21 | 3,26% | 5,99 | 6,61 |
-| L0 | CPU média na fase attack | 5 | 0,32 | 0,05 | 16,55% | 0,25 | 0,38 |
-| L1 | Linhas do dataset | 5 | 15.228.692,8 | 1.034.970,63 | 6,8% | 13.952.550 | 17.001.768 |
-| L1 | Tempo de execução | 5 | 40 | 0 | 0% | 40 | 40 |
-| L1 | Falha na fase attack | 5 | 0 | 0 | n/d | 0 | 0 |
-| L1 | Latência p95 censurada | 5 | 6,36 | 0,77 | 12,17% | 5,41 | 7,51 |
-| L1 | CPU média na fase attack | 5 | 7,76 | 0,45 | 5,85% | 7,4 | 8,57 |
-| L2 | Linhas do dataset | 4 | 16.336.531 | 415.821,61 | 2,55% | 15.818.810 | 16.750.290 |
-| L2 | Tempo de execução | 4 | 40 | 0 | 0% | 40 | 40 |
-| L2 | Falha na fase attack | 4 | 0 | 0 | n/d | 0 | 0 |
-| L2 | Latência p95 censurada | 4 | 6,97 | 0,79 | 11,39% | 6,15 | 8,08 |
-| L2 | CPU média na fase attack | 4 | 7,68 | 0,09 | 1,16% | 7,54 | 7,78 |
+| L0 | Dataset rows | 5 | 18.084,4 | 3.367,82 | 18,62% | 11.370 | 20.238 |
+| L0 | Execution time | 5 | 40 | 0 | 0% | 40 | 40 |
+| L0 | Failure in attack phase | 5 | 0 | 0 | n/a | 0 | 0 |
+| L0 | Censored p95 latency | 5 | 6,32 | 0,21 | 3,26% | 5,99 | 6,61 |
+| L0 | Mean CPU in attack phase | 5 | 0,32 | 0,05 | 16,55% | 0,25 | 0,38 |
+| L1 | Dataset rows | 5 | 15.228.692,8 | 1.034.970,63 | 6,8% | 13.952.550 | 17.001.768 |
+| L1 | Execution time | 5 | 40 | 0 | 0% | 40 | 40 |
+| L1 | Failure in attack phase | 5 | 0 | 0 | n/a | 0 | 0 |
+| L1 | Censored p95 latency | 5 | 6,36 | 0,77 | 12,17% | 5,41 | 7,51 |
+| L1 | Mean CPU in attack phase | 5 | 7,76 | 0,45 | 5,85% | 7,4 | 8,57 |
+| L2 | Dataset rows | 4 | 16.336.531 | 415.821,61 | 2,55% | 15.818.810 | 16.750.290 |
+| L2 | Execution time | 4 | 40 | 0 | 0% | 40 | 40 |
+| L2 | Failure in attack phase | 4 | 0 | 0 | n/a | 0 | 0 |
+| L2 | Censored p95 latency | 4 | 6,97 | 0,79 | 11,39% | 6,15 | 8,08 |
+| L2 | Mean CPU in attack phase | 4 | 7,68 | 0,09 | 1,16% | 7,54 | 7,78 |
 
-## Validação de artefatos
+## Artifact Validation
 
-Não foi encontrada tabela agregada de validação de artefatos para este ataque.
+No aggregated artifact validation table was found for this attack.
 
-## Figuras selecionadas
+## Selected Figures
 
-Nenhuma figura agregada foi encontrada em `reports/figs` para este ataque.
+No aggregated figure was found in `reports/figs` for this attack.
 
-## Fontes utilizadas
+## Sources Used
 
-- Catálogo do ataque: `docker/attackers/ipv6-mld-flood/attack.yaml`
-- Artefatos da campanha: `experiments/60att_5runs_l0l1l2l3/net_ipv6_mld_flood`
+- Attack catalog: `docker/attackers/ipv6-mld-flood/attack.yaml`
+- Campaign artifacts: `experiments/60att_5runs_l0l1l2l3/net_ipv6_mld_flood`
