@@ -31,7 +31,7 @@ This document is organized as follows:
 4. [Basic environment information, components, and requirements](#basic-information)
 5. [Dependencies and external resources used during installation](#dependencies)
 6. [Safety and isolation guidance](#safety-considerations)
-7. [Installation on a clean machine](#installation)
+7. [Installation on a clean machine](#installation-process)
 8. [Minimal validation test](#minimal-test)
 9. [Reproducible experiment claims](#reproducible-experiment-claims)
 10. [Basic code and repository documentation](#basic-documentation)
@@ -206,7 +206,7 @@ The steps below assume a **clean Ubuntu 24.04 LTS machine** or an equivalent env
 ### 1. Clone the repository and enters it
 
 ```bash
-git clone https://github.com/ljbitzki/attackzoo-sbseg26.git
+git clone git@github.com:GT-IoTEdu/attackzoo-sbseg26.git
 cd attackzoo-sbseg26
 ```
 
@@ -214,7 +214,7 @@ cd attackzoo-sbseg26
 
 ```bash
 chmod +x setup.sh
-./setup.sh
+./setup.sh dependencies
 ```
 
 After installation, apply the new Docker group permission:
@@ -240,17 +240,17 @@ Here we have 2 options:
 > This builds all server, attacker, and client images, starts target servers, and other elements. The first build depends on machine and network speed: on a machine similar to the one previously described as the test environment used by the authors, **reserve 20 to 60 minutes** because many Docker images and packages will be downloaded and compiled.
 
 ```bash
-chmod +x setup.sh
 ./setup.sh full
 ```
+
+
 
 #### \*\* Reduced Version Installation \*\* 
 
 >[!TIP]
->For a faster reviewer demonstration, the repository provides this reduced profile with seven attacks, one from each catalog category, and only the HTTP, SSH, and MQTT target servers: yet they still manage to demonstrate all of the tool's capabilities.
+>For a faster reviewer demonstration, the repository provides this reduced profile with seven attacks, one from each catalog category, and only the HTTP, SSH, and MQTT target servers: yet they still manage to demonstrate all of the tool's capabilities. Even so, the installation typically takes **at least 2 to 5 minutes**.
 
 ```bash
-chmod +x setup.sh
 ./setup.sh redux
 ```
 
@@ -259,7 +259,7 @@ The reduced testbed profile does not build benign client images. See [contrib/do
 ### 4. Activate The Python Environment
 
 ```bash
-cd /path/to/sbseg26
+cd /path/to/attackzoo-sbseg26
 if [[ -z "${VIRTUAL_ENV}" ]]; then
   source .venv/bin/activate
 fi
@@ -283,7 +283,7 @@ This section runs a short validation to confirm that the CLI loads the catalog, 
 ### 1. Prepare The Session
 
 ```bash
-cd /path/to/sbseg26
+cd /path/to/attackzoo-sbseg26
 if [[ -z "${VIRTUAL_ENV}" ]]; then
   source .venv/bin/activate
 fi
@@ -375,7 +375,7 @@ Goal: show that the tool automatically discovers attacks declared in `docker/att
 Commands:
 
 ```bash
-cd /path/to/sbseg26
+cd /path/to/attackzoo-sbseg26
 if [[ -z "${VIRTUAL_ENV}" ]]; then
   source .venv/bin/activate
 fi
@@ -411,7 +411,7 @@ Goal: demonstrate functional attack execution against services inside the testbe
 Preparation:
 
 ```bash
-cd /path/to/sbseg26
+cd /path/to/attackzoo-sbseg26
 if [[ -z "${VIRTUAL_ENV}" ]]; then
   source .venv/bin/activate
 fi
