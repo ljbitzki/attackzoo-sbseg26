@@ -2,9 +2,14 @@
 
 This folder documents the campaign `experiments/60att_5runs_l0l1l2l3` in one file per attack. Each document uses only information already present in the repository: the local attack catalog, the tables in `reports/tables`, execution artifacts, and the figures from `reports/figs` copied to `contrib/assets/campaign_doc`.
 
-- Documented attacks: 60
-- Attacks with aggregated tables: 56
-- Figures copied to the documentation: 448
+- Documented attacks: **60**
+- _.pcap_ captures: **1200**
+- Total data volume: **672.1 GB**
+- Resulting datasets: **225.4 GB**
+- [High-compressed single-file](https://doi.org/10.6084/m9.figshare.32900828) : **16.9 GB**
+
+>[!IMPORTANT]
+>[https://doi.org/10.6084/m9.figshare.32900828](https://doi.org/10.6084/m9.figshare.32900828)
 
 ## Documents
 
