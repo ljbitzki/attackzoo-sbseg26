@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-PROFILE="${1:-full}"
+PROFILE="${1}"
 
 case "${PROFILE}" in
     full|redux)

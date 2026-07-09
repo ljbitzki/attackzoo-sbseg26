@@ -237,13 +237,11 @@ Here we have 2 options:
 #### \*\* Full Version Installation \*\*
 
 >[!CAUTION]
-> This builds all server, attacker, and client images, starts target servers, and other elements. The first build depends on machine and network speed: on a machine similar to the one previously described as the test environment used by the authors, **reserve 20 to 60 minutes** because many Docker images and packages will be downloaded and compiled.
+> This builds all server, attacker, and client images, starts target servers, and other elements. The first build depends on machine and network speed: on a machine similar to the one previously described as the test environment used by the authors, **reserve 15 to 30 minutes** because many Docker images and packages will be downloaded and compiled.
 
 ```bash
 ./setup.sh full
 ```
-
-
 
 #### \*\* Reduced Version Installation \*\* 
 

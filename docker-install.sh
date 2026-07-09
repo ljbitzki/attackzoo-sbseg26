@@ -1,14 +1,15 @@
 #!/usr/bin/env bash
 
-PROFILE="${1:-full}"
+PROFILE="${1}"
 INSTALLED=0
 MIN_DOCKER_VERSION="29.5"
 
 case "${PROFILE}" in
-    full|redux)
+    dependencies)
         ;;
     *)
-        echo "Usage: $0 [full|redux]"
+        echo "Usage: $0 [dependencies]"
+        echo "Make sure you have ran at least ./setup.sh dependencies one time."
         exit 1
         ;;
 esac
@@ -72,7 +73,6 @@ EOF
     fi
 else
     echo "Docker is installed and meets the minimum version."
-    echo -e "Starting the image build with \"\e[32m./build.sh ${PROFILE}\e[0m\""
-    ./build.sh "${PROFILE}"
+    echo -e "Proceed to \e[33m./setup.sh full\e[0m or \e[33m./setup redux\e[0m"
 fi
 exit 0

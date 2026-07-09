@@ -13,6 +13,7 @@ case "${PROFILE}" in
 esac
 
 if [ "${PROFILE}" == "dependencies" ]; then
+    echo '1' > /tmp/attackzoo-setup.ok
     echo "Installing required packages..."
     sudo apt update
     sudo DEBIAN_FRONTEND=noninteractive apt install -y tshark tcpdump python3-venv cmake wireshark redis ca-certificates curl git
@@ -35,10 +36,29 @@ if [ "${PROFILE}" == "dependencies" ]; then
     rm -rf .git/
     cd ../ || exit 1
     pip install -r requirements.txt
+    ./docker-install.sh "${PROFILE}"
     echo -e "All dependencies satisfied.\nNow execute \e[92mnewgrp docker\e[0m to reload this shell session and then continue the procedure."
     exit 0
 fi
 
 if [ "${PROFILE}" == "redux" ] || [ "${PROFILE}" == "full" ]; then
-    ./docker-install.sh "${PROFILE}"
+    if [[ -z "/tmp/attackzoo-setup.ok" ]]; then
+        echo -e "Make sure you have ran at least \e[92m./setup.sh dependencies\e[0m one time."
+        read -p "Do you want to proceed? (y/n): " YN
+        case ${YN} in
+            [Yy] )
+                ./build.sh "${PROFILE}"
+                break
+                ;;
+            [Nn] )
+                echo "Exiting..."
+                exit 0
+                ;;
+            * )
+                echo "Please answer yes or no."
+                ;;
+        esac
+    else
+        ./build.sh "${PROFILE}"
+    fi
 fi
