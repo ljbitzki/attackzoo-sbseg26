@@ -12,7 +12,7 @@ case "${PROFILE}" in
         ;;
 esac
 
-if [ "${1}" == "dependencies" ]; then
+if [ "${PROFILE}" == "dependencies" ]; then
     echo "Installing required packages..."
     sudo apt update
     sudo DEBIAN_FRONTEND=noninteractive apt install -y tshark tcpdump python3-venv cmake wireshark redis ca-certificates curl git
@@ -39,6 +39,6 @@ if [ "${1}" == "dependencies" ]; then
     exit 0
 fi
 
-if [ "${1}" == "redux" ] || [ "${1}" == "full" ]; then
+if [ "${PROFILE}" == "redux" ] || [ "${PROFILE}" == "full" ]; then
     ./docker-install.sh "${PROFILE}"
 fi

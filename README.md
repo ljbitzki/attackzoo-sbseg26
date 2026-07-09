@@ -248,7 +248,7 @@ Here we have 2 options:
 #### \*\* Reduced Version Installation \*\* 
 
 >[!TIP]
->For a faster reviewer demonstration, the repository provides this reduced profile with seven attacks, one from each catalog category, and only the HTTP, SSH, and MQTT target servers: yet they still manage to demonstrate all of the tool's capabilities. Even so, the installation typically takes **at least 2 to 5 minutes**.
+>For a faster reviewer demonstration, the repository provides this reduced profile with seven attacks, one from each catalog category, and only the HTTP, SSH, and MQTT target servers: yet they still manage to demonstrate all of the tool's capabilities. Even so, the installation typically takes **at least 2 to 5 minutes**. 
 
 ```bash
 ./setup.sh redux
