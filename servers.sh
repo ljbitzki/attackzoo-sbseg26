@@ -19,7 +19,7 @@ case "${PROFILE}" in
         ;;
 esac
 
-ALL_REQUIRED_IMAGES=(
+ALL_SERVER_IMAGES=(
     server-http-server
     server-ssh-server
     server-smb-server
@@ -31,56 +31,72 @@ ALL_REQUIRED_IMAGES=(
     server-ssl-heartbleed
 )
 
-REDUX_REQUIRED_IMAGES=(
+REDUX_SERVER_IMAGES=(
     server-http-server
     server-ssh-server
     server-mqtt-broker
 )
 
 if [ "${PROFILE}" = "redux" ]; then
-    REQUIRED_IMAGES=("${REDUX_REQUIRED_IMAGES[@]}")
+    EXPECTED_IMAGES=("${REDUX_SERVER_IMAGES[@]}")
     BUILD_PROFILE="redux"
 else
-    REQUIRED_IMAGES=("${ALL_REQUIRED_IMAGES[@]}")
+    EXPECTED_IMAGES=("${ALL_SERVER_IMAGES[@]}")
     BUILD_PROFILE="full"
 fi
 
-for IMAGE in "${REQUIRED_IMAGES[@]}"; do
+AVAILABLE_IMAGES=()
+MISSING_IMAGES=()
+
+for IMAGE in "${EXPECTED_IMAGES[@]}"; do
     if [ "$( docker images -q "${IMAGE}:latest" | wc -l )" -eq 0 ]; then
-        echo "Missing server image: ${IMAGE}:latest. Run ./build.sh ${BUILD_PROFILE} to rebuild the images."
-        exit 1
+        MISSING_IMAGES+=("${IMAGE}")
+    else
+        AVAILABLE_IMAGES+=("${IMAGE}")
     fi
 done
 
-function PROFILE_INCLUDES {
-    if [ "${PROFILE}" != "redux" ]; then
-        return 0
+function WARN_MISSING_IMAGES {
+    if [ "${#MISSING_IMAGES[@]}" -gt 0 ]; then
+        echo "Not all server images were found. Available servers will be handled only."
+        echo "Missing server images: ${MISSING_IMAGES[*]}"
+        echo "Run ./build.sh ${BUILD_PROFILE} to build the expected server images."
     fi
-    case "${1}" in
-        server-http-server|server-ssh-server|server-mqtt-broker)
+}
+
+function PROFILE_INCLUDES {
+    local IMAGE
+    for IMAGE in "${AVAILABLE_IMAGES[@]}"; do
+        if [ "${IMAGE}" = "${1}" ]; then
             return 0
-            ;;
-        *)
-            return 1
-            ;;
-    esac
+        fi
+    done
+    return 1
 }
 
 function STOP {
-    if [ "${PROFILE}" = "redux" ]; then
-        local servers=()
-        mapfile -t servers < <( docker ps -a --format '{{.Names}}' | grep -E '^server-(http-server|ssh-server|mqtt-broker)$' || true )
-        if [ "${#servers[@]}" -gt 0 ]; then
-            docker rm -f "${servers[@]}"
+    local servers=()
+    local IMAGE
+
+    for IMAGE in "${EXPECTED_IMAGES[@]}"; do
+        if [ "$( docker ps -a --format '{{.Names}}' | grep -xc "${IMAGE}" || true )" -gt 0 ]; then
+            servers+=("${IMAGE}")
         fi
-        return
+    done
+
+    if [ "${#servers[@]}" -gt 0 ]; then
+        docker rm -f "${servers[@]}"
     fi
-    while read -r SERVER; do
-        docker rm -f "${SERVER}"
-    done < <( docker ps -a | grep 'server-' | awk '{print $1}' )
 }
 
 function START {
+    WARN_MISSING_IMAGES
+
+    if [ "${#AVAILABLE_IMAGES[@]}" -eq 0 ]; then
+        echo "No available server images were found for profile: ${PROFILE}"
+        exit 1
+    fi
+
     if PROFILE_INCLUDES server-http-server && [ $( docker ps -a | grep -c 'server-http-server') -eq 0 ]; then
         docker run -d --rm --name server-http-server -p 8080:80 server-http-server:latest
     fi

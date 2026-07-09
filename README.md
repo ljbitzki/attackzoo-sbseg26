@@ -307,6 +307,11 @@ docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}" | grep server-htt
 curl -I http://127.0.0.1:8080/
 ```
 
+>[!IMPORTANT]
+> If you installed the reduced version, you need to add `redux` as first parameter for servers.sh script.
+> `./servers.sh redux start`
+
+
 Expected result:
 
 - The `server-http-server` container is `Up`.
@@ -416,6 +421,10 @@ fi
 ./servers.sh start
 docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}" | grep -E '^server-'
 ```
+
+>[!IMPORTANT]
+> If you installed the reduced version, you need to add `redux` as first parameter for servers.sh script.
+> `./servers.sh redux start`
 
 Simple HTTP DoS against th HTTP Server (for example):
 
@@ -779,6 +788,10 @@ cd /path/to/attackzoo-sbseg/
 ./servers.sh start
 docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}" | grep server
 ```
+
+>[!IMPORTANT]
+> If you installed the reduced version, you need to add `redux` as first parameter for servers.sh script.
+> `./servers.sh redux start`
 
 ## License
 
