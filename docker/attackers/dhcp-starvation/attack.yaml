@@ -8,11 +8,28 @@ container_name: attack-dhcp-starvation
 max_runtime_s: 10
 target_services:
 - local network
-no_params_note: This attack does not take parameters and operates at the local network level.
+no_params_note: This attack does not require a target and operates at the local network level. Intensity parameters bound unattended campaign runs.
+details_warning: The launcher is intentionally capped for campaign safety. Increase count or active_s only after validating host load, DHCP state churn, and capture volume.
 mitre:
 - https://attack.mitre.org/tactics/TA0040/
 - https://attack.mitre.org/techniques/T1498/
 - https://attack.mitre.org/techniques/T1498/001/
 - https://attack.mitre.org/techniques/T1499/
 - https://attack.mitre.org/techniques/T1499/002/
-params: []
+params:
+- key: active_s
+  label: Active flood duration inside the attack window (s)
+  kind: int
+  default: 5
+  validate: '^[1-9]\d*$'
+  required: false
+  positional: false
+  env_var: ACTIVE_S
+intensity_params:
+- key: duration_s
+- key: count
+  label: Number of yersinia worker processes
+  default: 1
+- key: delay_ms
+  label: Delay between worker starts (ms)
+  default: 1000

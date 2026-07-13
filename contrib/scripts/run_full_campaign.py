@@ -56,6 +56,12 @@ DEFAULT_PROBE_TIMEOUT_S = 2.0
 DEFAULT_RESOURCE_INTERVAL_S = 1.0
 DEFAULT_IFACE = "any"
 
+AUTO_BPF_BY_ATTACK: Dict[str, str] = {
+    "net_dhcp_starvation": "udp port 67 or udp port 68",
+    "net_ipv6_mld_flood": "icmp6",
+    "net_stp_tcn_flood": "stp",
+}
+
 SERVICE_OVERRIDES: Dict[str, str] = {
     "bf_ssh": "ssh-server",
     "bf_telnet": "telnet-server",
@@ -469,11 +475,13 @@ def probe_endpoint_args(probe: str, endpoint: str) -> List[str]:
     return ["--probe-endpoint", f"{probe}={endpoint}"]
 
 
-def build_bpf(args: argparse.Namespace, plan_ports: Iterable[int], local_link: bool) -> str:
+def build_bpf(args: argparse.Namespace, attack_id: str, plan_ports: Iterable[int], local_link: bool) -> str:
     if args.bpf_mode == "all":
         return ""
     if args.bpf:
         return args.bpf
+    if attack_id in AUTO_BPF_BY_ATTACK:
+        return AUTO_BPF_BY_ATTACK[attack_id]
     if local_link:
         return ""
     ports = sorted({int(p) for p in plan_ports if p})
@@ -622,7 +630,7 @@ def build_plans(args: argparse.Namespace, campaign_root: Path) -> List[AttackPla
             server_container=service.container_name if service else "",
             probes=tuple(probe_endpoints.keys()),
             probe_endpoints=probe_endpoints,
-            bpf=build_bpf(args, bpf_ports, local_link=capture_all),
+            bpf=build_bpf(args, attack_id, bpf_ports, local_link=capture_all),
             features_dir=str(features_dir),
             datasets_dir=str(datasets_dir),
             attack_start_hook=start_hook,
