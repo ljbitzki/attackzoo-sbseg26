@@ -54,6 +54,7 @@ The artifact is intended to support the following review badges:
 | --- | --- | --- |
 | Main CLI | `attackzoo.py` | Command-line entry point for the AttackZoo Testbed. |
 | CLI parser and commands | `modules/attackzoo/` | Implementation of `status`, `list`, `run`, `stop`, `ps`, `logs`, `captures`, `features`, `dataset`, `experiment`, and `report`. |
+| Reviewer claim scripts | `run_claim1.sh`, `run_claim2.sh`, `run_claim3.sh` | One-command checks for the reproducible experiment claims. |
 | Dynamic attack catalog | `docker/attackers/*/attack.yaml` | Plug-and-play attack definitions loaded automatically by the tool. |
 | Target servers | `docker/servers/` | Docker images for HTTP, SSH, SMB, MQTT, CoAP, XRCE-DDS, Zenoh, Telnet, and SSL/Heartbleed services. |
 | Benign clients | `docker/clients/` | Containers that generate benign background traffic. |
@@ -370,276 +371,84 @@ Accepted availability probes for `--probes` are `http`, `https`, `ssh`, `smb`, `
 
 ## Reproducible Experiment Claims
 
-The claims below reflect the functionality implemented in this repository. If the final paper uses different numbering or titles, keep the commands and adjust only the claim labels.
+The claims below are automated reviewer checks. Run each command from the repository root after completing the installation and image build. Each script activates `.venv` automatically when it is available and prints a final comparison block.
+
+For reduced installations, Claims 2 and 3 use the HTTP subset and can be run with the default `ATTACKZOO_PROFILE=redux`. For a full installation, prefix the command with `ATTACKZOO_PROFILE=full`, for example `ATTACKZOO_PROFILE=full bash run_claim2.sh`.
 
 ### Claim 1: The Artifact Provides An Extensible Catalog Of Containerized Attacks
 
-Goal: show that the tool automatically discovers attacks declared in `docker/attackers/*/attack.yaml`, groups them by category, and exposes execution parameters through the CLI.
+Goal: show that the CLI automatically discovers attacks declared in `docker/attackers/*/attack.yaml`, groups them by category, and exposes the expected JSON fields.
 
-Commands:
-
-```bash
-cd /path/to/attackzoo-sbseg26
-if [[ -z "${VIRTUAL_ENV}" ]]; then
-  source .venv/bin/activate
-fi
-python3 attackzoo.py list
-python3 attackzoo.py list --json > /tmp/attackzoo-catalog.json
-python3 -m json.tool /tmp/attackzoo-catalog.json > /tmp/attackzoo-catalog-formatted.json
-```
-To check the full output:
+Command:
 
 ```bash
-cat /tmp/attackzoo-catalog-formatted.json | jq
+bash run_claim1.sh
 ```
 
-To check the count by categories:
+Expected time: less than 1 minute.
 
-```bash
-python3 - <<'PY'
-from modules.registry import CATEGORIES
-print(sum(len(v) for v in CATEGORIES.values()), "attacks")
-for category, attacks in CATEGORIES.items():
-    print(f"{category}: {len(attacks)}")
-PY
+Expected result:
+
+```text
+══════════════════════════════════════════════════════════════
+Claim 1 — Catálogo de ataques
+Ataques no catálogo : 60
+Categorias          : 7
+Campos JSON         : sim
+Resultado esperado  : 60 ataques / 7 categorias / campos JSON → OK
+══════════════════════════════════════════════════════════════
 ```
-
-**Expected time**: less than 1 minute.
-**Expected resources**: negligible CPU and memory. Docker does not need to be running for catalog listing, but Python dependencies must be installed.
-**Expected result**: 60 attacks loaded across 7 categories. The JSON output contains `id`, `name`, `image`, `container`, `params`, `mitre`, and `max_runtime_s` for each attack.
 
 ### Claim 2: The Environment Runs Attacks Against Containerized Target Servers
 
-Goal: demonstrate functional attack execution against services inside the testbed.
+Goal: demonstrate functional attack execution against a Dockerized HTTP target inside the testbed.
 
-Preparation:
-
-```bash
-cd /path/to/attackzoo-sbseg26
-if [[ -z "${VIRTUAL_ENV}" ]]; then
-  source .venv/bin/activate
-fi
-./servers.sh start
-docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}" | grep -E '^server-'
-```
-
->[!IMPORTANT]
-> If you installed the reduced version, you need to add `redux` as first parameter for servers.sh script.
-> `./servers.sh redux start`
-
-Simple HTTP DoS against th HTTP Server (for example):
+Command:
 
 ```bash
-HTTP_IP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' server-http-server)
-python3 attackzoo.py run dos_http_simple --target "$HTTP_IP" --port 80
-```
-
-TCP Port Knocking Reconnaissance against the HTTP Server (for example):
-
-```bash
-python3 attackzoo.py run recon_port_scanner_tcp --target "$HTTP_IP"
-```
-
-Check running attacks and stop manually:
-
-```bash
-python3 attackzoo.py ps
-python3 attackzoo.py stop dos_http_simple
-python3 attackzoo.py stop recon_port_scanner_tcp
+bash run_claim2.sh
 ```
 
 Expected time: 1 to 5 minutes after images have already been built.
 
-Expected resources: 1 to 2 vCPUs and up to 2 GB of additional RAM for short tests. Flood attacks may increase CPU and network usage; keep durations short.
-
-Expected result: the CLI prints `[OK] Container started` and `[OK] Container stoped`, containers appear in `ps` while active, and servers remain manageable through `servers.sh`.
-
-### Claim 3: The Artifact Generates Traffic Evidence, Features, And Datasets
-
-Goal: demonstrate the PCAP capture, feature extraction, and dataset-generation pipeline from a controlled execution.
-
-Short experiment with capture and extraction:
-
-```bash
-python3 attackzoo.py experiment \
-  --attack-id dos_http_simple \
-  --out http_features \
-  --runs 1 \
-  --levels L0 \
-  --warmup 5 \
-  --attack 5 \
-  --cooldown 5 \
-  --probes http \
-  --http-url http://127.0.0.1:8080/ \
-  --iface lo \
-  --bpf "tcp port 8080" \
-  --extract-features \
-  --build-dataset \
-  --tools-tshark \
-  --tools-scapy
-```
-
->[!NOTE]
-> This experimente takes 15 seconds to complete. Please wait until terminal prints something like:
->`[OK] dos_http_simple L0 run01`
->`experiments/http_features/reports`
-
-**Expected time**: 1 to 10 minutes for short experiments. NTLFlowLyzer may take longer on large PCAP files.
-**Expected resources**: disk use proportional to captured traffic. Short tests usually need less than 1 GB; full repetitions may require tens of GB.
-**Expected result**:
-- Probes, tables, charts, telemetry and more under `experiments/http_features/dos_http_simple/...`
-- Stored PCAP captures under `captures/`.
-- Features CSVs under `features/`.
-- Dataset CSVs under `datasets/`.
-- Per-run metadata in `meta.json`.
-
-To list resulting captures:
-
-```bash
-python3 attackzoo.py captures
-python3 attackzoo.py captures --latest --json
-```
-
-### Claim 4: The Artifact Reproduces Warmup-Attack-Cooldown Batches And T3-T8 Reports
-
-Goal: reproduce a more complex experimental scenario with warmup, attack, and cooldown phases, multi throughput levels, availability probes, hooks, filter and consolidated reports:
-
-```bash
-
-HTTP_IP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' server-http-server)
-
-python3 attackzoo.py experiment \
-  --attack-id dos_http_simple \
-  --out full_http \
-  --service http \
-  --runs 3 \
-  --levels L0,L1 \
-  --warmup 30 \
-  --attack 60 \
-  --cooldown 30 \
-  --probes http \
-  --http-url http://127.0.0.1:8080/ \
-  --host "$HTTP_IP" \
-  --port 80 \
-  --iface docker0 \
-  --bpf "tcp port 80 or tcp port 8080" \
-  --collect-resources \
-  --server server-http-server \
-  --attack-start-hook "python3 attackzoo.py run dos_http_simple --target {host} --port {port}" \
-  --attack-stop-hook "python3 attackzoo.py stop dos_http_simple"
-```
-
->[!NOTE]
-> This experimente takes 12~15 minutes to complete. It will execute 3 runs of 2 throughput levels with 30s+60s+30s seconds per run:
->`3 x 2 x (30 + 60 + 30) = 720 seconds (12 minutes)`.
->Please wait until terminal prints something like:
->`[OK] dos_http_simple L0 run01`
->`[OK] dos_http_simple L0 run02`
->`[OK] dos_http_simple L0 run03`
->`[OK] dos_http_simple L1 run01`
->`[OK] dos_http_simple L1 run02`
->`[OK] dos_http_simple L1 run03`
->`experiments/full_http/reports`
-
-If you already have data from a previous experiment, you can regenerate reports from collected/stored data:
-
-```bash
-python3 attackzoo.py report \
-  --input experiments/full_http/ \
-  --warmup 30 \
-  --attack 60 \
-  --cooldown 30
-```
-
-**Expected time**: approximately `(warmup + attack + cooldown) * runs * levels`, plus post-processing. The example above takes about 12 minutes before report generation.
-**Expected resources**: 4 vCPUs, 8 GB RAM, and a few GB of free space for PCAPs/CSVs. Increase disk and memory for more levels, more repetitions, or higher-intensity attacks.
-**Expected result**:
+Expected result:
 
 ```text
-experiments/paper_http/
-  dos_http_simple/
-    L0/run01/
-    L0/run02/
-    L0/run03/
-    L1/run01/
-    L1/run02/
-    L1/run03/
-  reports/
-    figs/
-    tables/
+══════════════════════════════════════════════════════════════
+Claim 2 — Execução contra servidor Docker
+Docker disponível   : sim
+Servidor HTTP       : Up
+Ataque iniciado     : sim
+Ataque finalizado   : sim
+Resultado esperado  : Docker + HTTP ativo + ataque executado → OK
+══════════════════════════════════════════════════════════════
 ```
 
-Expected files include `probe_<service>.csv` (for example, `probe_http.csv`), `resource.csv`, `server_stats.csv`, `meta.json`, PCAP files, and tables/figures summarizing availability, resources, stability, and reexecution.
+### Claim 3: The Artifact Generates Traffic Evidence, Features, Datasets, And Reports
 
-### Claim 5: New Attacks Can Be Added Without Changing Python Code
+Goal: demonstrate a short warmup/attack/cooldown experiment with HTTP probes, PCAP capture, Scapy feature extraction, dataset generation, metadata, and reports.
 
-Goal: demonstrate catalog sustainability and extensibility through YAML files.
-
-Steps:
-
-1. Create a directory under `docker/attackers/<new-attack>/`.
-2. Add `Dockerfile`, `entrypoint.sh`, `README.md`, and `attack.yaml`.
-3. Declare fields such as `id`, `name`, `category`, `image`, `container_name`, `target_mapping`, `params`, and `max_runtime_s` in `attack.yaml`.
-4. Build the Docker image.
-5. Run `python3 attackzoo.py list --id <attack_id>`.
-
-Minimal `attack.yaml` example:
-
-```yaml
-id: example_ping
-name: Example Ping
-category: 1) Reconnaissance and Discovery
-description: Example attack used to validate dynamic discovery.
-image: attack-example-ping:latest
-container_name: attack-example-ping
-max_runtime_s: 10
-target_mapping:
-  target: target_ip
-params:
-  - key: target_ip
-    label: Target IP address or FQDN
-    kind: ip
-    placeholder: __HOST_IP__
-```
-
-Full example `copy-and-paste`: 
+Command:
 
 ```bash
-# Create attack dir
-mkdir -p docker/attackers/example-ping
-# Create Dockerfile
-cat > docker/attackers/example-ping/Dockerfile <<'EOF'
-FROM alpine:3.20
-
-RUN apk add --no-cache iputils
-
-ENTRYPOINT ["ping", "-c", "4"]
-EOF
-# Create attack.yaml attack declaration
-cat > docker/attackers/example-ping/attack.yaml <<'EOF'
-id: example_ping
-name: Example Ping
-category: 1) Reconnaissance and Discovery
-description: Example attack used to validate dynamic discovery.
-image: attack-example-ping:latest
-container_name: attack-example-ping
-max_runtime_s: 10
-target_mapping:
-  target: target_ip
-params:
-  - key: target_ip
-    label: Target IP address or FQDN
-    kind: ip
-    placeholder: __HOST_IP__
-EOF
-# Build the new container
-docker build -t attack-example-ping:latest docker/attackers/example-ping
-# List attack from catalog
-python3 attackzoo.py list --id example_ping
+bash run_claim3.sh
 ```
 
-**Expected time**: less than 5 minutes for a simple attack, plus Docker image build time.
-**Expected result**: the new "attack" appears in the CLI without changing any core Python file in the Project.
+Expected time: less than 2 minutes after images have already been built.
+
+Expected result:
+
+```text
+══════════════════════════════════════════════════════════════
+Claim 3 — Evidências, features e datasets
+Execuções concluídas: 2
+PCAPs válidos       : 2
+Features Scapy      : 2
+Datasets            : 2
+Relatórios          : sim
+Resultado esperado  : 2 runs / PCAPs / features / datasets / relatórios → OK
+══════════════════════════════════════════════════════════════
+```
 
 ## Additional Documentation
 
