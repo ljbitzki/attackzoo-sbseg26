@@ -41,10 +41,10 @@ This document is organized as follows:
 
 The artifact is intended to support the following review badges:
 
-- Available Artifacts (Artefatos Disponíveis): **`SeloD`** <img src="./contrib/assets/SeloD.png" width="23"/>
-- Functional Artifacts (Artefatos Funcionais): **`SeloF`** <img src="./contrib/assets/SeloF.png" width="23"/>
-- Sustainable Artifacts (Artefatos Sustentáveis): **`SeloS`** <img src="./contrib/assets/SeloS.png" width="23"/>
-- Reproducible Experiments (Experimentos Reprodutíveis): **`SeloR`** <img src="./contrib/assets/SeloR.png" width="23"/>
+- Available Artifacts: **`SeloD`** <img src="./contrib/assets/SeloD.png" width="23"/>
+- Functional Artifacts: **`SeloF`** <img src="./contrib/assets/SeloF.png" width="23"/>
+- Sustainable Artifacts: **`SeloS`** <img src="./contrib/assets/SeloS.png" width="23"/>
+- Reproducible Experiments: **`SeloR`** <img src="./contrib/assets/SeloR.png" width="23"/>
 
 ## Basic Information
 
@@ -54,7 +54,7 @@ The artifact is intended to support the following review badges:
 | --- | --- | --- |
 | Main CLI | `attackzoo.py` | Command-line entry point for the AttackZoo Testbed. |
 | CLI parser and commands | `modules/attackzoo/` | Implementation of `status`, `list`, `run`, `stop`, `ps`, `logs`, `captures`, `features`, `dataset`, `experiment`, and `report`. |
-| Reviewer claim scripts | `run_claim1.sh`, `run_claim2.sh`, `run_claim3.sh` | One-command checks for the reproducible experiment claims. |
+| Reviewer claim scripts | `run_claim1.sh`, `run_claim2.sh`, `run_claim3.sh`, `run_claim_figures.sh` | One-command checks for the reproducible experiment claims and paper-figure regeneration. |
 | Dynamic attack catalog | `docker/attackers/*/attack.yaml` | Plug-and-play attack definitions loaded automatically by the tool. |
 | Target servers | `docker/servers/` | Docker images for HTTP, SSH, SMB, MQTT, CoAP, XRCE-DDS, Zenoh, Telnet, and SSL/Heartbleed services. |
 | Benign clients | `docker/clients/` | Containers that generate benign background traffic. |
@@ -391,11 +391,11 @@ Expected result:
 
 ```text
 ══════════════════════════════════════════════════════════════
-Claim 1 — Catálogo de ataques
-Ataques no catálogo : 60
-Categorias          : 7
-Campos JSON         : sim
-Resultado esperado  : 60 ataques / 7 categorias / campos JSON → OK
+Claim 1 — Attack catalog
+Attacks in catalog  : 60
+Categories          : 7
+JSON fields         : yes
+Expected result     : 60 attacks / 7 categories / JSON fields → OK
 ══════════════════════════════════════════════════════════════
 ```
 
@@ -415,20 +415,20 @@ Expected result:
 
 ```text
 ══════════════════════════════════════════════════════════════
-Claim 2 — Execução contra servidor Docker
-Docker disponível   : sim
-Servidor HTTP       : Up
-Ataque iniciado     : sim
-Ataque finalizado   : sim
-Resultado esperado  : Docker + HTTP ativo + ataque executado → OK
+Claim 2 — Execution against a Docker server
+Docker available    : yes
+HTTP server         : Up
+Attack started      : yes
+Attack stopped      : yes
+Expected result     : Docker + active HTTP server + executed attack → OK
 ══════════════════════════════════════════════════════════════
 ```
 
-### Claim 3: The Artifact Generates Traffic Evidence, Features, Datasets, And Reports
+### Claim 3: The Artifact Generates Traffic Evidence, Features, Datasets, Reports, And Paper Figures
 
-Goal: demonstrate a short warmup/attack/cooldown experiment with HTTP probes, PCAP capture, Scapy feature extraction, dataset generation, metadata, and reports.
+Goal: demonstrate both a reduced end-to-end experiment and a complete paper-figure regeneration path from the published Figshare campaign dataset.
 
-Command:
+Reduced command for the minimum reviewer check:
 
 ```bash
 bash run_claim3.sh
@@ -440,13 +440,40 @@ Expected result:
 
 ```text
 ══════════════════════════════════════════════════════════════
-Claim 3 — Evidências, features e datasets
-Execuções concluídas: 2
-PCAPs válidos       : 2
+Claim 3 — Evidence, features, and datasets
+Completed runs      : 2
+Valid PCAPs         : 2
 Features Scapy      : 2
 Datasets            : 2
-Relatórios          : sim
-Resultado esperado  : 2 runs / PCAPs / features / datasets / relatórios → OK
+Reports             : yes
+Expected result     : 2 runs / PCAPs / features / datasets / reports → OK
+══════════════════════════════════════════════════════════════
+```
+
+Complete paper-figure regeneration:
+
+```bash
+ATTACKZOO_CONFIRM_LARGE_DOWNLOAD=1 bash run_claim_figures.sh
+```
+
+This complete mode resolves the Figshare DOI `10.6084/m9.figshare.32900828`, downloads `attackzoo-full_campaign_5runs_4levels.tar.gz` from the public Figshare API when needed, verifies the MD5 checksum, unpacks the campaign, and runs `contrib/scripts/campaign_traffic_stats.py --plots all`.
+
+>[!CAUTION]
+>The complete mode downloads a **16.9 GB** compressed archive and needs at least **225 GB** of additional space to unpack the campaign. The script requires **260 GiB** free by default, which can be adjusted with `ATTACKZOO_FIGSHARE_MIN_FREE_GB`. Regeneration can take roughly **30 to 60 minutes**, depending on disk and CPU speed.
+
+Expected complete result:
+
+```text
+══════════════════════════════════════════════════════════════
+Claim 3 — Full paper figure reproduction
+DOI Figshare        : 10.6084/m9.figshare.32900828
+Compressed archive  : attackzoo-full_campaign_5runs_4levels.tar.gz
+Attacks             : 60
+PCAPs processed     : 1200/1200
+Traffic counted     : <reported GiB>
+Figures generated   : 8
+Report              : contrib/reports/paper_figures
+Expected result     : 60 attacks / 1200 PCAPs / 8 figures / manifest OK → OK
 ══════════════════════════════════════════════════════════════
 ```
 

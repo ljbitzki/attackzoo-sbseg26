@@ -9,16 +9,16 @@ LINE="════════════════════════�
 
 attacks="0"
 categories="0"
-json_fields="não"
-result="FALHOU"
+json_fields="no"
+result="FAILED"
 
 print_summary() {
     printf '%s\n' "${LINE}"
-    printf 'Claim 1 — Catálogo de ataques\n'
-    printf 'Ataques no catálogo : %s\n' "${attacks}"
-    printf 'Categorias          : %s\n' "${categories}"
-    printf 'Campos JSON         : %s\n' "${json_fields}"
-    printf 'Resultado esperado  : 60 ataques / 7 categorias / campos JSON → %s\n' "${result}"
+    printf 'Claim 1 — Attack catalog\n'
+    printf 'Attacks in catalog  : %s\n' "${attacks}"
+    printf 'Categories          : %s\n' "${categories}"
+    printf 'JSON fields         : %s\n' "${json_fields}"
+    printf 'Expected result     : 60 attacks / 7 categories / JSON fields → %s\n' "${result}"
     printf '%s\n' "${LINE}"
 }
 
@@ -33,7 +33,7 @@ if [[ -z "${VIRTUAL_ENV:-}" && -f ".venv/bin/activate" ]]; then
 fi
 
 mkdir -p ".tmp"
-python3 attackzoo.py list --json > "${CATALOG_JSON}" || fail "Não foi possível executar: python3 attackzoo.py list --json"
+python3 attackzoo.py list --json > "${CATALOG_JSON}" || fail "Could not run: python3 attackzoo.py list --json"
 
 mapfile -t metrics < <(python3 - "${CATALOG_JSON}" <<'PY'
 import json
@@ -52,7 +52,7 @@ for items in payload.values():
 
 print(sum(len(items) for items in payload.values()))
 print(len(payload))
-print("sim" if not missing else "não")
+print("yes" if not missing else "no")
 print("; ".join(missing[:5]))
 PY
 )
@@ -63,13 +63,13 @@ json_fields="${metrics[2]}"
 missing_fields="${metrics[3]:-}"
 
 if [[ "${attacks}" != "60" ]]; then
-    fail "Quantidade de ataques inesperada: ${attacks}"
+    fail "Unexpected attack count: ${attacks}"
 fi
 if [[ "${categories}" != "7" ]]; then
-    fail "Quantidade de categorias inesperada: ${categories}"
+    fail "Unexpected category count: ${categories}"
 fi
-if [[ "${json_fields}" != "sim" ]]; then
-    fail "Campos obrigatórios ausentes no JSON: ${missing_fields}"
+if [[ "${json_fields}" != "yes" ]]; then
+    fail "Required JSON fields are missing: ${missing_fields}"
 fi
 
 result="OK"

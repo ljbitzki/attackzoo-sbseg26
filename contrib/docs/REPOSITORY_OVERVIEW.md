@@ -16,6 +16,7 @@ For attack catalog schema and maintenance notes, see `contrib/docs/CATALOG_MAINT
 |-- run_claim1.sh                 # Automated Claim 1 reviewer check
 |-- run_claim2.sh                 # Automated Claim 2 reviewer check
 |-- run_claim3.sh                 # Automated Claim 3 reviewer check
+|-- run_claim_figures.sh          # Full Figshare-based paper-figure regeneration
 |-- servers.sh                    # Control script for server-* containers
 |-- clients.sh                    # Control script for client-* containers
 |-- environment.sh                # Streamlit/environment helper
