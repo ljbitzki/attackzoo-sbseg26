@@ -98,23 +98,23 @@ The current repository contains 60 attacks declared through individual `attack.y
 
 ### Recommended Execution Environment
 
-Environment used by the authors for local tests:
+Environment used for local validation:
 
 | Resource | Tested configuration |
 | --- | --- |
 | CPU | AMD Ryzen 5 5600X 6-Core Processor |
 | Memory | 32 GB DDR4 |
 | Storage | NVMe |
-| Operating system | Kubuntu 24.04 LTS |
-| Python | Python 3.11 with `venv` |
-| Docker | Docker Engine 29.2.1 |
+| Operating system | Ubuntu 24.04.4 LTS |
+| Python | Python 3.12.3 with `venv` |
+| Docker | Docker Engine 29.6.1 |
 
 >[!WARNING]
 >**Minimum recommended environment for review:**
 
 | Resource | Recommended minimum |
 | --- | --- |
-| Operating system | Ubuntu 24.04 LTS or a compatible Linux distribution with `apt` |
+| Operating system | Ubuntu 24.04 LTS or a compatible Linux distribution with `apt` packge manager  |
 | Packages | Docker and Python 3 |
 | CPU | 4 vCPUs |
 | Memory | 4 GB RAM for reduced tests; 8 GB for full experiment |
@@ -135,23 +135,41 @@ Environment used by the authors for local tests:
 - `tshark`
 - Docker Engine (`docker-ce`, `docker-ce-cli`, `containerd.io`, `docker-buildx-plugin`)
 
+Tested package versions on Ubuntu 24.04.4 LTS:
+
+| Package | Tested version |
+| --- | --- |
+| `ca-certificates` | `20260601~24.04.1` |
+| `curl` | `8.5.0-2ubuntu10.11` |
+| `git` | `1:2.43.0-1ubuntu7.3` |
+| `python3-venv` | `3.12.3-0ubuntu2.1` |
+| `tcpdump` | `4.99.4-3ubuntu4.24.04.1` |
+| `tshark` | `4.2.2-1.1build3` |
+| `docker-ce` | `5:29.6.1-1~ubuntu.24.04~noble` |
+| `docker-ce-cli` | `5:29.6.1-1~ubuntu.24.04~noble` |
+| `containerd.io` | `2.2.6-1~ubuntu.24.04~noble` |
+| `docker-buildx-plugin` | `0.35.0-1~ubuntu.24.04~noble` |
+
 >[!CAUTION]
 >Please note that **this repository depends** on `Docker Engine` being installed as described in the [official documentation](https://docs.docker.com/engine/install/ubuntu/) and also on the [post-installation instructions for Linux](https://docs.docker.com/engine/install/linux-postinstall). Be advised that installation via `apt install` **might not be compatible**.
 
-The script also adds the current user to the `docker` group, configures capture permissions for `tcpdump`, creates `.venv/`, installs Python dependencies, and installs latest NTLFlowLyzer Project (direct from GitHub repository cloning).
+The script also adds the current user to the `docker` group, configures capture permissions for `tcpdump`, creates `.venv/`, installs Python dependencies, and installs NTLFlowLyzer Project directly from its GitHub repository.
 
 ### Python Dependencies
 
-Dependencies from `requirements.txt`:
+`requirements.txt` is frozen with exact versions from the validated `.venv`.
+Primary runtime dependencies include:
 
 ```text
-streamlit>=1.36
-pandas>=2.0
-numpy>=1.20
-matplotlib>=3.5
-scapy>=2.5
-pyyaml>=6.0
+streamlit==1.58.0
+pandas==3.0.4
+numpy==2.5.0
+matplotlib==3.11.0
+scapy==2.7.0
+PyYAML==6.0.3
 ```
+
+The validated `.venv` also contains `NTLFlowLyzer==0.1.0`; `setup.sh` installs it separately from the upstream GitHub repository listed below.
 
 ### External Resources Used During Installation
 
