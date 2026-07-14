@@ -95,15 +95,15 @@ Environment used for local validation:
 | Storage | NVMe |
 | Operating system | Ubuntu 24.04.4 LTS |
 | Python | Python 3.12.3 with `venv` |
-| Docker | Docker Engine 29.6.1 |
+| Docker | Docker Engine 29.6.1; setup accepts Docker Engine 27.0 or newer |
 
 >[!WARNING]
 >**Minimum recommended environment for review:**
 
 | Resource | Recommended minimum |
 | --- | --- |
-| Operating system | Ubuntu 24.04 LTS or a compatible Linux distribution with `apt` packge manager  |
-| Packages | Docker and Python 3 |
+| Operating system | Ubuntu 24.04 LTS or a compatible Linux distribution with the `apt` package manager |
+| Packages | Docker Engine 27.0 or newer and Python 3 |
 | CPU | 4 vCPUs |
 | Memory | 4 GB RAM for reduced tests; 8 GB for full experiment |
 | Storage | 30 GB free for installation and images; 50 GB or more for PCAP captures and repeated experiments |
@@ -121,7 +121,7 @@ Environment used for local validation:
 - `python3-venv`
 - `tcpdump`
 - `tshark`
-- Docker Engine (`docker-ce`, `docker-ce-cli`, `containerd.io`, `docker-buildx-plugin`)
+- Docker Engine 27.0 or newer (`docker-ce`, `docker-ce-cli`, `containerd.io`, `docker-buildx-plugin`)
 
 Tested package versions on Ubuntu 24.04.4 LTS:
 
@@ -208,7 +208,7 @@ The steps below assume a **clean Ubuntu 24.04 LTS machine** or an equivalent env
 ### 1. Clone the repository and enters it
 
 ```bash
-git clone git@github.com:GT-IoTEdu/attackzoo-sbseg26.git
+git clone https://github.com/GT-IoTEdu/attackzoo-sbseg26.git
 cd attackzoo-sbseg26
 ```
 
@@ -310,8 +310,8 @@ curl -I http://127.0.0.1:8080/
 ```
 
 >[!IMPORTANT]
-> If you installed the reduced version, you need to add `redux` as first parameter for servers.sh script.
-> `./servers.sh redux start`
+> If you installed the reduced version, pass `redux` as the second argument to `servers.sh`:
+> `./servers.sh start redux`
 
 
 Expected result:
@@ -420,6 +420,7 @@ Docker available    : yes
 HTTP server         : Up
 Attack started      : yes
 Attack stopped      : yes
+Stop confirmation   : [OK] Stopped: attack-dos-http-simple
 Expected result     : Docker + active HTTP server + executed attack → OK
 ══════════════════════════════════════════════════════════════
 ```
@@ -433,6 +434,8 @@ Reduced command for the minimum reviewer check:
 ```bash
 bash run_claim3.sh
 ```
+
+Preparation is handled by the script: it starts the HTTP server with `./servers.sh start "$ATTACKZOO_PROFILE"` and waits until `http://127.0.0.1:8080/` is reachable before running the experiment. The default profile is `redux`; use `ATTACKZOO_PROFILE=full bash run_claim3.sh` for a full installation.
 
 Expected time: less than 2 minutes after images have already been built.
 

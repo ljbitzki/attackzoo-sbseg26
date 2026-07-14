@@ -11,6 +11,7 @@ docker_status="unavailable"
 server_status="not started"
 attack_started="no"
 attack_finished="no"
+stop_confirmation="not checked"
 result="FAILED"
 
 print_summary() {
@@ -20,6 +21,7 @@ print_summary() {
     printf 'HTTP server         : %s\n' "${server_status}"
     printf 'Attack started      : %s\n' "${attack_started}"
     printf 'Attack stopped      : %s\n' "${attack_finished}"
+    printf 'Stop confirmation   : %s\n' "${stop_confirmation}"
     printf 'Expected result     : Docker + active HTTP server + executed attack → %s\n' "${result}"
     printf '%s\n' "${LINE}"
 }
@@ -86,9 +88,13 @@ if grep -q '\[OK\] Container started' ".tmp/claim2-attack.log"; then
 else
     fail "The CLI did not confirm attack container creation."
 fi
-
-python3 attackzoo.py stop dos_http_simple >/dev/null 2>&1 || true
-attack_finished="yes"
+if grep -qx '\[OK\] Stopped: attack-dos-http-simple' ".tmp/claim2-attack.log"; then
+    attack_finished="yes"
+    stop_confirmation="[OK] Stopped: attack-dos-http-simple"
+else
+    python3 attackzoo.py stop dos_http_simple >/dev/null 2>&1 || true
+    fail "The CLI did not print the expected stop confirmation. See .tmp/claim2-attack.log."
+fi
 
 result="OK"
 print_summary

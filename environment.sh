@@ -35,7 +35,7 @@ function RESTART {
 
 function STOP {
 	./servers.sh stop "${PROFILE}"
-	if [[ -n $( which deactivate ) ]]; then
+	if declare -F deactivate >/dev/null 2>&1; then
 		deactivate
 	fi
 	SLPID=$( sudo ps aux | grep 'streamlit' | grep -v grep | awk '{print $2}' )

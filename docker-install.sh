@@ -2,14 +2,14 @@
 
 PROFILE="${1}"
 INSTALLED=0
-MIN_DOCKER_VERSION="29.5"
+MIN_DOCKER_VERSION="27.0"
 
 case "${PROFILE}" in
     dependencies)
         ;;
     *)
         echo "Usage: $0 [dependencies]"
-        echo "Make sure you have ran at least ./setup.sh dependencies one time."
+        echo "Make sure you have run ./setup.sh dependencies at least once."
         exit 1
         ;;
 esac
@@ -49,8 +49,15 @@ else
 fi
 
 if [ "${INSTALLED}" -eq 0 ]; then
-    echo "Docker not found. Installing..."
-    sudo apt remove "$( dpkg --get-selections docker.io docker-compose docker-compose-v2 docker-doc podman-docker containerd runc | cut -f1 )"
+    echo "Docker not found or below ${MIN_DOCKER_VERSION}. Installing or upgrading..."
+    mapfile -t OLD_DOCKER_PACKAGES < <(
+        dpkg-query -W -f='${binary:Package}\n' \
+            docker.io docker-compose docker-compose-v2 docker-doc podman-docker containerd runc \
+            2>/dev/null || true
+    )
+    if [ "${#OLD_DOCKER_PACKAGES[@]}" -gt 0 ]; then
+        sudo apt remove -y "${OLD_DOCKER_PACKAGES[@]}"
+    fi
     sudo install -m 0755 -d /etc/apt/keyrings
     sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
     sudo chmod a+r /etc/apt/keyrings/docker.asc
@@ -64,15 +71,9 @@ EOF
     sudo apt update
     sudo DEBIAN_FRONTEND=noninteractive apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin
     sudo usermod -aG docker "${USER}"
-    if [ "${PROFILE}" = "redux" ]; then
-        echo -e "Dependency installation complete.\nStarting the reduced image build with sudo for this first run."
-        sudo ./build.sh "${PROFILE}"
-        echo -e "Before future Docker commands, run \"\e[33mnewgrp docker\e[0m\" or log out and back in."
-    else
-        echo -e "Dependency installation complete.\nNow run \"\e[33mnewgrp docker\e[0m\" and then start the image build with \"\e[32m./build.sh ${PROFILE}\e[0m\""
-    fi
+    echo -e "Docker dependency installation complete.\nNow run \"\e[33mnewgrp docker\e[0m\" or log out and back in before building images."
 else
-    echo "Docker is installed and meets the minimum version."
-    echo -e "Proceed to \e[33m./setup.sh full\e[0m or \e[33m./setup redux\e[0m"
+    echo "Docker is installed and meets the minimum version (${MIN_DOCKER_VERSION})."
+    echo -e "Proceed to \e[33m./setup.sh full\e[0m or \e[33m./setup.sh redux\e[0m"
 fi
 exit 0

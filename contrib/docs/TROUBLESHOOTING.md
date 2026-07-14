@@ -59,5 +59,5 @@ docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}" | grep server
 ```
 
 >[!IMPORTANT]
-> If you installed the reduced version, add `redux` as the first parameter to `servers.sh`:
-> `./servers.sh redux start`
+> If you installed the reduced version, pass `redux` as the second argument to `servers.sh`:
+> `./servers.sh start redux`

@@ -1,19 +1,24 @@
 #!/usr/bin/env bash
 
-PROFILE="${1}"
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "${ROOT_DIR}"
+
+PROFILE="${1:-}"
+SETUP_MARKER="${ROOT_DIR}/.attackzoo-setup.ok"
 
 case "${PROFILE}" in
     full|redux|dependencies)
         ;;
     *)
         echo "Usage: $0 [full|redux|dependencies]"
-        echo "Make sure you have ran at least ./setup.sh dependencies one time."
+        echo "Make sure you have run ./setup.sh dependencies at least once."
         exit 1
         ;;
 esac
 
 if [ "${PROFILE}" == "dependencies" ]; then
-    echo '1' > /tmp/attackzoo-setup.ok
     echo "Installing required packages..."
     sudo apt update
     sudo DEBIAN_FRONTEND=noninteractive apt install -y tshark tcpdump python3-venv ca-certificates curl git
@@ -30,33 +35,26 @@ if [ "${PROFILE}" == "dependencies" ]; then
 
     echo -e "\nsetuptools" >> requirements.txt
     pip install -r requirements.txt
-    python3 setup.py install
+    pip install .
     rm -rf .git/
     cd ../ || exit 1
     pip install -r requirements.txt
     ./docker-install.sh "${PROFILE}"
+    echo '1' > "${SETUP_MARKER}"
     echo -e "All dependencies satisfied.\nNow execute \e[92mnewgrp docker\e[0m to reload this shell session and then continue the procedure."
     exit 0
 fi
 
 if [ "${PROFILE}" == "redux" ] || [ "${PROFILE}" == "full" ]; then
-    if [[ -z "/tmp/attackzoo-setup.ok" ]]; then
-        echo -e "Make sure you have ran at least \e[92m./setup.sh dependencies\e[0m one time."
-        read -p "Do you want to proceed? (y/n): " YN
-        case ${YN} in
-            [Yy] )
-                ./build.sh "${PROFILE}"
-                break
-                ;;
-            [Nn] )
-                echo "Exiting..."
-                exit 0
-                ;;
-            * )
-                echo "Please answer yes or no."
-                ;;
-        esac
-    else
-        ./build.sh "${PROFILE}"
+    if [ ! -f "${SETUP_MARKER}" ]; then
+        echo -e "Dependency marker not found: ${SETUP_MARKER}"
+        echo -e "Run \e[92m./setup.sh dependencies\e[0m before \e[92m./setup.sh ${PROFILE}\e[0m."
+        exit 1
     fi
+    if [ ! -f ".venv/bin/activate" ]; then
+        echo "Python virtual environment not found: .venv/bin/activate"
+        echo -e "Run \e[92m./setup.sh dependencies\e[0m to recreate it."
+        exit 1
+    fi
+    ./build.sh "${PROFILE}"
 fi
