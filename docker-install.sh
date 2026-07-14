@@ -62,7 +62,7 @@ Components: stable
 Signed-By: /etc/apt/keyrings/docker.asc
 EOF
     sudo apt update
-    sudo DEBIAN_FRONTEND=noninteractive apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+    sudo DEBIAN_FRONTEND=noninteractive apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin
     sudo usermod -aG docker "${USER}"
     if [ "${PROFILE}" = "redux" ]; then
         echo -e "Dependency installation complete.\nStarting the reduced image build with sudo for this first run."

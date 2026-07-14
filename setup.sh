@@ -16,9 +16,7 @@ if [ "${PROFILE}" == "dependencies" ]; then
     echo '1' > /tmp/attackzoo-setup.ok
     echo "Installing required packages..."
     sudo apt update
-    sudo DEBIAN_FRONTEND=noninteractive apt install -y tshark tcpdump python3-venv cmake wireshark redis ca-certificates curl git
-    sudo DEBIAN_FRONTEND=noninteractive dpkg-reconfigure wireshark-common
-    sudo chmod +x /usr/bin/dumpcap
+    sudo DEBIAN_FRONTEND=noninteractive apt install -y tshark tcpdump python3-venv ca-certificates curl git
     sudo setcap cap_net_raw,cap_net_admin=eip "$(command -v tcpdump)"
 
     echo "Installing tools..."

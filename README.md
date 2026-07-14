@@ -108,7 +108,6 @@ Environment used by the authors for local tests:
 | Operating system | Kubuntu 24.04 LTS |
 | Python | Python 3.11 with `venv` |
 | Docker | Docker Engine 29.2.1 |
-| Optional virtualization | VirtualBox 7.1 |
 
 >[!WARNING]
 >**Minimum recommended environment for review:**
@@ -120,7 +119,7 @@ Environment used by the authors for local tests:
 | CPU | 4 vCPUs |
 | Memory | 4 GB RAM for reduced tests; 8 GB for full experiment |
 | Storage | 30 GB free for installation and images; 50 GB or more for PCAP captures and repeated experiments |
-| Network | Isolated environment, preferably a VM or dedicated host without direct Internet exposure |
+| Network | Isolated environment, preferably a dedicated host or lab environment without direct Internet exposure |
 
 ## Dependencies
 
@@ -130,19 +129,16 @@ Environment used by the authors for local tests:
 
 - `ca-certificates`
 - `curl`
-- `cmake`
 - `git`
 - `python3-venv`
 - `tcpdump`
 - `tshark`
-- `wireshark`
-- `redis`
-- Docker Engine (`docker-ce`, `docker-ce-cli`, `containerd.io`, `docker-buildx-plugin`, `docker-compose-plugin`)
+- Docker Engine (`docker-ce`, `docker-ce-cli`, `containerd.io`, `docker-buildx-plugin`)
 
 >[!CAUTION]
 >Please note that **this repository depends** on `Docker Engine` being installed as described in the [official documentation](https://docs.docker.com/engine/install/ubuntu/) and also on the [post-installation instructions for Linux](https://docs.docker.com/engine/install/linux-postinstall). Be advised that installation via `apt install` **might not be compatible**.
 
-The script also adds the current user to the `docker` group, configures capture permissions for `tcpdump`/`dumpcap`, creates `.venv/`, installs Python dependencies, and installs latest NTLFlowLyzer Project (direct from GitHub repository cloning).
+The script also adds the current user to the `docker` group, configures capture permissions for `tcpdump`, creates `.venv/`, installs Python dependencies, and installs latest NTLFlowLyzer Project (direct from GitHub repository cloning).
 
 ### Python Dependencies
 
@@ -176,8 +172,8 @@ This artifact runs scanners, brute-force tools, fuzzers, floods, and other attac
 
 Safe review recommendations:
 
-- Run the artifact in a VM or dedicated machine.
-  - **It is strongly advised against installing the testbed directly on the machine's operating system.**
+- Run the artifact on an isolated dedicated machine or disposable lab environment.
+- Avoid installing the testbed on a workstation or shared host.
 - Do not point attacks at external addresses, third-party networks, or services without explicit authorization.
 - Prefer internal testbed targets, such as the `server-*` containers.
 - Avoid exposing the host directly to the Internet during review.
