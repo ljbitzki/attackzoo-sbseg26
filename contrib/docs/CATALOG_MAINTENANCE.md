@@ -4,9 +4,12 @@ This document is a compact contributor reference for maintaining the local Attac
 
 ## Documentation Map
 
-- `README.md`: primary artifact documentation for setup, execution, safety, validation, reproducibility claims, CLI usage, and repository layout.
+- `README.md`: primary artifact documentation for setup, safety, validation, and reproducibility claims.
+- `contrib/docs/CLI.md`: detailed `attackzoo.py` command reference.
+- `contrib/docs/REPOSITORY_OVERVIEW.md`: repository layout and code-organization notes.
 - `contrib/docs/MITRE_ATTACK_MAPPING.md`: canonical repository-level MITRE ATT&CK coverage reference generated from `docker/attackers/*/attack.yaml`.
 - `contrib/docs/REDUX_LAB.md`: reduced reviewer lab profile, included attacks, servers, and quick campaign defaults.
+- `contrib/docs/TROUBLESHOOTING.md`: operational troubleshooting notes.
 - `docker/attackers/*/README.md`: attack-specific purpose, parameters, examples, and safety notes.
 - `docker/servers/*/README.md` and `docker/clients/*/README.md`: service/client-specific operational notes.
 
@@ -38,6 +41,32 @@ A complete attack entry usually includes:
 
 The runtime catalog is discovered from `docker/attackers/*/attack.yaml` by `modules/loader.py` and `modules/registry.py`. A well-formed attack definition should appear in the CLI without changing Python code.
 
+## Summary Of The `attack.yaml` Basic Schema
+
+| Field | Required | Description |
+| --- | --- | --- |
+| `id` | yes | Unique attack identifier used by the CLI. |
+| `name` | yes | Human-readable name displayed in the UI/CLI. |
+| `category` | yes | Category used to group the attack. |
+| `description` | no | Attack behavior description. |
+| `image` | yes | Docker image used by `docker run`. |
+| `container_name` | yes | Attacker container name. |
+| `max_runtime_s` | no | Suggested default duration for the UI. |
+| `target_mapping` | no | Maps CLI aliases such as `target` and `port` to real parameters. |
+| `mitre` | no | Related MITRE technique/tactic URLs. |
+| `params` | no | Ordered list of parameters passed to `entrypoint.sh`. |
+
+Fields for each item in `params`:
+
+| Field | Required | Description |
+| --- | --- | --- |
+| `key` | yes | Internal parameter name. |
+| `label` | yes | User-facing label. |
+| `kind` | yes | Type: `ip`, `port`, `cidr`, `int`, `float`, or `text`. |
+| `placeholder` | no | UI/documentation example. |
+| `default` | no | Default value; makes the parameter optional in the CLI. |
+| `validate` | no | Custom validation regex. |
+
 ## Parameterization Guidance
 
 Prefer adding new runtime controls through `attack.yaml` instead of hardcoding values in entrypoints. When an attack accepts intensity parameters, map them to environment variables or explicit command arguments in `entrypoint.sh`.
@@ -60,7 +89,7 @@ Common parameter keys include:
 
 1. Create or update `docker/attackers/<attack-name>/`.
 2. Add or revise `attack.yaml`, `Dockerfile`, `entrypoint.sh`, and `README.md`.
-3. Keep `attack.yaml` aligned with the schema described in the root `README.md`.
+3. Keep `attack.yaml` aligned with the schema described in this document.
 4. Add MITRE metadata when the behavior has a clear mapping.
 5. Build the relevant Docker image.
 6. Verify catalog discovery and perform a short local run against an authorized target.

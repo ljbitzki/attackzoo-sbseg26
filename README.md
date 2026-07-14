@@ -25,7 +25,7 @@ The associated paper, `"AttackZoo: A Reproducible Testbed for Attack Execution a
 
 This document is organized as follows:
 
-1. [Project summary and artifact scope](#attackzoo-a-reproducible-testbed-for-the-execution-of-attacks-and-the-generation-of-network-traffic-datasets)
+1. [Project summary and artifact scope](#attackzoo-a-reproducible-testbed-for-attack-execution-and-network-traffic-datasets-generation)
 2. [This README Structure](#readme-structure)
 3. [Artifact Badges Considered](#artifact-badges-considered)
 4. [Basic environment information, components, and requirements](#basic-information)
@@ -34,9 +34,8 @@ This document is organized as follows:
 7. [Installation on a clean machine](#installation-process)
 8. [Minimal validation test](#minimal-test)
 9. [Reproducible experiment claims](#reproducible-experiment-claims)
-10. [Basic code and repository documentation](#basic-documentation)
-11. [Troubleshooting](#troubleshooting)
-12. [License](#license)
+10. [Additional documentation](#additional-documentation)
+11. [License](#license)
 
 ## Artifact Badges Considered
 
@@ -64,20 +63,8 @@ The artifact is intended to support the following review badges:
 
 ### Current Catalog
 
-The current repository contains 60 attacks declared through individual `attack.yaml`, organized into the following categories:
-
-| Category | Count |
-| --- | :---: |
-| `1) Reconnaissance and Discovery` | 9 |
-| `2) Network Interception and Exploitation` | 8 |
-| `3) Web Application Attacks` | 10 |
-| `4) Brute Force Against Remote Access Applications` | 2 |
-| `5) Exfiltration and Tunneling` | 2 |
-| `6) Denial of Service and Impact` | 8 |
-| `7) IoT` | 21 |
-
->[!NOTE]
->The current MITRE ATT&CK metadata covers 9 tactics, 21 top-level techniques, and 35 technique/sub-technique entries when sub-techniques are counted separately. See the [full mapping documentation](contrib/docs/MITRE_ATTACK_MAPPING.md).
+The current repository contains 60 attacks declared through individual `attack.yaml` files.
+The complete catalog coverage, category counts, and MITRE ATT&CK mapping are maintained in [contrib/docs/MITRE_ATTACK_MAPPING.md](contrib/docs/MITRE_ATTACK_MAPPING.md).
 
 ### Target Servers
 
@@ -286,7 +273,7 @@ python3 attackzoo.py status
 Expected output: `docker_available=true`
 
 >[!NOTE]
->If Docker is not accessible, check whether the service is running and whether Docker group permissions have been applied. Some help could be found in [Troubleshooting section](#troubleshooting).
+>If Docker is not accessible, check whether the service is running and whether Docker group permissions have been applied. See [Troubleshooting](contrib/docs/TROUBLESHOOTING.md) for common checks.
 
 ## Minimal Test
 
@@ -654,158 +641,14 @@ python3 attackzoo.py list --id example_ping
 **Expected time**: less than 5 minutes for a simple attack, plus Docker image build time.
 **Expected result**: the new "attack" appears in the CLI without changing any core Python file in the Project.
 
-## Basic Documentation
+## Additional Documentation
 
-### Repository Layout
-
-```text
-.
-|-- attackzoo.py                  # Main CLI
-|-- setup.sh                      # System/Python dependency installation
-|-- build.sh                      # Docker image build and server startup wrapper
-|-- servers.sh                    # Control script for server-* containers
-|-- clients.sh                    # Control script for client-* containers
-|-- environment.sh                # Streamlit/environment helper
-|-- requirements.txt              # Python dependencies
-|-- modules/
-|   |-- attackzoo_st.py           # Streamlit UI
-|   |-- loader.py                 # Dynamic attack.yaml discovery
-|   |-- registry.py               # AttackSpec/ParamSpec dataclasses and loaded catalog
-|   |-- runners.py                # Docker wrappers
-|   |-- features.py               # PCAP feature extraction
-|   |-- datasets.py               # CSV dataset generation
-|   `-- attackzoo/
-|       |-- parser.py             # argparse parser
-|       |-- commands.py           # Main subcommands
-|       |-- experiment.py         # Experiment orchestration
-|       |-- capture.py            # tcpdump capture
-|       |-- probes.py             # HTTP/MQTT/etc. probes
-|       |-- telemetry.py          # Host resources and docker stats
-|       `-- reports/              # Availability, stability, and resource reports
-|-- docker/
-|   |-- build-images.sh           # Builds servers, attackers, and clients
-|   |-- attackers/                # One subdirectory per attack
-|   |-- servers/                  # Target server Dockerfiles and YAMLs
-|   `-- clients/                  # Benign client Dockerfiles and YAMLs
-|-- hooks/
-|   |-- attack_start.sh           # Attack-window start hook helper
-|   `-- attack_stop.sh            # Attack-window stop hook helper
-|-- logs/                         # Runtime logs
-|-- contrib/docs/
-|   |-- CLI.md                    # Detailed attackzoo.py command reference
-|   |-- REDUX_LAB.md              # Reduced reviewer lab profile
-|   |-- MITRE_ATTACK_MAPPING.md   # MITRE ATT&CK coverage reference
-|   `-- CATALOG_MAINTENANCE.md    # Notes for maintaining the attack catalog
-`-- LICENSE                       # BSD 3-Clause License
-```
-
-### Code Documentation
-
-This project was developed with code documentation as built-in function comments, using mainly **`Python docstring`**.
-
-### Main CLI
-
-```bash
-python3 attackzoo.py --help
-python3 attackzoo.py status
-python3 attackzoo.py list [--category TEXT] [--id ID] [--json]
-python3 attackzoo.py run <attack_id> [--target IP_OR_HOST] [--port PORT] [--duration N] [--rate N]
-python3 attackzoo.py stop <attack_id>
-python3 attackzoo.py ps [--all] [--json]
-python3 attackzoo.py logs <attack_id> [--tail N]
-python3 attackzoo.py captures [--latest] [--json]
-python3 attackzoo.py features --pcap FILE [--tools LIST] [--outdir DIR]
-python3 attackzoo.py dataset --pcap FILE [--features-dir DIR] [--outdir DIR]
-python3 attackzoo.py experiment --attack-id ID --out DIR [options]
-python3 attackzoo.py report --input DIR --warmup N --attack N --cooldown N [--outdir DIR]
-```
-
-### Summary of the `attack.yaml` Basic Schema
-
-| Field | Required | Description |
-| --- | --- | --- |
-| `id` | yes | Unique attack identifier used by the CLI. |
-| `name` | yes | Human-readable name displayed in the UI/CLI. |
-| `category` | yes | Category used to group the attack. |
-| `description` | no | Attack behavior description. |
-| `image` | yes | Docker image used by `docker run`. |
-| `container_name` | yes | Attacker container name. |
-| `max_runtime_s` | no | Suggested default duration for the UI. |
-| `target_mapping` | no | Maps CLI aliases such as `target` and `port` to real parameters. |
-| `mitre` | no | Related MITRE technique/tactic URLs. |
-| `params` | no | Ordered list of parameters passed to `entrypoint.sh`. |
-
-Fields for each item in `params`:
-
-| Field | Required | Description |
-| --- | --- | --- |
-| `key` | yes | Internal parameter name. |
-| `label` | yes | User-facing label. |
-| `kind` | yes | Type: `ip`, `port`, `cidr`, `int`, `float`, or `text`. |
-| `placeholder` | no | UI/documentation example. |
-| `default` | no | Default value; makes the parameter optional in the CLI. |
-| `validate` | no | Custom validation regex. |
-
-## Troubleshooting
-
-### Docker isn't running or not available
-
-Check that Docker is installed, running, and accessible by your user:
-
-```bash
-sudo systemctl status docker
-newgrp docker
-docker version
-python3 attackzoo.py status
-```
-
-### Port Already In Use
-
-If a server fails with a bind error, identify the local process:
-
-```bash
-sudo ss -tulpn | grep -E ':8080|:1883|:2222|:2323|:5683|:8443|:7447|:9001|:11080'
-```
-
-Stop the conflicting service or change the port mapping in the corresponding script/YAML.
-
-### Missing Docker Image
-
-If the CLI reports that an image cannot be found:
-
-```bash
-cd cd /path/to/attackzoo-sbseg/docker/
-./build-images.sh full
-```
-
-Or run the wrapper again:
-
-```bash
-cd /path/to/attackzoo-sbseg/
-./build.sh full
-```
-
-### Packet Capture Permission Problems
-
-If PCAP files are not generated, confirm `tcpdump` and capabilities:
-
-```bash
-which tcpdump
-getcap "$(command -v tcpdump)"
-sudo setcap cap_net_raw,cap_net_admin=eip "$(command -v tcpdump)"
-```
-
-### Servers Stopped After Reboot
-
-```bash
-cd /path/to/attackzoo-sbseg/
-./servers.sh start
-docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}" | grep server
-```
-
->[!IMPORTANT]
-> If you installed the reduced version, you need to add `redux` as first parameter for servers.sh script.
-> `./servers.sh redux start`
+- [CLI reference](contrib/docs/CLI.md)
+- [Repository overview](contrib/docs/REPOSITORY_OVERVIEW.md)
+- [Attack catalog maintenance and `attack.yaml` schema](contrib/docs/CATALOG_MAINTENANCE.md)
+- [MITRE ATT&CK mapping](contrib/docs/MITRE_ATTACK_MAPPING.md)
+- [Reduced reviewer lab profile](contrib/docs/REDUX_LAB.md)
+- [Troubleshooting](contrib/docs/TROUBLESHOOTING.md)
 
 ## License
 
