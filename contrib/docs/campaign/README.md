@@ -1,6 +1,6 @@
 # Campaign `60att_5runs_l0l1l2l3`
 
-This folder documents the campaign `experiments/60att_5runs_l0l1l2l3` in one file per attack. Each document uses only information already present in the repository: the local attack catalog, the tables in `reports/tables`, execution artifacts, and the figures from `reports/figs` copied to `contrib/assets/campaign_doc`.
+This folder documents the published full campaign `60att_5runs_l0l1l2l3` in one file per attack. The full `experiments/60att_5runs_l0l1l2l3` directory is not versioned in Git because of its size; retrieve it from the Figshare dataset below or regenerate the paper figures with `bash run_claim_figures.sh` from the repository root. The per-attack pages summarize the published campaign, and the selected figures are copied under `contrib/assets/campaign_doc`.
 
 - Documented attacks: **60**
 - _.pcap_ captures: **1200**

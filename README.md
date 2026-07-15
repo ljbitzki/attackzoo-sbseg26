@@ -13,6 +13,8 @@
   <a href="https://opensource.org/license/bsd-3-clause"><img src="https://img.shields.io/badge/BSD-License-003001.svg" /></a>
 </p>
 
+<a id="project-summary-and-artifact-scope"></a>
+
 # AttackZoo: A Reproducible Testbed for Attack Execution and Network Traffic Datasets Generation
 
 This repository contains **AttackZoo**, a Docker-based testbed for building and running controlled network, application, and IoT attack scenarios. The artifact automates target servers, benign clients, attack containers, traffic capture, feature extraction, dataset generation, and experiment reporting through both a command-line (CLI) interface and an optional Streamlit Web UI.
@@ -25,7 +27,7 @@ The associated paper, `"AttackZoo: A Reproducible Testbed for Attack Execution a
 
 This document is organized as follows:
 
-1. [Project summary and artifact scope](#attackzoo-a-reproducible-testbed-for-attack-execution-and-network-traffic-datasets-generation)
+1. [Project summary and artifact scope](#project-summary-and-artifact-scope)
 2. [This README Structure](#readme-structure)
 3. [Artifact Badges Considered](#artifact-badges-considered)
 4. [Basic environment information, components, and requirements](#basic-information)
@@ -166,6 +168,7 @@ The validated `.venv` also contains `NTLFlowLyzer==0.1.0`; `setup.sh` installs i
 - PyPI for Python packages.
 - `https://github.com/ahlashkari/NTLFlowLyzer.git`.
 - Base images and packages referenced by Dockerfiles under `docker/`.
+- Dozzle (`docker.io/amir20/dozzle`, pinned by digest) for the optional full-profile container log viewer.
 
 No SSH keys, private credentials, API tokens, or cloud infrastructure are required to run the artifact.
 
@@ -186,6 +189,7 @@ Safe review recommendations:
 - Check for port conflicts before starting servers.
 - Use short durations for DoS/flood attacks during initial tests.
 - Stop attack containers after validation with `python3 attackzoo.py stop <attack_id>` or `docker rm -f <container>`.
+- The full image build starts Dozzle on host port `11080` and mounts `/var/run/docker.sock`. Access to that port should be treated as Docker host control; keep it inside the isolated lab and remove it with `docker rm -f suporte-dozzle` if it is not needed.
 
 Ports that may be exposed on the host:
 **TCP**: 139, 445, 1883, 2222, 2323, 5683, 7447, 8080, 8443, 9001, 11080.
@@ -385,6 +389,10 @@ Command:
 bash run_claim1.sh
 ```
 
+Flags used:
+
+- `attackzoo.py list --json` inside the script.
+
 Expected time: less than 1 minute.
 
 Expected result:
@@ -408,6 +416,11 @@ Command:
 ```bash
 bash run_claim2.sh
 ```
+
+Flags used:
+
+- Optional environment flag: `ATTACKZOO_PROFILE=redux` by default, or `ATTACKZOO_PROFILE=full`.
+- `attackzoo.py run dos_http_simple --target <server-ip> --port 80 --duration 3 --count 500 --concurrency 4 --delay_ms 50`.
 
 Expected time: 1 to 5 minutes after images have already been built.
 
@@ -437,6 +450,12 @@ bash run_claim3.sh
 
 Preparation is handled by the script: it starts the HTTP server with `./servers.sh start "$ATTACKZOO_PROFILE"` and waits until `http://127.0.0.1:8080/` is reachable before running the experiment. The default profile is `redux`; use `ATTACKZOO_PROFILE=full bash run_claim3.sh` for a full installation.
 
+Flags used:
+
+- Optional environment flag: `ATTACKZOO_PROFILE=redux` by default, or `ATTACKZOO_PROFILE=full`.
+- `attackzoo.py experiment --attack-id dos_http_simple --out claim3_http --service claim3_http --runs 1 --levels L0,L1 --warmup 2 --attack 3 --cooldown 2 --interval 0.5 --probe-timeout 1 --probes http --http-url http://127.0.0.1:8080/ --host <server-ip> --port 80 --iface lo --bpf "tcp port 8080" --extract-features --build-dataset --tools-scapy`.
+- Hook flags: `--attack-start-hook "python3 attackzoo.py run dos_http_simple ..."` and `--attack-stop-hook "python3 attackzoo.py stop dos_http_simple"`.
+
 Expected time: less than 2 minutes after images have already been built.
 
 Expected result:
@@ -458,6 +477,12 @@ Complete paper-figure regeneration:
 ```bash
 ATTACKZOO_CONFIRM_LARGE_DOWNLOAD=1 bash run_claim_figures.sh
 ```
+
+Flags used:
+
+- Required environment flag for the large download: `ATTACKZOO_CONFIRM_LARGE_DOWNLOAD=1`.
+- Optional environment flags: `FIGSHARE_ARTICLE_ID`, `FIGSHARE_DOI`, `ATTACKZOO_FIGSHARE_DIR`, `ATTACKZOO_FIGURES_REPORT`, and `ATTACKZOO_FIGSHARE_MIN_FREE_GB`.
+- `campaign_traffic_stats.py --campaign-dir <extracted-campaign> --reports-root contrib/reports --campaign-name paper_figures --source auto --plots all --progress-interval 25`.
 
 This complete mode resolves the Figshare DOI `10.6084/m9.figshare.32900828`, downloads `attackzoo-full_campaign_5runs_4levels.tar.gz` from the public Figshare API when needed, verifies the MD5 checksum, unpacks the campaign, and runs `contrib/scripts/campaign_traffic_stats.py --plots all`.
 

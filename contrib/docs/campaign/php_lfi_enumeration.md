@@ -2,7 +2,7 @@
 
 [Campaign index](README.md)
 
-In campaign `experiments/60att_5runs_l0l1l2l3`, this document consolidates the execution of attack `php_lfi_enumeration`. In the local catalog, the attack is described as: Controlled enumeration of Local File Inclusion (LFI) vectors in a vulnerable PHP application. The documentation below uses only artifacts already present in the repository, mainly the tables and figures from `experiments/60att_5runs_l0l1l2l3/php_lfi_enumeration`.
+This document summarizes the published campaign execution of attack `php_lfi_enumeration`. In the local catalog, the attack is described as: Controlled enumeration of Local File Inclusion (LFI) vectors in a vulnerable PHP application. The full execution artifacts are not versioned in this repository; retrieve them from the Figshare dataset linked in the campaign index or regenerate the figures with `run_claim_figures.sh`. The selected figures below are stored under `contrib/assets/campaign_doc`.
 
 ## Attack Metadata
 
@@ -85,4 +85,4 @@ In campaign `experiments/60att_5runs_l0l1l2l3`, this document consolidates the e
 ## Sources Used
 
 - Attack catalog: `docker/attackers/php-lfi-enumeration/attack.yaml`
-- Campaign artifacts: `experiments/60att_5runs_l0l1l2l3/php_lfi_enumeration`
+- Full campaign artifacts: available from the Figshare dataset linked in the campaign index; when extracted locally, expected under `experiments/60att_5runs_l0l1l2l3/php_lfi_enumeration`.

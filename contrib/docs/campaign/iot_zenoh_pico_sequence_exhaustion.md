@@ -2,7 +2,7 @@
 
 [Campaign index](README.md)
 
-In campaign `experiments/60att_5runs_l0l1l2l3`, this document consolidates the execution of attack `iot_zenoh_pico_sequence_exhaustion`. In the local catalog, the attack is described as: Exhaustion or intensive manipulation of Zenoh/Zenoh-Pico sequence numbers to degrade ordering, reliability, or session-state control. The documentation below uses only artifacts already present in the repository, mainly the tables and figures from `experiments/60att_5runs_l0l1l2l3/iot_zenoh_pico_sequence_exhaustion`.
+This document summarizes the published campaign execution of attack `iot_zenoh_pico_sequence_exhaustion`. In the local catalog, the attack is described as: Exhaustion or intensive manipulation of Zenoh/Zenoh-Pico sequence numbers to degrade ordering, reliability, or session-state control. The full execution artifacts are not versioned in this repository; retrieve them from the Figshare dataset linked in the campaign index or regenerate the figures with `run_claim_figures.sh`. The selected figures below are stored under `contrib/assets/campaign_doc`.
 
 ## Attack Metadata
 
@@ -85,4 +85,4 @@ In campaign `experiments/60att_5runs_l0l1l2l3`, this document consolidates the e
 ## Sources Used
 
 - Attack catalog: `docker/attackers/zenoh-pico-sequence-exhaustion/attack.yaml`
-- Campaign artifacts: `experiments/60att_5runs_l0l1l2l3/iot_zenoh_pico_sequence_exhaustion`
+- Full campaign artifacts: available from the Figshare dataset linked in the campaign index; when extracted locally, expected under `experiments/60att_5runs_l0l1l2l3/iot_zenoh_pico_sequence_exhaustion`.

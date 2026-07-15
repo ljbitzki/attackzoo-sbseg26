@@ -29,14 +29,14 @@ Stop the conflicting service or change the port mapping in the corresponding scr
 If the CLI reports that an image cannot be found:
 
 ```bash
-cd /path/to/attackzoo-sbseg/docker/
+cd /path/to/attackzoo-sbseg26/docker/
 ./build-images.sh full
 ```
 
 Or run the wrapper again:
 
 ```bash
-cd /path/to/attackzoo-sbseg/
+cd /path/to/attackzoo-sbseg26/
 ./build.sh full
 ```
 
@@ -53,7 +53,7 @@ sudo setcap cap_net_raw,cap_net_admin=eip "$(command -v tcpdump)"
 ## Servers Stopped After Reboot
 
 ```bash
-cd /path/to/attackzoo-sbseg/
+cd /path/to/attackzoo-sbseg26/
 ./servers.sh start
 docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}" | grep server
 ```

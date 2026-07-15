@@ -2,7 +2,7 @@
 
 [Campaign index](README.md)
 
-In campaign `experiments/60att_5runs_l0l1l2l3`, this document consolidates the execution of attack `net_ipv6_mld_flood`. In the local catalog, the attack is described as: ICMPv6 Multicast Listener Report MLD (131) flood on the local network. The documentation below uses only artifacts already present in the repository, mainly the tables and figures from `experiments/60att_5runs_l0l1l2l3/net_ipv6_mld_flood`.
+This document summarizes the published campaign execution of attack `net_ipv6_mld_flood`. In the local catalog, the attack is described as: ICMPv6 Multicast Listener Report MLD (131) flood on the local network. The full execution artifacts are not versioned in this repository; retrieve them from the Figshare dataset linked in the campaign index or regenerate the figures with `run_claim_figures.sh`. The selected figures below are stored under `contrib/assets/campaign_doc`.
 
 ## Attack Metadata
 
@@ -57,4 +57,4 @@ No aggregated figure was found in `reports/figs` for this attack.
 ## Sources Used
 
 - Attack catalog: `docker/attackers/ipv6-mld-flood/attack.yaml`
-- Campaign artifacts: `experiments/60att_5runs_l0l1l2l3/net_ipv6_mld_flood`
+- Full campaign artifacts: available from the Figshare dataset linked in the campaign index; when extracted locally, expected under `experiments/60att_5runs_l0l1l2l3/net_ipv6_mld_flood`.
