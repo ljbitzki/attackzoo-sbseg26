@@ -143,7 +143,7 @@ Tested package versions on Ubuntu 24.04.4 LTS:
 >[!CAUTION]
 >Please note that **this repository depends** on `Docker Engine` being installed as described in the [official documentation](https://docs.docker.com/engine/install/ubuntu/) and also on the [post-installation instructions for Linux](https://docs.docker.com/engine/install/linux-postinstall). Be advised that installation via `apt install` **might not be compatible**.
 
-The script also adds the current user to the `docker` group, configures capture permissions for `tcpdump`, creates `.venv/`, installs Python dependencies, and installs NTLFlowLyzer Project directly from its GitHub repository.
+The script also adds the current user to the `docker` group, configures capture permissions for `tcpdump`, creates `.venv/`, installs Python dependencies, and installs NTLFlowLyzer Project directly from its GitHub repository at commit `86d0102466ea42ba03ddda5c649ac7e533fb25d9` by default.
 
 ### Python Dependencies
 
@@ -166,7 +166,7 @@ The validated `.venv` also contains `NTLFlowLyzer==0.1.0`; `setup.sh` installs i
 - The official Docker repository for Ubuntu.
 - Operating-system package indexes.
 - PyPI for Python packages.
-- `https://github.com/ahlashkari/NTLFlowLyzer.git`.
+- `https://github.com/ahlashkari/NTLFlowLyzer.git` at commit `86d0102466ea42ba03ddda5c649ac7e533fb25d9`.
 - Base images and packages referenced by Dockerfiles under `docker/`.
 - Dozzle (`docker.io/amir20/dozzle`, pinned by digest) for the optional full-profile container log viewer.
 
@@ -379,9 +379,13 @@ The claims below are automated reviewer checks. Run each command from the reposi
 
 For reduced installations, Claims 2 and 3 use the HTTP subset and can be run with the default `ATTACKZOO_PROFILE=redux`. For a full installation, prefix the command with `ATTACKZOO_PROFILE=full`, for example `ATTACKZOO_PROFILE=full bash run_claim2.sh`.
 
+Live traffic contains scheduler, Docker startup, TCP timing, and target-response variance; the reproducibility target is therefore the generated evidence shape and aggregate paper metrics, not byte-identical packet timing. See [Reproducibility notes](contrib/docs/REPRODUCIBILITY_NOTES.md) for the variance discussion, dataset audit trail, and dependency provenance.
+
 ### Claim 1: The Artifact Provides An Extensible Catalog Of Containerized Attacks
 
 Goal: show that the CLI automatically discovers attacks declared in `docker/attackers/*/attack.yaml`, groups them by category, and exposes the expected JSON fields.
+
+Configuration files to edit: none.
 
 Command:
 
@@ -394,6 +398,8 @@ Flags used:
 - `attackzoo.py list --json` inside the script.
 
 Expected time: less than 1 minute.
+
+Expected resources: one Python process; less than 512 MB RAM; no Docker containers or new datasets.
 
 Expected result:
 
@@ -411,6 +417,8 @@ Expected result     : 60 attacks / 7 categories / JSON fields → OK
 
 Goal: demonstrate functional attack execution against a Dockerized HTTP target inside the testbed.
 
+Configuration files to edit: none.
+
 Command:
 
 ```bash
@@ -423,6 +431,8 @@ Flags used:
 - `attackzoo.py run dos_http_simple --target <server-ip> --port 80 --duration 3 --count 500 --concurrency 4 --delay_ms 50`.
 
 Expected time: 1 to 5 minutes after images have already been built.
+
+Expected resources: Docker daemon access, the HTTP server image and `dos_http_simple` attack image already built, host port `8080`, and less than 2 GB RAM during the short run.
 
 Expected result:
 
@@ -442,6 +452,8 @@ Expected result     : Docker + active HTTP server + executed attack → OK
 
 Goal: demonstrate both a reduced end-to-end experiment and a complete paper-figure regeneration path from the published Figshare campaign dataset.
 
+Configuration files to edit: none.
+
 Reduced command for the minimum reviewer check:
 
 ```bash
@@ -457,6 +469,8 @@ Flags used:
 - Hook flags: `--attack-start-hook "python3 attackzoo.py run dos_http_simple ..."` and `--attack-stop-hook "python3 attackzoo.py stop dos_http_simple"`.
 
 Expected time: less than 2 minutes after images have already been built.
+
+Expected resources: Docker daemon access, `tcpdump`, host port `8080`, loopback capture permission, less than 2 GB RAM, and less than 1 GB additional disk for the reduced evidence, features, datasets, and reports.
 
 Expected result:
 
@@ -486,8 +500,12 @@ Flags used:
 
 This complete mode resolves the Figshare DOI `10.6084/m9.figshare.32900828`, downloads `attackzoo-full_campaign_5runs_4levels.tar.gz` from the public Figshare API when needed, verifies the MD5 checksum, unpacks the campaign, and runs `contrib/scripts/campaign_traffic_stats.py --plots all`.
 
+Audit target: the script fails unless the extracted published dataset contains `60` attack directories and the regenerated manifest reports `1200/1200` PCAPs and `8` figure outputs.
+
 >[!CAUTION]
 >The complete mode downloads a **16.9 GB** compressed archive and needs at least **225 GB** of additional space to unpack the campaign. The script requires **260 GiB** free by default, which can be adjusted with `ATTACKZOO_FIGSHARE_MIN_FREE_GB`. Regeneration can take roughly **30 to 60 minutes**, depending on disk and CPU speed.
+
+Expected resources: `curl`, `tar`, `md5sum`, the Python environment, at least `260 GiB` free in `ATTACKZOO_FIGSHARE_DIR`, and enough CPU/disk bandwidth for a 30 to 60 minute aggregation pass.
 
 Expected complete result:
 
@@ -512,6 +530,7 @@ Expected result     : 60 attacks / 1200 PCAPs / 8 figures / manifest OK → OK
 - [Attack catalog maintenance and `attack.yaml` schema](contrib/docs/CATALOG_MAINTENANCE.md)
 - [MITRE ATT&CK mapping](contrib/docs/MITRE_ATTACK_MAPPING.md)
 - [Reduced reviewer lab profile](contrib/docs/REDUX_LAB.md)
+- [Reproducibility notes](contrib/docs/REPRODUCIBILITY_NOTES.md)
 - [Troubleshooting](contrib/docs/TROUBLESHOOTING.md)
 
 ## License

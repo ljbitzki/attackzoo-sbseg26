@@ -48,6 +48,7 @@ For attack catalog schema and maintenance notes, see `contrib/docs/CATALOG_MAINT
 |-- contrib/docs/
 |   |-- CLI.md                    # Detailed attackzoo.py command reference
 |   |-- REDUX_LAB.md              # Reduced reviewer lab profile
+|   |-- REPRODUCIBILITY_NOTES.md  # Variance, dataset audit trail, and provenance
 |   |-- MITRE_ATTACK_MAPPING.md   # MITRE ATT&CK coverage reference
 |   |-- CATALOG_MAINTENANCE.md    # Attack catalog schema and maintenance notes
 |   |-- TROUBLESHOOTING.md        # Operational troubleshooting notes

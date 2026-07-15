@@ -7,6 +7,7 @@ cd "${ROOT_DIR}"
 
 PROFILE="${1:-}"
 SETUP_MARKER="${ROOT_DIR}/.attackzoo-setup.ok"
+NTLFLOWLYZER_REF="${NTLFLOWLYZER_REF:-86d0102466ea42ba03ddda5c649ac7e533fb25d9}"
 
 case "${PROFILE}" in
     full|redux|dependencies)
@@ -32,6 +33,7 @@ if [ "${PROFILE}" == "dependencies" ]; then
     pip install -r requirements.txt
     git clone https://github.com/ahlashkari/NTLFlowLyzer.git
     cd NTLFlowLyzer || exit 1
+    git checkout "${NTLFLOWLYZER_REF}"
 
     echo -e "\nsetuptools" >> requirements.txt
     pip install -r requirements.txt
