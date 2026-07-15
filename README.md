@@ -170,8 +170,6 @@ The validated `.venv` also contains `NTLFlowLyzer==0.1.0`; `setup.sh` installs i
 - Base images and packages referenced by Dockerfiles under `docker/`.
 - Dozzle (`docker.io/amir20/dozzle`, pinned by digest) for the optional full-profile container log viewer.
 
-No SSH keys, private credentials, API tokens, or cloud infrastructure are required to run the artifact.
-
 >[!NOTE]
 > The time required to complete the process may vary depending on the host's resources and the available internet speed.
 
@@ -212,7 +210,7 @@ The steps below assume a **clean Ubuntu 24.04 LTS machine** or an equivalent env
 ### 1. Clone the repository and enters it
 
 ```bash
-git clone https://github.com/GT-IoTEdu/attackzoo-sbseg26.git
+git clone git@github.com:GT-IoTEdu/attackzoo-sbseg26.git
 cd attackzoo-sbseg26
 ```
 
