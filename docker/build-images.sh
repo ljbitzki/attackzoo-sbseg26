@@ -139,7 +139,7 @@ docker build -t attack-zenoh-pico-timestamp-mess -f attackers/zenoh-pico-timesta
 docker build --no-cache -t client-random -f clients/client-random/Dockerfile .
 docker build --no-cache -t client-super -f clients/client-super/Dockerfile .
 if [ $( docker ps -a | grep -Ec '(dozzle)' ) -eq 0 ]; then
-    docker run -d -v /var/run/docker.sock:/var/run/docker.sock -v dozzle_data:/data --restart unless-stopped --name suporte-dozzle -p 11080:8080 amir20/dozzle:latest
+    docker run -d -v /var/run/docker.sock:/var/run/docker.sock -v dozzle_data:/data --restart unless-stopped --name suporte-dozzle -p 11080:8080 docker.io/amir20/dozzle:latest@sha256:6f4644814cce31e11fe80f2610515df6a5a2e40120b4087c298a72df8d65866b
 fi
 echo "Web server: $( docker container inspect $( docker ps -a | grep 'server-http-server' | awk '{print $NF}' ) | grep 'IPAddress' | tail -n1 | awk -F'"' '{print $4}' )"
 echo "SSH server: $( docker container inspect $( docker ps -a | grep 'server-ssh-server' | awk '{print $NF}' ) | grep 'IPAddress' | tail -n1 | awk -F'"' '{print $4}' )"

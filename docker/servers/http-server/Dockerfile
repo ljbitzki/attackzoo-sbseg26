@@ -1,2 +1,2 @@
-FROM vulnerables/web-dvwa
+FROM docker.io/vulnerables/web-dvwa:latest@sha256:dae203fe11646a86937bf04db0079adef295f426da68a92b40e3b181f337daa7
 EXPOSE 80

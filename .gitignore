@@ -117,6 +117,7 @@ logs/*
 # ---------------------------------------------------------------------------
 # External/local tool checkouts and scratch files
 # ---------------------------------------------------------------------------
+docker/attackers/*/ffuf
 NTLFlowLyzer/
 old/
 .tmp/
