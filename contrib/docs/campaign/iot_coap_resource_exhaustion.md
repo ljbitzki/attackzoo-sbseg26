@@ -2,7 +2,7 @@
 
 [Campaign index](README.md)
 
-This document summarizes the published campaign execution of attack `iot_coap_resource_exhaustion`. In the local catalog, the attack is described as: Burst of CoAP resource discovery/mapping messages, typically against /.well-known/core, intended to exhaust target resources. The full execution artifacts are not versioned in this repository; retrieve them from the Figshare dataset linked in the campaign index or regenerate the figures with `run_claim_figures.sh`. The selected figures below are stored under `contrib/assets/campaign_doc`.
+This document summarizes the published campaign execution of attack `iot_coap_resource_exhaustion`. In the local catalog, the attack is described as: Burst of CoAP resource discovery/mapping messages, typically against /.well-known/core, intended to exhaust target resources. The full execution artifacts are not versioned in this repository; retrieve the generated dataset CSVs from the Figshare dataset linked in the campaign index. Raw PCAP captures are not included in that archive. The selected figures below are stored under `contrib/assets/campaign_doc`.
 
 ## Attack Metadata
 

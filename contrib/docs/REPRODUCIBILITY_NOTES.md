@@ -15,26 +15,26 @@ The reproducibility target is the generated evidence shape and the aggregate pap
 - the attack catalog and category structure;
 - successful target-server and attack-container orchestration;
 - PCAP, feature, dataset, and report generation;
-- the published full-campaign aggregate counts and figures.
+- the published full-campaign dataset counts and aggregate documentation.
 
 The full campaign used five runs for each attack-level pair where supported. The campaign documentation reports per-level means, min/max values, and coefficient-of-variation tables to make run-to-run variability explicit.
 
 ## Published Dataset Audit Trail
 
-The full raw campaign is intentionally not versioned in Git because it is too large. The paper-figure reproduction path uses the published Figshare archive:
+The full raw campaign is intentionally not versioned in Git because it is too large. The published Figshare archive contains the generated datasets from that campaign, not the raw PCAP captures:
 
 - DOI: `10.6084/m9.figshare.32900828`
 - Archive: `attackzoo-full_campaign_5runs_4levels.tar.gz`
 - Compressed size: `16.9 GB`
-- Expected extracted campaign: `60` attacks, `1200` PCAP files, `8` generated figure outputs
+- Expected extracted campaign: `60` attacks and `1200` dataset CSV files under `*/datasets/*.csv`
 
-`run_claim_figures.sh` resolves the Figshare metadata through the public API, verifies the archive MD5 provided by Figshare, requires the extracted campaign to contain exactly `1200` PCAP files, runs `campaign_traffic_stats.py --plots all`, and fails if the resulting manifest does not report `1200/1200` processed PCAPs and `8` figures.
+`run_claim3.sh` supports two modes. The default `mini` mode runs a short local `dos_http_simple` campaign, generates PCAPs, Scapy features, dataset CSVs, reports, and writes `contrib/reports/claim3_mini_dataset/manifest.json`. The explicit `figshare` mode resolves the Figshare metadata through the public API, verifies the archive MD5 provided by Figshare, requires the extracted campaign to contain exactly `1200` generated dataset CSVs, validates the expected four levels and five runs per attack, and writes `contrib/reports/claim3_figshare_dataset/manifest.json`.
 
 ## Reduced Versus Complete Paths
 
-`run_claim3.sh` is the reduced reviewer path. It proves the local pipeline end to end with a short `dos_http_simple` experiment over levels `L0,L1`; it is not expected to reproduce the paper distributions.
+`run_claim3.sh` is the quick reviewer path by default. It proves the local generation pipeline at reduced scale and validates that the resulting campaign has the same dataset-directory shape as the published package.
 
-`run_claim_figures.sh` is the complete paper-figure path. It reproduces the paper-level aggregate figures from the published dataset without requiring reviewers to spend roughly 82 hours rerunning the full live campaign.
+`ATTACKZOO_CLAIM3_MODE=figshare bash run_claim3.sh` is the published-dataset audit path. It validates the public Figshare dataset package without requiring Docker, `tcpdump`, or raw PCAP captures. `run_claim_figures.sh` is kept as a compatibility alias for older instructions and delegates to that Figshare mode. To regenerate traffic figures from raw captures, run a local campaign that preserves PCAP files and use `contrib/scripts/campaign_traffic_stats.py` against that local campaign directory.
 
 ## Dependency Provenance
 

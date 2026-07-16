@@ -2,7 +2,7 @@
 
 [Campaign index](README.md)
 
-This document summarizes the published campaign execution of attack `iot_mqtt_lwt_abuse`. In the local catalog, the attack is described as: Abuse of the MQTT Last Will and Testament mechanism to force critical publications or false alarms on sensitive topics. The full execution artifacts are not versioned in this repository; retrieve them from the Figshare dataset linked in the campaign index or regenerate the figures with `run_claim_figures.sh`. The selected figures below are stored under `contrib/assets/campaign_doc`.
+This document summarizes the published campaign execution of attack `iot_mqtt_lwt_abuse`. In the local catalog, the attack is described as: Abuse of the MQTT Last Will and Testament mechanism to force critical publications or false alarms on sensitive topics. The full execution artifacts are not versioned in this repository; retrieve the generated dataset CSVs from the Figshare dataset linked in the campaign index. Raw PCAP captures are not included in that archive. The selected figures below are stored under `contrib/assets/campaign_doc`.
 
 ## Attack Metadata
 

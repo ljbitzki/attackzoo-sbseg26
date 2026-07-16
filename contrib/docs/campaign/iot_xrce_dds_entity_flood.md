@@ -2,7 +2,7 @@
 
 [Campaign index](README.md)
 
-This document summarizes the published campaign execution of attack `iot_xrce_dds_entity_flood`. In the local catalog, the attack is described as: Mass creation of XRCE-DDS entities to consume session, memory, and control resources on the agent. The full execution artifacts are not versioned in this repository; retrieve them from the Figshare dataset linked in the campaign index or regenerate the figures with `run_claim_figures.sh`. The selected figures below are stored under `contrib/assets/campaign_doc`.
+This document summarizes the published campaign execution of attack `iot_xrce_dds_entity_flood`. In the local catalog, the attack is described as: Mass creation of XRCE-DDS entities to consume session, memory, and control resources on the agent. The full execution artifacts are not versioned in this repository; retrieve the generated dataset CSVs from the Figshare dataset linked in the campaign index. Raw PCAP captures are not included in that archive. The selected figures below are stored under `contrib/assets/campaign_doc`.
 
 ## Attack Metadata
 

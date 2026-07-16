@@ -2,7 +2,7 @@
 
 [Campaign index](README.md)
 
-This document summarizes the published campaign execution of attack `web_dir_enumeration`. In the local catalog, the attack is described as: Web server subdirectory and resource enumeration using a wordlist. The full execution artifacts are not versioned in this repository; retrieve them from the Figshare dataset linked in the campaign index or regenerate the figures with `run_claim_figures.sh`. The selected figures below are stored under `contrib/assets/campaign_doc`.
+This document summarizes the published campaign execution of attack `web_dir_enumeration`. In the local catalog, the attack is described as: Web server subdirectory and resource enumeration using a wordlist. The full execution artifacts are not versioned in this repository; retrieve the generated dataset CSVs from the Figshare dataset linked in the campaign index. Raw PCAP captures are not included in that archive. The selected figures below are stored under `contrib/assets/campaign_doc`.
 
 ## Attack Metadata
 

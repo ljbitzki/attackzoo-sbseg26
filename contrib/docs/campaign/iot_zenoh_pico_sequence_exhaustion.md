@@ -2,7 +2,7 @@
 
 [Campaign index](README.md)
 
-This document summarizes the published campaign execution of attack `iot_zenoh_pico_sequence_exhaustion`. In the local catalog, the attack is described as: Exhaustion or intensive manipulation of Zenoh/Zenoh-Pico sequence numbers to degrade ordering, reliability, or session-state control. The full execution artifacts are not versioned in this repository; retrieve them from the Figshare dataset linked in the campaign index or regenerate the figures with `run_claim_figures.sh`. The selected figures below are stored under `contrib/assets/campaign_doc`.
+This document summarizes the published campaign execution of attack `iot_zenoh_pico_sequence_exhaustion`. In the local catalog, the attack is described as: Exhaustion or intensive manipulation of Zenoh/Zenoh-Pico sequence numbers to degrade ordering, reliability, or session-state control. The full execution artifacts are not versioned in this repository; retrieve the generated dataset CSVs from the Figshare dataset linked in the campaign index. Raw PCAP captures are not included in that archive. The selected figures below are stored under `contrib/assets/campaign_doc`.
 
 ## Attack Metadata
 

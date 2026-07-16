@@ -56,7 +56,7 @@ The artifact is intended to support the following review badges:
 | --- | --- | --- |
 | Main CLI | `attackzoo.py` | Command-line entry point for the AttackZoo Testbed. |
 | CLI parser and commands | `modules/attackzoo/` | Implementation of `status`, `list`, `run`, `stop`, `ps`, `logs`, `captures`, `features`, `dataset`, `experiment`, and `report`. |
-| Reviewer claim scripts | `run_claim1.sh`, `run_claim2.sh`, `run_claim3.sh`, `run_claim_figures.sh` | One-command checks for the reproducible experiment claims and paper-figure regeneration. |
+| Reviewer claim scripts | `run_claim1.sh`, `run_claim2.sh`, `run_claim3.sh`, `run_claim_figures.sh` | One-command checks for the reproducible experiment claims and published dataset validation. |
 | Dynamic attack catalog | `docker/attackers/*/attack.yaml` | Plug-and-play attack definitions loaded automatically by the tool. |
 | Target servers | `docker/servers/` | Docker images for HTTP, SSH, SMB, MQTT, CoAP, XRCE-DDS, Zenoh, Telnet, and SSL/Heartbleed services. |
 | Benign clients | `docker/clients/` | Containers that generate benign background traffic. |
@@ -375,7 +375,7 @@ Accepted availability probes for `--probes` are `http`, `https`, `ssh`, `smb`, `
 
 The claims below are automated reviewer checks. Run each command from the repository root after completing the installation and image build. Each script activates `.venv` automatically when it is available and prints a final comparison block.
 
-For reduced installations, Claims 2 and 3 use the HTTP subset and can be run with the default `ATTACKZOO_PROFILE=redux`. For a full installation, prefix the command with `ATTACKZOO_PROFILE=full`, for example `ATTACKZOO_PROFILE=full bash run_claim2.sh`.
+For reduced installations, Claim 2 uses the HTTP subset and can be run with the default `ATTACKZOO_PROFILE=redux`. For a full installation, prefix the command with `ATTACKZOO_PROFILE=full`, for example `ATTACKZOO_PROFILE=full bash run_claim2.sh`.
 
 Live traffic contains scheduler, Docker startup, TCP timing, and target-response variance; the reproducibility target is therefore the generated evidence shape and aggregate paper metrics, not byte-identical packet timing. See [Reproducibility notes](contrib/docs/REPRODUCIBILITY_NOTES.md) for the variance discussion, dataset audit trail, and dependency provenance.
 
@@ -446,80 +446,89 @@ Expected result     : Docker + active HTTP server + executed attack → OK
 ══════════════════════════════════════════════════════════════
 ```
 
-### Claim 3: The Artifact Generates Traffic Evidence, Features, Datasets, Reports, And Paper Figures
+### Claim 3: Dataset Campaign Generation And Published Dataset Validation
 
-Goal: demonstrate both a reduced end-to-end experiment and a complete paper-figure regeneration path from the published Figshare campaign dataset.
+Goal: provide a quick local reproducibility check that generates a tiny dataset campaign, and an optional full validation path for the published Figshare archive. The Figshare archive contains generated dataset CSVs under each attack's `datasets/` directory; it does not contain raw PCAP captures.
 
 Configuration files to edit: none.
 
-Reduced command for the minimum reviewer check:
+Quick local mini campaign, default mode:
 
 ```bash
 bash run_claim3.sh
 ```
 
-Preparation is handled by the script: it starts the HTTP server with `./servers.sh start "$ATTACKZOO_PROFILE"` and waits until `http://127.0.0.1:8080/` is reachable before running the experiment. The default profile is `redux`; use `ATTACKZOO_PROFILE=full bash run_claim3.sh` for a full installation.
-
-Flags used:
-
-- Optional environment flag: `ATTACKZOO_PROFILE=redux` by default, or `ATTACKZOO_PROFILE=full`.
-- `attackzoo.py experiment --attack-id dos_http_simple --out claim3_http --service claim3_http --runs 1 --levels L0,L1 --warmup 2 --attack 3 --cooldown 2 --interval 0.5 --probe-timeout 1 --probes http --http-url http://127.0.0.1:8080/ --host <server-ip> --port 80 --iface lo --bpf "tcp port 8080" --extract-features --build-dataset --tools-scapy`.
-- Hook flags: `--attack-start-hook "python3 attackzoo.py run dos_http_simple ..."` and `--attack-stop-hook "python3 attackzoo.py stop dos_http_simple"`.
-
-Expected time: less than 2 minutes after images have already been built.
-
-Expected resources: Docker daemon access, `tcpdump`, host port `8080`, loopback capture permission, less than 2 GB RAM, and less than 1 GB additional disk for the reduced evidence, features, datasets, and reports.
-
-Expected result:
-
-```text
-══════════════════════════════════════════════════════════════
-Claim 3 — Evidence, features, and datasets
-Completed runs      : 2
-Valid PCAPs         : 2
-Features Scapy      : 2
-Datasets            : 2
-Reports             : yes
-Expected result     : 2 runs / PCAPs / features / datasets / reports → OK
-══════════════════════════════════════════════════════════════
-```
-
-Complete paper-figure regeneration:
+Full Figshare validation when the archive must be downloaded:
 
 ```bash
-ATTACKZOO_CONFIRM_LARGE_DOWNLOAD=1 bash run_claim_figures.sh
+ATTACKZOO_CLAIM3_MODE=figshare ATTACKZOO_CONFIRM_LARGE_DOWNLOAD=1 bash run_claim3.sh
 ```
+
+Full Figshare validation when the archive is already downloaded or extracted:
+
+```bash
+ATTACKZOO_CLAIM3_MODE=figshare bash run_claim3.sh
+```
+
+
+In `mini` mode, the script starts the HTTP server, runs a short `dos_http_simple` experiment for `L0,L1`, extracts Scapy features, builds datasets under `experiments/claim3_mini/dos_http_simple/datasets/`, generates local reports, and writes `contrib/reports/claim3_mini_dataset/manifest.json`.
+
+In `figshare` mode, the script resolves the Figshare DOI, downloads the archive when explicitly confirmed, verifies the MD5 checksum, unpacks it under `downloads/figshare/extracted/`, finds `60att_5runs_l0l1l2l3`, validates the `60 x 4 x 5` dataset matrix, and writes `contrib/reports/claim3_figshare_dataset/manifest.json`.
 
 Flags used:
 
-- Required environment flag for the large download: `ATTACKZOO_CONFIRM_LARGE_DOWNLOAD=1`.
-- Optional environment flags: `FIGSHARE_ARTICLE_ID`, `FIGSHARE_DOI`, `ATTACKZOO_FIGSHARE_DIR`, `ATTACKZOO_FIGURES_REPORT`, and `ATTACKZOO_FIGSHARE_MIN_FREE_GB`.
-- `campaign_traffic_stats.py --campaign-dir <extracted-campaign> --reports-root contrib/reports --campaign-name paper_figures --source auto --plots all --progress-interval 25`.
+- Mode selector: `ATTACKZOO_CLAIM3_MODE=mini` by default, or `ATTACKZOO_CLAIM3_MODE=figshare`.
+- Mini-mode environment flags: `ATTACKZOO_PROFILE`, `ATTACKZOO_CLAIM3_MINI_OUT`, `ATTACKZOO_CLAIM3_MINI_LEVELS`, `ATTACKZOO_CLAIM3_MINI_RUNS`, `ATTACKZOO_CLAIM3_MINI_WARMUP`, `ATTACKZOO_CLAIM3_MINI_ATTACK`, and `ATTACKZOO_CLAIM3_MINI_COOLDOWN`.
+- Figshare-mode environment flags: `ATTACKZOO_CONFIRM_LARGE_DOWNLOAD`, `FIGSHARE_ARTICLE_ID`, `FIGSHARE_DOI`, `ATTACKZOO_FIGSHARE_DIR`, `ATTACKZOO_CLAIM3_CAMPAIGN_DIR`, and `ATTACKZOO_FIGSHARE_MIN_FREE_GB`.
+- Shared validation flags: `ATTACKZOO_CLAIM3_REPORT`, `ATTACKZOO_EXPECTED_ATTACKS`, `ATTACKZOO_EXPECTED_LEVELS`, and `ATTACKZOO_EXPECTED_RUNS`.
+- `run_claim_figures.sh` is kept as a compatibility alias and delegates to `ATTACKZOO_CLAIM3_MODE=figshare bash run_claim3.sh`, because the Figshare package is dataset-only.
 
-This complete mode resolves the Figshare DOI `10.6084/m9.figshare.32900828`, downloads `attackzoo-full_campaign_5runs_4levels.tar.gz` from the public Figshare API when needed, verifies the MD5 checksum, unpacks the campaign, and runs `contrib/scripts/campaign_traffic_stats.py --plots all`.
+Expected time: less than 2 minutes for the mini mode after images have already been built. Figshare validation takes seconds to a few minutes when the campaign is already extracted; download and extraction time depend on network and disk speed.
 
-Audit target: the script fails unless the extracted published dataset contains `60` attack directories and the regenerated manifest reports `1200/1200` PCAPs and `8` figure outputs.
+Expected resources for mini mode: Docker daemon access, `tcpdump`, the HTTP server image and `dos_http_simple` attack image already built, host port `8080`, and less than 2 GB RAM during the short run. Expected resources for Figshare mode: `curl`, `tar`, `md5sum`, Python, and sufficient disk for the published dataset archive. The full download is about **16.9 GB** compressed and needs roughly **225 GB** extracted; the script requires **260 GiB** free by default unless `ATTACKZOO_FIGSHARE_MIN_FREE_GB` is adjusted.
 
->[!CAUTION]
->The complete mode downloads a **16.9 GB** compressed archive and needs at least **225 GB** of additional space to unpack the campaign. The script requires **260 GiB** free by default, which can be adjusted with `ATTACKZOO_FIGSHARE_MIN_FREE_GB`. Regeneration can take roughly **30 to 60 minutes**, depending on disk and CPU speed.
-
-Expected resources: `curl`, `tar`, `md5sum`, the Python environment, at least `260 GiB` free in `ATTACKZOO_FIGSHARE_DIR`, and enough CPU/disk bandwidth for a 30 to 60 minute aggregation pass.
-
-Expected complete result:
+Expected mini result:
 
 ```text
 ══════════════════════════════════════════════════════════════
-Claim 3 — Full paper figure reproduction
-DOI Figshare        : 10.6084/m9.figshare.32900828
-Compressed archive  : attackzoo-full_campaign_5runs_4levels.tar.gz
-Attacks             : 60
-PCAPs processed     : 1200/1200
-Traffic counted     : <reported GiB>
-Figures generated   : 8
-Report              : contrib/reports/paper_figures
-Expected result     : 60 attacks / 1200 PCAPs / 8 figures / manifest OK → OK
+Claim 3 — Mini local dataset campaign
+Mode                : mini
+Mini experiment     : experiments/claim3_mini
+Attack              : dos_http_simple
+Profile             : redux
+Campaign directory  : experiments/claim3_mini
+Attacks             : 1/1
+Dataset CSVs        : 2/2
+Readable CSV headers: 2/2
+Missing level/runs  : 0
+Raw PCAPs required  : no (2 generated locally)
+Campaign reports    : yes
+Manifest            : contrib/reports/claim3_mini_dataset/manifest.json
+Expected result     : 1 attacks / 2 dataset CSVs / manifest OK → OK
 ══════════════════════════════════════════════════════════════
 ```
+
+Expected Figshare result:
+
+```text
+══════════════════════════════════════════════════════════════
+Claim 3 — Published Figshare datasets
+Mode                : figshare
+DOI Figshare        : 10.6084/m9.figshare.32900828
+Compressed archive  : attackzoo-full_campaign_5runs_4levels.tar.gz
+Campaign directory  : downloads/figshare/extracted/60att_5runs_l0l1l2l3
+Attacks             : 60/60
+Dataset CSVs        : 1200/1200
+Readable CSV headers: 1200/1200
+Missing level/runs  : 0
+Raw PCAPs required  : no
+Campaign reports    : <yes/no>
+Manifest            : contrib/reports/claim3_figshare_dataset/manifest.json
+Expected result     : 60 attacks / 1200 dataset CSVs / manifest OK → OK
+══════════════════════════════════════════════════════════════
+```
+
+To regenerate traffic figures from raw captures, run a local campaign that preserves PCAPs and then use `contrib/scripts/campaign_traffic_stats.py` against that local campaign directory.
 
 ## Additional Documentation
 
