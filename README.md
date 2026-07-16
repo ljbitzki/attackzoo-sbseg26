@@ -202,7 +202,7 @@ Ports that may be exposed on the host:
 
 ### Demonstration video of the installation process
 
-[![installation-process-video](https://img.youtube.com/vi/fx2Z5ZD_Rbo/0.jpg)](https://www.youtube.com/watch?v=fx2Z5ZD_Rbo)
+[![installation-process-video](contrib/assets/thumb.png)](https://www.youtube.com/watch?v=JcGyh28vjEE)
 
 >[!TIP]
 >This video demonstrates and follows all the steps listed below.
@@ -454,11 +454,13 @@ Goal: provide a quick local reproducibility check that generates a tiny dataset 
 
 Configuration files to edit: none.
 
-Quick local mini campaign, default mode:
+Quick local mini campaign, **default and recomended mode for evaluation purposes**:
 
 ```bash
 bash run_claim3.sh
 ```
+>[!TIP]
+>This `mini` mode starts the HTTP server, runs a short `dos_http_simple` experiment for `L0,L1`, extracts Scapy features, builds datasets under `experiments/claim3_mini/dos_http_simple/datasets/`, generates local reports, and writes `contrib/reports/claim3_mini_dataset/manifest.json`. All process should finish under `1 minute`.
 
 Full validation when the archive must be downloaded (from Figshare):
 
@@ -472,10 +474,8 @@ Full validation when the archive is already downloaded (from Figshare) or extrac
 ATTACKZOO_CLAIM3_MODE=figshare bash run_claim3.sh
 ```
 
-
-In `mini` mode, the script starts the HTTP server, runs a short `dos_http_simple` experiment for `L0,L1`, extracts Scapy features, builds datasets under `experiments/claim3_mini/dos_http_simple/datasets/`, generates local reports, and writes `contrib/reports/claim3_mini_dataset/manifest.json`.
-
-In `figshare` mode, the script resolves the Figshare DOI, downloads the archive when explicitly confirmed, verifies the MD5 checksum, unpacks it under `downloads/figshare/extracted/`, finds `60att_5runs_l0l1l2l3`, validates the `60 x 4 x 5` dataset matrix, and writes `contrib/reports/claim3_figshare_dataset/manifest.json`.
+>[!CAUTION]
+>In `figshare` mode, the script resolves the Figshare DOI, downloads the archive when explicitly confirmed, verifies the MD5 checksum, unpacks it under `downloads/figshare/extracted/`, finds `60att_5runs_l0l1l2l3`, validates the `60 x 4 x 5` dataset matrix, and writes `contrib/reports/claim3_figshare_dataset/manifest.json`. This mode downloads about **16.9 GB** from Figshare Dataset archive (compressed) and needs roughly **225 GB** for the extraction process. Download and extraction time depend on network and disk speed and could takes more than `60 minutes`.
 
 Flags used:
 
@@ -485,11 +485,7 @@ Flags used:
 - Shared validation flags: `ATTACKZOO_CLAIM3_REPORT`, `ATTACKZOO_EXPECTED_ATTACKS`, `ATTACKZOO_EXPECTED_LEVELS`, and `ATTACKZOO_EXPECTED_RUNS`.
 - `run_claim_figures.sh` is kept as a compatibility alias and delegates to `ATTACKZOO_CLAIM3_MODE=figshare bash run_claim3.sh`, because the Figshare package is dataset-only.
 
-Expected time: less than 2 minutes for the mini mode after images have already been built. Figshare validation takes seconds to a few minutes when the campaign is already extracted; download and extraction time depend on network and disk speed.
-
-Expected resources for mini mode: Docker daemon access, `tcpdump`, the HTTP server image and `dos_http_simple` attack image already built, host port `8080`, and less than 2 GB RAM during the short run. Expected resources for Figshare mode: `curl`, `tar`, `md5sum`, Python, and sufficient disk for the published dataset archive. The full download is about **16.9 GB** compressed and needs roughly **225 GB** extracted; the script requires **260 GiB** free by default unless `ATTACKZOO_FIGSHARE_MIN_FREE_GB` is adjusted.
-
-Expected mini result:
+Expected `mini` result:
 
 ```text
 ══════════════════════════════════════════════════════════════
@@ -510,7 +506,7 @@ Expected result     : 1 attacks / 2 dataset CSVs / manifest OK → OK
 ══════════════════════════════════════════════════════════════
 ```
 
-Expected Figshare result:
+Expected `Full Figshare` result:
 
 ```text
 ══════════════════════════════════════════════════════════════
