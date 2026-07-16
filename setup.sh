@@ -22,7 +22,7 @@ esac
 if [ "${PROFILE}" == "dependencies" ]; then
     echo "Installing required packages..."
     sudo apt update
-    sudo DEBIAN_FRONTEND=noninteractive apt install -y tshark tcpdump python3-venv ca-certificates curl git
+    sudo DEBIAN_FRONTEND=noninteractive apt install -y tshark tcpdump tree python3-venv ca-certificates curl git
     sudo setcap cap_net_raw,cap_net_admin=eip "$(command -v tcpdump)"
 
     echo "Installing tools..."

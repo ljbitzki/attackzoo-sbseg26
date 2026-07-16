@@ -168,3 +168,5 @@ python3 attackzoo.py stop dos_http_simple >/dev/null 2>&1 || true
 
 result="OK"
 print_summary
+
+tree experiments/
