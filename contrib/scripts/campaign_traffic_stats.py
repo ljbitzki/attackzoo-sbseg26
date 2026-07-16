@@ -19,6 +19,7 @@ from typing import Any, Iterable, Optional, Sequence
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_CAMPAIGN_DIR = REPO_ROOT / "experiments" / "60att_5runs_l0l1l2l3"
+DEFAULT_FIGSHARE_CAMPAIGN_DIR = REPO_ROOT / "downloads" / "figshare" / "extracted" / "60att_5runs_l0l1l2l3"
 DEFAULT_REPORTS_ROOT = REPO_ROOT / "contrib" / "reports"
 
 TSHARK_FIELDS = (
@@ -119,8 +120,11 @@ def parse_args(argv: Optional[Sequence[str]] = None) -> argparse.Namespace:
     parser.add_argument(
         "--campaign-dir",
         type=Path,
-        default=DEFAULT_CAMPAIGN_DIR,
-        help=f"Campaign directory. Default: {DEFAULT_CAMPAIGN_DIR}",
+        default=None,
+        help=(
+            "Campaign directory. Default: auto-detects "
+            f"{DEFAULT_FIGSHARE_CAMPAIGN_DIR} or {DEFAULT_CAMPAIGN_DIR}."
+        ),
     )
     parser.add_argument(
         "--reports-root",
@@ -221,6 +225,40 @@ def write_json(path: Path, payload: dict[str, Any]) -> None:
 
 def sha1_text(value: str) -> str:
     return hashlib.sha1(value.encode("utf-8")).hexdigest()
+
+
+def find_dataset_csvs(campaign_dir: Path) -> list[Path]:
+    return sorted(
+        path
+        for path in campaign_dir.glob("*/datasets/*.csv")
+        if path.is_file()
+    )
+
+
+def campaign_has_inputs(campaign_dir: Path) -> bool:
+    return bool(find_pcaps(campaign_dir) or find_dataset_csvs(campaign_dir))
+
+
+def resolve_campaign_dir(requested: Optional[Path]) -> Path:
+    if requested is not None:
+        return requested.resolve()
+
+    candidates = (
+        DEFAULT_FIGSHARE_CAMPAIGN_DIR,
+        DEFAULT_CAMPAIGN_DIR,
+    )
+    for candidate in candidates:
+        if candidate.is_dir() and campaign_has_inputs(candidate):
+            return candidate.resolve()
+
+    for root in (DEFAULT_FIGSHARE_CAMPAIGN_DIR.parent, DEFAULT_CAMPAIGN_DIR.parent):
+        if not root.is_dir():
+            continue
+        for candidate in sorted(root.rglob("60att_5runs_l0l1l2l3")):
+            if candidate.is_dir() and campaign_has_inputs(candidate):
+                return candidate.resolve()
+
+    return DEFAULT_CAMPAIGN_DIR.resolve()
 
 
 def find_pcaps(campaign_dir: Path) -> list[Path]:
@@ -638,8 +676,39 @@ def read_csv_dicts(path: Path) -> Iterable[dict[str, str]]:
         yield from reader
 
 
+def csv_has_data_rows(path: Path) -> bool:
+    try:
+        with path.open("r", encoding="utf-8", newline="") as handle:
+            reader = csv.reader(handle)
+            next(reader, None)
+            return next(reader, None) is not None
+    except OSError:
+        return False
+
+
 def table_paths(campaign_dir: Path, table_name: str) -> list[Path]:
     return sorted(campaign_dir.glob(f"*/reports/tables/{table_name}"))
+
+
+def csv_data_row_count(path: Path) -> int:
+    try:
+        with path.open("r", encoding="utf-8", newline="") as handle:
+            return max(sum(1 for _ in handle) - 1, 0)
+    except OSError:
+        return 0
+
+
+def dataset_csv_identity(campaign_dir: Path, path: Path) -> dict[str, str]:
+    rel = path.relative_to(campaign_dir)
+    attack_id = rel.parts[0] if rel.parts else path.parents[1].name
+    tokens = path.stem.split("-")
+    level = next((token for token in tokens if token in LEVEL_ORDER), "")
+    run_id = next((token for token in tokens if token.startswith("run")), "")
+    return {
+        "attack_id": attack_id,
+        "level": level,
+        "run_id": run_id,
+    }
 
 
 def mean(values: Sequence[float]) -> float:
@@ -675,12 +744,14 @@ def write_dataset_and_variability_outputs(
     known_categories = set(attack_categories.values())
 
     dataset_by_category_level: dict[tuple[str, str], dict[str, float]] = {}
+    table_rows = 0
     for path in table_paths(campaign_dir, "T8_artifact_summary.csv"):
         for row in read_csv_dicts(path):
             attack_id = row.get("attack_id", "")
             level = row.get("level", "")
             if not level:
                 continue
+            table_rows += 1
             category = attack_categories.get(attack_id, "Unmapped")
             known_categories.add(category)
             key = (category, level)
@@ -694,6 +765,26 @@ def write_dataset_and_variability_outputs(
             rows_value = to_float(row.get("dataset_rows", "")) or 0.0
             bucket["run_count"] += 1
             bucket["dataset_rows"] += rows_value
+
+    if table_rows == 0:
+        for path in find_dataset_csvs(campaign_dir):
+            identity = dataset_csv_identity(campaign_dir, path)
+            attack_id = identity["attack_id"]
+            level = identity["level"]
+            if not level:
+                continue
+            category = attack_categories.get(attack_id, "Unmapped")
+            known_categories.add(category)
+            key = (category, level)
+            bucket = dataset_by_category_level.setdefault(
+                key,
+                {
+                    "run_count": 0.0,
+                    "dataset_rows": 0.0,
+                },
+            )
+            bucket["run_count"] += 1
+            bucket["dataset_rows"] += csv_data_row_count(path)
 
     dataset_rows = []
     for category in sorted(known_categories, key=sort_category_key):
@@ -1282,7 +1373,9 @@ def plot_outputs(
         ax.set_ylabel("Packets per second (pps)")
         ax.ticklabel_format(axis="y", style="plain")
         ax.grid(alpha=0.25)
-        ax.legend(title="Level")
+        handles, labels = ax.get_legend_handles_labels()
+        if handles and labels:
+            ax.legend(handles, labels, title="Level")
         path = figures_dir / "03_pps_by_level_over_campaign_seconds.png"
         fig.savefig(path, dpi=180, bbox_inches="tight")
         plt.close(fig)
@@ -1541,7 +1634,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         return 2
     stability_metrics = parse_csv_list(args.stability_metrics)
 
-    campaign_dir = args.campaign_dir.resolve()
+    campaign_dir = resolve_campaign_dir(args.campaign_dir)
     if not campaign_dir.is_dir():
         print(f"[ERROR] Campaign directory not found: {campaign_dir}", file=sys.stderr)
         return 2
@@ -1552,12 +1645,15 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     report_dir.mkdir(parents=True, exist_ok=True)
     summary_dir.mkdir(parents=True, exist_ok=True)
 
+    dataset_csvs = find_dataset_csvs(campaign_dir)
     pcaps = find_pcaps(campaign_dir)
     if args.max_files is not None:
         pcaps = pcaps[: args.max_files]
-    if not pcaps:
-        print(f"[ERROR] No PCAP files found under {campaign_dir}", file=sys.stderr)
+    if not pcaps and not dataset_csvs:
+        print(f"[ERROR] No PCAP files or dataset CSVs found under {campaign_dir}", file=sys.stderr)
         return 2
+    if not pcaps:
+        print(f"[INFO] No PCAP files found under {campaign_dir}; generating dataset-only outputs.", file=sys.stderr)
 
     summaries: list[dict[str, Any]] = []
     for index, pcap in enumerate(pcaps, start=1):
@@ -1587,6 +1683,11 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             stability_metrics,
         )
     )
+    if "stability" in selected_plots and not csv_has_data_rows(csv_paths["reexecution_stability_cv_pct_csv"]):
+        selected_plots.discard("stability")
+    if "phase_metrics" in selected_plots and not csv_has_data_rows(csv_paths["phase_success_latency_metrics_csv"]):
+        selected_plots.discard("phase_metrics")
+
     plot_paths: dict[str, Path] = {}
     plot_error = ""
     if not args.no_plots:
@@ -1615,6 +1716,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         "processed_pcap_count": len(summaries),
         "ok_pcap_count": ok_count,
         "error_pcap_count": len(summaries) - ok_count,
+        "dataset_csv_count": len(dataset_csvs),
         "packet_total": packet_total,
         "byte_total": byte_total,
         "selected_plots": sorted(selected_plots),
@@ -1632,6 +1734,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     print("Traffic statistics")
     print(f"- Report dir: {report_dir}")
     print(f"- PCAPs processed: {ok_count}/{len(summaries)}")
+    print(f"- Dataset CSVs found: {len(dataset_csvs)}")
     print(f"- Packets counted: {packet_total}")
     print(f"- Bytes counted: {byte_total}")
     print(f"- CSV outputs: {report_dir / 'data'}")

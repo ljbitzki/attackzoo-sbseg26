@@ -219,9 +219,30 @@ find_figshare_campaign_dir() {
         campaign_dir="${CAMPAIGN_OVERRIDE}"
         return
     fi
-    campaign_dir="$(
-        find "${EXTRACT_DIR}" -type d -name "60att_5runs_l0l1l2l3" -print -quit 2>/dev/null
-    )"
+
+    local candidate
+    local first_existing=""
+    local -a candidates=(
+        "${EXTRACT_DIR}/60att_5runs_l0l1l2l3"
+        "experiments/60att_5runs_l0l1l2l3"
+    )
+
+    while IFS= read -r candidate; do
+        candidates+=("${candidate}")
+    done < <(find "${EXTRACT_DIR}" "experiments" -type d -name "60att_5runs_l0l1l2l3" -print 2>/dev/null || true)
+
+    for candidate in "${candidates[@]}"; do
+        [[ -d "${candidate}" ]] || continue
+        if [[ -z "${first_existing}" ]]; then
+            first_existing="${candidate}"
+        fi
+        if [[ "$(dataset_count_for_dir "${candidate}")" == "${EXPECTED_DATASETS}" ]]; then
+            campaign_dir="${candidate}"
+            return
+        fi
+    done
+
+    campaign_dir="${first_existing}"
 }
 
 download_archive() {
@@ -263,20 +284,31 @@ extract_archive_if_needed() {
 }
 
 prepare_figshare_campaign() {
-    require_command curl
-    require_command tar
-    require_command md5sum
+    local dataset_count
 
     mkdir -p "${EXTRACT_DIR}"
     find_figshare_campaign_dir
-    if [[ -n "${campaign_dir}" && -d "${campaign_dir}" ]] && [[ "$(dataset_count_for_dir "${campaign_dir}")" == "${EXPECTED_DATASETS}" ]]; then
-        printf '[INFO] Reusing existing extracted dataset campaign: %s\n' "${campaign_dir}"
-        return
+    if [[ -n "${campaign_dir}" && -d "${campaign_dir}" ]]; then
+        dataset_count="$(dataset_count_for_dir "${campaign_dir}")"
+        if [[ "${dataset_count}" -gt 0 ]]; then
+            printf '[INFO] Reusing existing extracted dataset campaign: %s\n' "${campaign_dir}"
+            return
+        fi
+
+        if [[ "${ATTACKZOO_CONFIRM_LARGE_DOWNLOAD:-0}" != "1" ]]; then
+            attacks_done="$(find "${campaign_dir}" -mindepth 1 -maxdepth 1 -type d ! -name '_campaign' ! -name 'reports' | wc -l | tr -d ' ')"
+            datasets_done="${dataset_count}"
+            fail "Found extracted campaign at ${campaign_dir}, but it has ${dataset_count}/${EXPECTED_DATASETS} dataset CSVs. Fix/re-extract it, set ATTACKZOO_CLAIM3_CAMPAIGN_DIR to a complete extraction, or rerun with ATTACKZOO_CONFIRM_LARGE_DOWNLOAD=1 to allow re-download/re-extraction."
+        fi
     fi
 
     if [[ -n "${CAMPAIGN_OVERRIDE}" ]]; then
         fail "ATTACKZOO_CLAIM3_CAMPAIGN_DIR does not contain the expected ${EXPECTED_DATASETS} dataset CSVs: ${CAMPAIGN_OVERRIDE}"
     fi
+
+    require_command curl
+    require_command tar
+    require_command md5sum
 
     resolve_figshare_metadata
     download_archive
@@ -469,6 +501,19 @@ PY
 }
 
 validate_metrics() {
+    if [[ "${CLAIM3_MODE}" == "figshare" ]]; then
+        if [[ "${datasets_done}" == "0" ]]; then
+            fail "No dataset CSVs were found under ${campaign_dir}."
+        fi
+        if [[ "${datasets_ok}" == "0" ]]; then
+            fail "No readable dataset CSV headers were found under ${campaign_dir}."
+        fi
+        if [[ "${report_status}" == "no" ]]; then
+            fail "Manifest was not generated under ${REPORT_DIR}."
+        fi
+        return
+    fi
+
     if [[ "${attacks_done}" != "${EXPECTED_ATTACKS}" ]]; then
         fail "Unexpected attack count in the dataset: ${attacks_done}."
     fi

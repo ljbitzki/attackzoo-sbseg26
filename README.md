@@ -120,6 +120,7 @@ Environment used for local validation:
 - `ca-certificates`
 - `curl`
 - `git`
+- `tree`
 - `python3-venv`
 - `tcpdump`
 - `tshark`
@@ -132,6 +133,7 @@ Tested package versions on Ubuntu 24.04.4 LTS:
 | `ca-certificates` | `20260601~24.04.1` |
 | `curl` | `8.5.0-2ubuntu10.11` |
 | `git` | `1:2.43.0-1ubuntu7.3` |
+|`tree` | `2.1.1-2ubuntu3.24.04.2` |
 | `python3-venv` | `3.12.3-0ubuntu2.1` |
 | `tcpdump` | `4.99.4-3ubuntu4.24.04.1` |
 | `tshark` | `4.2.2-1.1build3` |
@@ -458,13 +460,13 @@ Quick local mini campaign, default mode:
 bash run_claim3.sh
 ```
 
-Full Figshare validation when the archive must be downloaded:
+Full validation when the archive must be downloaded (from Figshare):
 
 ```bash
 ATTACKZOO_CLAIM3_MODE=figshare ATTACKZOO_CONFIRM_LARGE_DOWNLOAD=1 bash run_claim3.sh
 ```
 
-Full Figshare validation when the archive is already downloaded or extracted:
+Full validation when the archive is already downloaded (from Figshare) or extracted:
 
 ```bash
 ATTACKZOO_CLAIM3_MODE=figshare bash run_claim3.sh
