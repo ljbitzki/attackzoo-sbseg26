@@ -202,7 +202,7 @@ Ports that may be exposed on the host:
 
 ### Demonstration video of the installation process
 
-[![installation-process-video](contrib/assets/thumb.png)](https://www.youtube.com/watch?v=JcGyh28vjEE)
+[![installation-process-video](contrib/assets/thumb.png)](https://www.youtube.com/watch?v=Jl6E-RwcYDA)
 
 >[!TIP]
 >This video demonstrates and follows all the steps listed below.
