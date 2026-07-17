@@ -20,7 +20,7 @@ params:
 - key: active_s
   label: Active flood duration inside the attack window (s)
   kind: int
-  default: 5
+  default: 1
   validate: '^[1-9]\d*$'
   required: false
   positional: false
@@ -28,7 +28,7 @@ params:
 - key: nice_level
   label: nice(1) scheduling priority adjustment
   kind: int
-  default: 10
+  default: 19
   validate: '^(?:[0-9]|1[0-9])$'
   required: false
   positional: false
@@ -40,4 +40,4 @@ intensity_params:
   default: 1
 - key: delay_ms
   label: Delay between worker starts (ms)
-  default: 500
+  default: 2000

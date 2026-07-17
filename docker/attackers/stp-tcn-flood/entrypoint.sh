@@ -2,17 +2,17 @@
 set -euo pipefail
 
 COUNT="${COUNT:-1}"
-DELAY_MS="${DELAY_MS:-500}"
+DELAY_MS="${DELAY_MS:-2000}"
 DURATION_S="${DURATION_S:-0}"
-ACTIVE_S="${ACTIVE_S:-5}"
-NICE_LEVEL="${NICE_LEVEL:-10}"
+ACTIVE_S="${ACTIVE_S:-1}"
+NICE_LEVEL="${NICE_LEVEL:-19}"
 HOLD_GRACE_S="${HOLD_GRACE_S:-5}"
 
 if [ "${DURATION_S}" -gt 0 ] && [ "${ACTIVE_S}" -gt "${DURATION_S}" ]; then
   ACTIVE_S="${DURATION_S}"
 fi
 if [ "${ACTIVE_S}" -le 0 ]; then
-  ACTIVE_S=5
+  ACTIVE_S=1
 fi
 
 started_at="${SECONDS}"
