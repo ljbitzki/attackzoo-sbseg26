@@ -25,6 +25,14 @@ params:
   required: false
   positional: false
   env_var: ACTIVE_S
+- key: nice_level
+  label: nice(1) scheduling priority adjustment
+  kind: int
+  default: 10
+  validate: '^(?:[0-9]|1[0-9])$'
+  required: false
+  positional: false
+  env_var: NICE_LEVEL
 intensity_params:
 - key: duration_s
 - key: count

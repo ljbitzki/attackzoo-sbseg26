@@ -16,7 +16,7 @@ fi
 started_at="${SECONDS}"
 
 set +e
-timeout "${ACTIVE_S}s" nice -n "${NICE_LEVEL}" /usr/local/bin/flood_mld6 eth0
+timeout -k 2s "${ACTIVE_S}s" nice -n "${NICE_LEVEL}" /usr/local/bin/flood_mld6 eth0
 status="$?"
 set -e
 
@@ -30,7 +30,7 @@ hold_until_duration() {
   fi
 }
 
-if [ "${status}" -eq 0 ] || [ "${status}" -eq 124 ] || [ "${status}" -eq 143 ]; then
+if [ "${status}" -eq 0 ] || [ "${status}" -eq 124 ] || [ "${status}" -eq 137 ] || [ "${status}" -eq 143 ]; then
   hold_until_duration
   exit 0
 fi

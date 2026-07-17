@@ -8,10 +8,28 @@ container_name: attack-ipv6-ns-flood
 max_runtime_s: 10
 target_services:
 - local IPv6 network
-no_params_note: This attack does not take parameters and operates at the local network level.
-details_warning: This attack can generate a large amount of data if captured until its automatic completion. For demonstrations, use less than 5 seconds of execution.
+no_params_note: This attack does not require a target and operates at the local network level. Intensity parameters bound unattended campaign runs.
+details_warning: The launcher is intentionally capped for campaign safety. The current binary does not expose packet-rate control, so active_s bounds generation time.
 mitre:
 - https://attack.mitre.org/tactics/TA0040/
 - https://attack.mitre.org/techniques/T1498/
 - https://attack.mitre.org/techniques/T1498/001/
-params: []
+params:
+- key: active_s
+  label: Active flood duration inside the attack window (s)
+  kind: int
+  default: 5
+  validate: '^[1-9]\d*$'
+  required: false
+  positional: false
+  env_var: ACTIVE_S
+- key: nice_level
+  label: nice(1) scheduling priority adjustment
+  kind: int
+  default: 10
+  validate: '^(?:[0-9]|1[0-9])$'
+  required: false
+  positional: false
+  env_var: NICE_LEVEL
+intensity_params:
+- key: duration_s
