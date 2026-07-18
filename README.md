@@ -512,7 +512,7 @@ Expected `Full Figshare` result:
 ══════════════════════════════════════════════════════════════
 Claim 3 — Published Figshare datasets
 Mode                : figshare
-DOI Figshare        : 10.6084/m9.figshare.32900828
+DOI Figshare        : 10.6084/m9.figshare.33023765
 Compressed archive  : attackzoo-full_campaign_5runs_4levels.tar.gz
 Campaign directory  : downloads/figshare/extracted/60att_5runs_l0l1l2l3
 Attacks             : 60/60

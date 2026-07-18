@@ -7,10 +7,10 @@ This folder documents the published full campaign `60att_5runs_l0l1l2l3` in one 
 - Original full-campaign captures before dataset packaging: **1200**
 - Original capture volume before dataset packaging: **672.1 GB**
 - Resulting datasets: **225.4 GB**
-- [High-compressed single-file](https://doi.org/10.6084/m9.figshare.32900828) : **16.9 GB**
+- [High-compressed single-file](https://doi.org/10.6084/m9.figshare.33023765) : **16.9 GB**
 
 >[!IMPORTANT]
->[https://doi.org/10.6084/m9.figshare.32900828](https://doi.org/10.6084/m9.figshare.32900828)
+>[https://doi.org/10.6084/m9.figshare.33023765](https://doi.org/10.6084/m9.figshare.33023765)
 
 ## Documents
 

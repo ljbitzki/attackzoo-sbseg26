@@ -23,7 +23,7 @@ The full campaign used five runs for each attack-level pair where supported. The
 
 The full raw campaign is intentionally not versioned in Git because it is too large. The published Figshare archive contains the generated datasets from that campaign, not the raw PCAP captures:
 
-- DOI: `10.6084/m9.figshare.32900828`
+- DOI: `10.6084/m9.figshare.33023765`
 - Archive: `attackzoo-full_campaign_5runs_4levels.tar.gz`
 - Compressed size: `16.9 GB`
 - Expected extracted campaign: `60` attacks and `1200` dataset CSV files under `*/datasets/*.csv`
