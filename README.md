@@ -108,7 +108,7 @@ Environment used for local validation:
 | Packages | Docker Engine 27.0 or newer and Python 3 |
 | CPU | 4 vCPUs |
 | Memory | 4 GB RAM for reduced tests; 8 GB for full experiment |
-| Storage | 30 GB free for installation and images; 50 GB or more for PCAP captures and repeated experiments |
+| Storage | 30 GB free for installation and images; 50 GB or more for PCAP captures and repeated standalone experiments; 250 GB or more for full Claim 3 reproduction |
 | Network | Isolated environment, preferably a dedicated host or lab environment without direct Internet exposure |
 
 ## Dependencies
@@ -477,7 +477,7 @@ ATTACKZOO_CLAIM3_MODE=figshare bash run_claim3.sh
 ```
 
 >[!CAUTION]
->In `figshare` mode, the script resolves the Figshare DOI, downloads the archive when explicitly confirmed, verifies the MD5 checksum, unpacks it under `downloads/figshare/extracted/`, finds `60att_5runs_l0l1l2l3`, validates the `60 x 4 x 5` dataset matrix, and writes `contrib/reports/claim3_figshare_dataset/manifest.json`. This mode downloads about **16.9 GB** from Figshare Dataset archive (compressed) and needs roughly **225 GB** for the extraction process. Download and extraction time depend on network and disk speed and could takes more than `60 minutes`.
+>In `figshare` mode, the script resolves the Figshare DOI, downloads the archive when explicitly confirmed, verifies the MD5 checksum, unpacks it under `downloads/figshare/extracted/`, finds `all_5runs_4levels`, validates the `60 x 4 x 5` dataset matrix, and writes `contrib/reports/claim3_figshare_dataset/manifest.json`. This mode downloads about **16.9 GB** from Figshare Dataset archive (compressed) and needs roughly **225 GB** for the extraction process. Download and extraction time depend on network and disk speed and could takes more than `60 minutes`.
 
 Flags used:
 
@@ -515,8 +515,8 @@ Expected `Full Figshare` result:
 Claim 3 — Published Figshare datasets
 Mode                : figshare
 DOI Figshare        : 10.6084/m9.figshare.33023765
-Compressed archive  : attackzoo-full_campaign_5runs_4levels.tar.gz
-Campaign directory  : downloads/figshare/extracted/60att_5runs_l0l1l2l3
+Compressed archive  : all_5runs_4levels_datasets.tar.gz
+Campaign directory  : downloads/figshare/extracted/all_5runs_4levels
 Attacks             : 60/60
 Dataset CSVs        : 1200/1200
 Readable CSV headers: 1200/1200
